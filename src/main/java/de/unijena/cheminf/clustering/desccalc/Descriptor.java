@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // TODO Jonas: Implement IAtomContainer based methods instead of/in addition to SMILES based ones.
+// TODO: Define useful descriptor profiles
 
 /**
  * Descriptor related calculations based on the CDK
@@ -44,6 +45,12 @@ public enum Descriptor {
      * Logger of this class
      */
     private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());
+
+    /*
+     * Instance of Chemistry Development Kit (CDK)
+     */
+    // TODO Jonas: Define CDK instance
+    // private static final CDK cdk = new ...;
     //</editor-fold>
 
     //<editor-fold desc="Public static methods">
@@ -111,6 +118,8 @@ public enum Descriptor {
      * @param aMatrix Matrix of component vectors of molecules. Note: aMatrix[i] corresponds to aSmilesArray[i]. (MAY
      *                BE CHANGED)
      * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors
+     * @param aNumberOfConcurrentCalculationThreads Number of concurrent calculation threads. If zero, then the
+     *                                              all calculations are performed one after another (sequentially).
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a descriptor
      * calculation is NaN
      * @throws IllegalArgumentException Thrown if an argument is illegal
@@ -120,7 +129,8 @@ public enum Descriptor {
         Descriptor[] aDescriptors,
         String[] aSmilesArray,
         float[][] aMatrix,
-        int aStartIndex
+        int aStartIndex,
+        int aNumberOfConcurrentCalculationThreads
     ) throws IllegalArgumentException, Exception {
         //<editor-fold desc="Checks">
         if (aDescriptors == null || aDescriptors.length == 0) {
@@ -200,16 +210,29 @@ public enum Descriptor {
                 throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aStartIndex is illegal.");
             }
         }
+        if (aNumberOfConcurrentCalculationThreads < 0) {
+            Descriptor.LOGGER.log(
+                Level.SEVERE,
+                "Descriptor.setCalculatedDescriptorComponents: aNumberOfConcurrentCalculationThreads is illegal."
+            );
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aNumberOfConcurrentCalculationThreads is illegal.");
+        }
         //</editor-fold>
 
         try {
-            boolean tmpIsSuccessful = true;
-            for (int i = 0; i < aSmilesArray.length; i++) {
-                if (!Descriptor.setCalculatedDescriptorComponents(aDescriptors, aSmilesArray[i], aMatrix[i], aStartIndex)) {
-                    tmpIsSuccessful = false;
+            if (aNumberOfConcurrentCalculationThreads > 0) {
+                // TODO: Implement parallelized calculation
+                // TODO Jonas: Has single static CDK instance thread-safe descriptor calculations?
+                return false;
+            } else {
+                boolean tmpIsSuccessful = true;
+                for (int i = 0; i < aSmilesArray.length; i++) {
+                    if (!Descriptor.setCalculatedDescriptorComponents(aDescriptors, aSmilesArray[i], aMatrix[i], aStartIndex)) {
+                        tmpIsSuccessful = false;
+                    }
                 }
+                return tmpIsSuccessful;
             }
-            return tmpIsSuccessful;
         } catch (Exception anException) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
@@ -278,11 +301,13 @@ public enum Descriptor {
             switch (aDescriptor) {
                 case MOLECULER_WEIGHT:
                     // TODO Jonas: Calculate components of descriptor for aSmiles with CDK and set aVector
+                    // aVector[aStartIndex] = cdk.getMolWeightSomehow(aSmiles)
                     // Demo code:
                     aVector[aStartIndex] = 500.0f;
                     break;
                 case WIENER_INDEX:
                     // TODO Jonas: Calculate components of descriptor for aSmiles with CDK and set aVector
+                    // aVector[aStartIndex] = cdk.getWienerIndexSomehow(aSmiles)
                     // Demo code:
                     aVector[aStartIndex] = 70.0f;
                     break;

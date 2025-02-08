@@ -22,10 +22,11 @@ class DescriptorTest {
             };
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT};
+        int tmpNumberOfConcurrentCalculationThreads = 0;
 
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
-            Assertions.assertTrue(Descriptor.setCalculatedDescriptorComponents(tmpDescriptors, tmpSmilesArray, tmpMatrix, tmpStartIndex));
+            Assertions.assertTrue(Descriptor.setCalculatedDescriptorComponents(tmpDescriptors, tmpSmilesArray, tmpMatrix, tmpStartIndex, tmpNumberOfConcurrentCalculationThreads));
             Assertions.assertEquals(500.0f, tmpMatrix[0][0]);
         } catch (Exception anException) {
             Assertions.fail();
@@ -46,10 +47,11 @@ class DescriptorTest {
                 };
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.WIENER_INDEX};
+        int tmpNumberOfConcurrentCalculationThreads = 0;
 
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
-            Assertions.assertTrue(Descriptor.setCalculatedDescriptorComponents(tmpDescriptors, tmpSmilesArray, tmpMatrix, tmpStartIndex));
+            Assertions.assertTrue(Descriptor.setCalculatedDescriptorComponents(tmpDescriptors, tmpSmilesArray, tmpMatrix, tmpStartIndex, tmpNumberOfConcurrentCalculationThreads));
             Assertions.assertEquals(70.0f, tmpMatrix[0][0]);
         } catch (Exception anException) {
             Assertions.fail();
@@ -70,10 +72,11 @@ class DescriptorTest {
                         {0f, 0f}
                 };
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT, Descriptor.WIENER_INDEX};
+        int tmpNumberOfConcurrentCalculationThreads = 0;
 
         try {
             Assertions.assertEquals(2, Descriptor.getNumberOfComponents(tmpDescriptors));
-            Assertions.assertTrue(Descriptor.setCalculatedDescriptorComponents(tmpDescriptors, tmpSmilesArray, tmpMatrix, tmpStartIndex));
+            Assertions.assertTrue(Descriptor.setCalculatedDescriptorComponents(tmpDescriptors, tmpSmilesArray, tmpMatrix, tmpStartIndex, tmpNumberOfConcurrentCalculationThreads));
             Assertions.assertEquals(500.0f, tmpMatrix[0][0]);
             Assertions.assertEquals(70.0f, tmpMatrix[0][1]);
         } catch (Exception anException) {
