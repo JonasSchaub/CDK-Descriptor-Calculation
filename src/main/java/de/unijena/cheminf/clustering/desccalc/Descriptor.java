@@ -22,20 +22,28 @@ public enum Descriptor {
      */
     MOLECULER_WEIGHT,
     /*
-     * Wiener index
+     * Wiener number
      */
-    WIENER_INDEX;
+    WIENER_NUMBER;
     // Add new descriptor here!
 
     /*
      * EnumMap that maps a descriptor to its number of calculated components
      */
     private static final EnumMap<Descriptor, Integer> descriptorToComponentNumberMap = new EnumMap<>(Descriptor.class);
+    /*
+     * EnumMap that maps a descriptor to its CDK object
+     */
+    private static final EnumMap<Descriptor, Object> descriptorToCdkObjectMap = new EnumMap<>(Descriptor.class);
     static {
         // MOLECULER_WEIGHT has 1 component
         descriptorToComponentNumberMap.put(MOLECULER_WEIGHT, 1);
+        // descriptorToCdkObjectMap.put(MOLECULER_WEIGHT, <new CdkObjectForMolWeightCalculation>);
+
         // WIENER_INDEX has 1 component
-        descriptorToComponentNumberMap.put(WIENER_INDEX, 1);
+        descriptorToComponentNumberMap.put(WIENER_NUMBER, 1);
+        // descriptorToCdkObjectMap.put(WIENER_NUMBER, <new CdkObjectForWienerNumberCalculation>);
+
         // Add new descriptor here!
     }
     //</editor-fold>
@@ -45,12 +53,6 @@ public enum Descriptor {
      * Logger of this class
      */
     private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());
-
-    /*
-     * Instance of Chemistry Development Kit (CDK)
-     */
-    // TODO Jonas: Define CDK instance
-    // private static final CDK cdk = new ...;
     //</editor-fold>
 
     //<editor-fold desc="Public static methods">
@@ -301,13 +303,13 @@ public enum Descriptor {
             switch (aDescriptor) {
                 case MOLECULER_WEIGHT:
                     // TODO Jonas: Calculate components of descriptor for aSmiles with CDK and set aVector
-                    // aVector[aStartIndex] = cdk.getMolWeightSomehow(aSmiles)
+                    // aVector[aStartIndex] = (float) ((<CdkMolWeightObject>) descriptorToCdkObjectMap.get(MOLECULER_WEIGHT)).getValue(aSmiles);
                     // Demo code:
                     aVector[aStartIndex] = 500.0f;
                     break;
-                case WIENER_INDEX:
+                case WIENER_NUMBER:
                     // TODO Jonas: Calculate components of descriptor for aSmiles with CDK and set aVector
-                    // aVector[aStartIndex] = cdk.getWienerIndexSomehow(aSmiles)
+                    // aVector[aStartIndex] = (float) ((<CdkWienerNumberObject>) descriptorToCdkObjectMap.get(WIENER_NUMBER)).getValue(aSmiles);
                     // Demo code:
                     aVector[aStartIndex] = 70.0f;
                     break;
