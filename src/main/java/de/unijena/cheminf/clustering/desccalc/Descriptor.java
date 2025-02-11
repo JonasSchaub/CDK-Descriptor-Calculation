@@ -25,56 +25,69 @@
 
 package de.unijena.cheminf.clustering.desccalc;
 
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.qsar.IMolecularDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.WienerNumbersDescriptor;
+import org.openscience.cdk.qsar.result.DoubleArrayResult;
+import org.openscience.cdk.qsar.result.DoubleResult;
+
 import java.util.EnumMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// TODO Jonas: Implement IAtomContainer based methods instead of/in addition to SMILES based ones.
+// TODO Jonas: Implement IAtomContainer based methods instead of/in addition to SMILES based ones. -> I would make the user take care of converting from SMILES to AC
 // TODO: Define useful descriptor profiles
 
 /**
  * Descriptor related calculations based on the CDK
- * for the enrichment of data vectors for clustering
+ * for the enrichment of data vectors for clustering.
  * Note: For adding a new descriptor goto "Add new descriptor here!"
  *
- * @author Jonas Schaub, Achim Zielesny
+ * @author Achim Zielesny
+ * @author Jonas Schaub
  */
 public enum Descriptor {
 
     //<editor-fold desc="Descriptor enumeration and initialization">
     /**
-     * Molecular weight
+     * Molecular weight, adds up the natural masses (weighted average of all known
+     * isotopes of the particular element based on their natural abundances) of every atom
+     * in the given molecule, it is NOT the exact mass.
      */
     MOLECULER_WEIGHT,
     /**
-     * Wiener number
+     * Wiener number, returns Wiener path nr and Wiener polarity nr.
+     * Path number: sum of the distances between any two atoms in the molecule.
+     * Polarity number: number of pairs of atoms which are separated by exactly three bonds.
+     * Note: the CDK implementation counts all distances, not just those of carbon atoms or only carbon-carbon bonds.
      */
     WIENER_NUMBER;
     // Add new descriptor here!
 
-    /*
+    /**
      * EnumMap that maps a descriptor to its number of calculated components
      */
     private static final EnumMap<Descriptor, Integer> descriptorToComponentNumberMap = new EnumMap<>(Descriptor.class);
-    /*
-     * EnumMap that maps a descriptor to its CDK object
+    /**
+     * EnumMap that maps a descriptor to an instance of its CDK descriptor class
      */
-    private static final EnumMap<Descriptor, Object> descriptorToCdkObjectMap = new EnumMap<>(Descriptor.class);
+    private static final EnumMap<Descriptor, IMolecularDescriptor> descriptorToCdkObjectMap = new EnumMap<>(Descriptor.class);
     static {
         // MOLECULER_WEIGHT has 1 component
         descriptorToComponentNumberMap.put(MOLECULER_WEIGHT, 1);
-        // descriptorToCdkObjectMap.put(MOLECULER_WEIGHT, <new CdkObjectForMolWeightCalculation>);
+        descriptorToCdkObjectMap.put(MOLECULER_WEIGHT, new WeightDescriptor());
 
-        // WIENER_INDEX has 1 component
-        descriptorToComponentNumberMap.put(WIENER_NUMBER, 1);
-        // descriptorToCdkObjectMap.put(WIENER_NUMBER, <new CdkObjectForWienerNumberCalculation>);
+        // WIENER_INDEX has 2 components, Wiener path nr. and Wiener polarity nr.
+        descriptorToComponentNumberMap.put(WIENER_NUMBER, 2);
+        descriptorToCdkObjectMap.put(WIENER_NUMBER, new WienerNumbersDescriptor());
 
         // Add new descriptor here!
     }
     //</editor-fold>
 
     //<editor-fold desc="Private static final LOGGER">
-    /*
+    /**
      * Logger of this class
      */
     private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());
@@ -93,7 +106,7 @@ public enum Descriptor {
     /**
      * Returns sum of number of calculated components of an array of defined descriptors
      *
-     * @param aDescriptors Array of  descriptors
+     * @param aDescriptors Array of descriptors
      * @return Sum of number of calculated components of array of descriptors
      * @throws IllegalArgumentException Thrown if an argument is illegal
      * @throws Exception Thrown if number of components could not be evaluated: This should never happen.
@@ -136,17 +149,17 @@ public enum Descriptor {
     }
 
     /**
-     * Sets calculated descriptor components in vectors of a aMatrix (that corresponds to aSmilesArray) beginning with
+     * Sets calculated descriptor components in vectors of a aMatrix (that corresponds to anIAtomContainerArray) beginning with
      * aStartIndex.
      *
      * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
-     * @param aSmilesArray Array of SMILES strings of molecules. Note: aSmilesArray[i] corresponds to aMatrix[i]. (IS
+     * @param anIAtomContainerArray Array of molecules. Note: anIAtomContainerArray[i] corresponds to aMatrix[i]. (IS
      *                     NOT CHANGED)
-     * @param aMatrix Matrix of component vectors of molecules. Note: aMatrix[i] corresponds to aSmilesArray[i]. (MAY
+     * @param aMatrix Matrix of component vectors of molecules. Note: aMatrix[i] corresponds to anIAtomContainerArray[i]. (MAY
      *                BE CHANGED)
      * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors
-     * @param aNumberOfConcurrentCalculationThreads Number of concurrent calculation threads. If zero, then the
-     *                                              all calculations are performed one after another (sequentially).
+     * @param aNumberOfConcurrentCalculationThreads Number of concurrent calculation threads. If zero, then
+     *                                              all calculations are performed one after another (sequentially). TODO: if 1, it would also be sequential, wouldn't it?
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a descriptor
      * calculation is NaN
      * @throws IllegalArgumentException Thrown if an argument is illegal
@@ -154,7 +167,7 @@ public enum Descriptor {
      */
     public static boolean setCalculatedDescriptorComponents (
         Descriptor[] aDescriptors,
-        String[] aSmilesArray,
+        IAtomContainer[] anIAtomContainerArray,
         float[][] aMatrix,
         int aStartIndex,
         int aNumberOfConcurrentCalculationThreads
@@ -176,20 +189,20 @@ public enum Descriptor {
                 throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: A descriptor in aDescriptors is null.");
             }
         }
-        if (aSmilesArray == null || aSmilesArray.length == 0) {
+        if (anIAtomContainerArray == null || anIAtomContainerArray.length == 0) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponents: aSmilesArray is null or has length 0."
+                "Descriptor.setCalculatedDescriptorComponents: anIAtomContainerArray is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aSmilesArray is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: anIAtomContainerArray is null or has length 0.");
         }
-        for (String tmpSmiles : aSmilesArray) {
-            if (tmpSmiles == null || tmpSmiles.isEmpty()) {
+        for (IAtomContainer tmpMol : anIAtomContainerArray) {
+            if (tmpMol == null || tmpMol.isEmpty()) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponents: A SMILES in aSmilesArray is null or empty."
+                    "Descriptor.setCalculatedDescriptorComponents: A molecule in anIAtomContainerArray is null or empty."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: A SMILES in aSmilesArray is null or empty.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: A molecule in anIAtomContainerArray is null or empty.");
             }
         }
         if (aMatrix == null || aMatrix.length == 0) {
@@ -199,12 +212,12 @@ public enum Descriptor {
             );
             throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aMatrix is null or has length 0.");
         }
-        if (aMatrix.length != aSmilesArray.length) {
+        if (aMatrix.length != anIAtomContainerArray.length) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponents: aMatrix and aSmilesArray must have the same length."
+                "Descriptor.setCalculatedDescriptorComponents: aMatrix and anIAtomContainerArray must have the same length."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aMatrix and aSmilesArray must have the same length.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aMatrix and anIAtomContainerArray must have the same length.");
         }
         for (float[] tmpVector : aMatrix) {
             if (tmpVector == null || tmpVector.length == 0) {
@@ -249,12 +262,12 @@ public enum Descriptor {
         try {
             if (aNumberOfConcurrentCalculationThreads > 0) {
                 // TODO: Implement parallelized calculation
-                // TODO Jonas: Has single static CDK instance thread-safe descriptor calculations?
+                // TODO Jonas: Has single static CDK instance thread-safe descriptor calculations? -> don't know, we have to test whether it's thread-safe
                 return false;
             } else {
                 boolean tmpIsSuccessful = true;
-                for (int i = 0; i < aSmilesArray.length; i++) {
-                    if (!Descriptor.setCalculatedDescriptorComponents(aDescriptors, aSmilesArray[i], aMatrix[i], aStartIndex)) {
+                for (int i = 0; i < anIAtomContainerArray.length; i++) {
+                    if (!Descriptor.setCalculatedDescriptorComponents(aDescriptors, anIAtomContainerArray[i], aMatrix[i], aStartIndex)) {
                         tmpIsSuccessful = false;
                     }
                 }
@@ -272,11 +285,11 @@ public enum Descriptor {
 
     //<editor-fold desc="Private static methods">
     /**
-     * Sets calculated descriptor components in aVector (that corresponds to aSmiles) beginning with aStartIndex
-     * Note: No checks are NOT performed. All necessary checks have already been made in public methods above.
+     * Sets calculated descriptor components in aVector (that corresponds to anIAtomContainer) beginning with aStartIndex
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param aDescriptors Array of descriptors to be calculated
-     * @param aSmiles SMILES of molecule
+     * @param anIAtomContainer molecule
      * @param aVector Component vector of molecule
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
@@ -285,14 +298,14 @@ public enum Descriptor {
      */
     private static boolean setCalculatedDescriptorComponents (
             Descriptor[] aDescriptors,
-            String aSmiles,
+            IAtomContainer anIAtomContainer,
             float[] aVector,
             int aStartIndex
     ) throws Exception {
         try {
             boolean tmpIsSuccessful = true;
             for (Descriptor tmpDescriptor : aDescriptors) {
-                if (!Descriptor.setComponentValues(tmpDescriptor, aSmiles, aVector, aStartIndex)) {
+                if (!Descriptor.setComponentValues(tmpDescriptor, anIAtomContainer, aVector, aStartIndex)) {
                     tmpIsSuccessful = false;
                 }
                 aStartIndex += descriptorToComponentNumberMap.get(tmpDescriptor);
@@ -308,11 +321,11 @@ public enum Descriptor {
     }
 
     /**
-     * Sets component values of aDescriptor for aSmiles in aVector beginning with aStartIndex.
-     * Note: No checks are NOT performed. All necessary checks have already been made in public methods above.
+     * Sets component values of aDescriptor for anIAtomContainer in aVector beginning with aStartIndex.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param aDescriptor Descriptor to be calculated
-     * @param aSmiles SMILES of molecule
+     * @param anIAtomContainer molecule
      * @param aVector Vector of molecule to be filled with calculated components of descriptors
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
@@ -320,25 +333,23 @@ public enum Descriptor {
      */
     private static boolean setComponentValues(
         Descriptor aDescriptor,
-        String aSmiles,
+        IAtomContainer anIAtomContainer,
         float[] aVector,
         int aStartIndex
     ) {
         try {
             switch (aDescriptor) {
                 case MOLECULER_WEIGHT:
-                    // TODO Jonas: Calculate components of descriptor for aSmiles with CDK and set aVector
-                    // aVector[aStartIndex] = (float) ((<CdkMolWeightObject>) descriptorToCdkObjectMap.get(MOLECULER_WEIGHT)).getValue(aSmiles);
-                    // Demo code:
-                    aVector[aStartIndex] = 500.0f;
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(MOLECULER_WEIGHT).calculate(anIAtomContainer).getValue()).doubleValue();
                     break;
                 case WIENER_NUMBER:
-                    // TODO Jonas: Calculate components of descriptor for aSmiles with CDK and set aVector
-                    // aVector[aStartIndex] = (float) ((<CdkWienerNumberObject>) descriptorToCdkObjectMap.get(WIENER_NUMBER)).getValue(aSmiles);
-                    // Demo code:
-                    aVector[aStartIndex] = 70.0f;
+                    DoubleArrayResult tmpResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(WIENER_NUMBER).calculate(anIAtomContainer).getValue();
+                    aVector[aStartIndex] = (float) tmpResult.get(0); //Wiener path number
+                    aVector[aStartIndex+1] = (float) tmpResult.get(1); //Wiener polarity number
                     break;
                 // Add new descriptor here!
+                default:
+                    throw new UnsupportedOperationException("This descriptor does not have a routine yet!");
             }
             return true;
         } catch (Exception anException) {

@@ -79,6 +79,8 @@ dependencies {
     implementation group: 'org.openscience.cdk', name: 'cdk-silent', version: cdkVersion
     implementation group: 'org.openscience.cdk', name: 'cdk-io', version: cdkVersion
     implementation group: 'org.openscience.cdk', name: 'cdk-interfaces', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-qsar', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-qsarmolecular', version: cdkVersion
 }
 
 tasks.withType(Test).configureEach {

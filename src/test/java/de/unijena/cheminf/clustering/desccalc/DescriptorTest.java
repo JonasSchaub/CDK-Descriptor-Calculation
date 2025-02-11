@@ -27,9 +27,19 @@ package de.unijena.cheminf.clustering.desccalc;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.smiles.SmilesParser;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 /**
- * Test class for descriptor
+ * Test class for Descriptor class.
+ *
+ * @author Achim Zielesny
+ * @author Jonas Schaub
  */
 class DescriptorTest {
 
@@ -37,10 +47,12 @@ class DescriptorTest {
      * Test method for descriptor MOLECULAR_WEIGHT
      */
     @Test
-    public void test_MOLECULAR_WEIGHT() {
-        // Ethanol
+    public void test_MOLECULAR_WEIGHT() throws Exception {
+        // Acetic acid
         String tmpSmiles = "CC(=O)O";
-        String[] tmpSmilesArray = new String[] {tmpSmiles};
+        SmilesParser tmpSmiPar = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMol = tmpSmiPar.parseSmiles(tmpSmiles);
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMol};
         float[][] tmpMatrix = new float[][]
             {
                 {0f}
@@ -48,11 +60,13 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT};
         int tmpNumberOfConcurrentCalculationThreads = 0;
+        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
+        DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
 
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
-            Assertions.assertTrue(Descriptor.setCalculatedDescriptorComponents(tmpDescriptors, tmpSmilesArray, tmpMatrix, tmpStartIndex, tmpNumberOfConcurrentCalculationThreads));
-            Assertions.assertEquals(500.0f, tmpMatrix[0][0]);
+            Assertions.assertTrue(Descriptor.setCalculatedDescriptorComponents(tmpDescriptors, tmpMoleculesArray, tmpMatrix, tmpStartIndex, tmpNumberOfConcurrentCalculationThreads));
+            Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -62,22 +76,27 @@ class DescriptorTest {
      * Test method for descriptor WIENER_INDEX
      */
     @Test
-    public void test_WIENER_INDEX() {
-        // Ethanol
+    public void test_WIENER_INDEX() throws Exception {
+        // Acetic acid
         String tmpSmiles = "CC(=O)O";
-        String[] tmpSmilesArray = new String[] {tmpSmiles};
+        SmilesParser tmpSmiPar = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMol = tmpSmiPar.parseSmiles(tmpSmiles);
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMol};
         float[][] tmpMatrix = new float[][]
                 {
-                        {0f}
+                        {0f, 0f}
                 };
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.WIENER_NUMBER};
         int tmpNumberOfConcurrentCalculationThreads = 0;
+        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
+        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         try {
-            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
-            Assertions.assertTrue(Descriptor.setCalculatedDescriptorComponents(tmpDescriptors, tmpSmilesArray, tmpMatrix, tmpStartIndex, tmpNumberOfConcurrentCalculationThreads));
-            Assertions.assertEquals(70.0f, tmpMatrix[0][0]);
+            Assertions.assertEquals(2, Descriptor.getNumberOfComponents(tmpDescriptors));
+            Assertions.assertTrue(Descriptor.setCalculatedDescriptorComponents(tmpDescriptors, tmpMoleculesArray, tmpMatrix, tmpStartIndex, tmpNumberOfConcurrentCalculationThreads));
+            Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1])); // there are no atoms that re 3 bonds apart
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -87,23 +106,28 @@ class DescriptorTest {
      * Test multiple descriptors
      */
     @Test
-    public void test_MultipleDescriptors() {
-        // Ethanol
+    public void test_MultipleDescriptors() throws Exception {
+        // Acetic acid
         String tmpSmiles = "CC(=O)O";
-        String[] tmpSmilesArray = new String[] {tmpSmiles};
+        SmilesParser tmpSmiPar = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMol = tmpSmiPar.parseSmiles(tmpSmiles);
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMol};
         int tmpStartIndex = 0;
         float[][] tmpMatrix = new float[][]
                 {
-                        {0f, 0f}
+                        {0f, 0f, 0f}
                 };
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT, Descriptor.WIENER_NUMBER};
         int tmpNumberOfConcurrentCalculationThreads = 0;
+        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
+        DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
 
         try {
-            Assertions.assertEquals(2, Descriptor.getNumberOfComponents(tmpDescriptors));
-            Assertions.assertTrue(Descriptor.setCalculatedDescriptorComponents(tmpDescriptors, tmpSmilesArray, tmpMatrix, tmpStartIndex, tmpNumberOfConcurrentCalculationThreads));
-            Assertions.assertEquals(500.0f, tmpMatrix[0][0]);
-            Assertions.assertEquals(70.0f, tmpMatrix[0][1]);
+            Assertions.assertEquals(3, Descriptor.getNumberOfComponents(tmpDescriptors));
+            Assertions.assertTrue(Descriptor.setCalculatedDescriptorComponents(tmpDescriptors, tmpMoleculesArray, tmpMatrix, tmpStartIndex, tmpNumberOfConcurrentCalculationThreads));
+            Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[0][1]));
+            Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[0][2]));
         } catch (Exception anException) {
             Assertions.fail();
         }
