@@ -42,11 +42,11 @@ import java.util.logging.Logger;
 public enum Descriptor {
 
     //<editor-fold desc="Descriptor enumeration and initialization">
-    /*
+    /**
      * Molecular weight
      */
     MOLECULER_WEIGHT,
-    /*
+    /**
      * Wiener number
      */
     WIENER_NUMBER;

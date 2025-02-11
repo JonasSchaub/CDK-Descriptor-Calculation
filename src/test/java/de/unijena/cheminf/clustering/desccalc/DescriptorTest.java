@@ -71,7 +71,7 @@ class DescriptorTest {
                         {0f}
                 };
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.WIENER_INDEX};
+        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.WIENER_NUMBER};
         int tmpNumberOfConcurrentCalculationThreads = 0;
 
         try {
@@ -96,7 +96,7 @@ class DescriptorTest {
                 {
                         {0f, 0f}
                 };
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT, Descriptor.WIENER_INDEX};
+        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT, Descriptor.WIENER_NUMBER};
         int tmpNumberOfConcurrentCalculationThreads = 0;
 
         try {
