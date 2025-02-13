@@ -150,7 +150,7 @@ public enum Descriptor {
 
     /**
      * Sets calculated descriptor components in vectors of a aMatrix (that corresponds to anAtomContainerArray)
-     * beginning with aStartIndex.
+     * beginning with aStartIndex by (optional) parallelization of molecules.
      *
      * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
      * @param anAtomContainerArray Array of molecules. Note: anAtomContainerArray[i] corresponds to aMatrix[i] data
@@ -164,7 +164,7 @@ public enum Descriptor {
      * @throws IllegalArgumentException Thrown if an argument is illegal
      * @throws Exception Thrown if fatal error occurs (this should never happen)
      */
-    public static boolean setCalculatedDescriptorComponents (
+    public static boolean setCalculatedDescriptorComponentsByMoleculeParallelization(
         Descriptor[] aDescriptors,
         IAtomContainer[] anAtomContainerArray,
         float[][] aMatrix,
@@ -175,78 +175,78 @@ public enum Descriptor {
         if (aDescriptors == null || aDescriptors.length == 0) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponents: aDescriptors is null or has length 0."
+                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aDescriptors is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aDescriptor is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aDescriptor is null or has length 0.");
         }
         for (Descriptor tmpDescriptor : aDescriptors) {
             if (tmpDescriptor == null) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponents: A descriptor in aDescriptors is null."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A descriptor in aDescriptors is null."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: A descriptor in aDescriptors is null.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A descriptor in aDescriptors is null.");
             }
         }
         if (anAtomContainerArray == null || anAtomContainerArray.length == 0) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponents: anAtomContainerArray is null or has length 0."
+                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: anAtomContainerArray is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: anAtomContainerArray is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: anAtomContainerArray is null or has length 0.");
         }
         for (IAtomContainer tmpMolecule : anAtomContainerArray) {
             if (tmpMolecule == null || tmpMolecule.isEmpty()) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponents: A molecule in anAtomContainerArray is null or empty."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A molecule in anAtomContainerArray is null or empty."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: A molecule in anAtomContainerArray is null or empty.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A molecule in anAtomContainerArray is null or empty.");
             }
         }
         if (aMatrix == null || aMatrix.length == 0) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponents: aMatrix is null or has length 0."
+                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aMatrix is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix is null or has length 0.");
         }
         if (aMatrix.length != anAtomContainerArray.length) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponents: aMatrix and anAtomContainerArray must have the same length."
+                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix and anAtomContainerArray must have the same length."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aMatrix and anAtomContainerArray must have the same length.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix and anAtomContainerArray must have the same length.");
         }
         for (float[] tmpVector : aMatrix) {
             if (tmpVector == null || tmpVector.length == 0) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponents: A vector is null or has length 0."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A vector is null or has length 0."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: A vector is null or has length 0.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A vector is null or has length 0.");
             }
             if (aStartIndex >= tmpVector.length) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponents: aStartIndex is illegal."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aStartIndex is illegal.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal.");
             }
             try {
                 if (aStartIndex + Descriptor.getNumberOfComponents(aDescriptors) > tmpVector.length) {
                     Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponents: aStartIndex is illegal."
+                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal."
                     );
-                    throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aStartIndex is illegal.");
+                    throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal.");
                 }
             } catch (Exception anException) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponents: aStartIndex is illegal."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aStartIndex is illegal.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal.");
             }
         }
         //</editor-fold>
@@ -293,7 +293,163 @@ public enum Descriptor {
         } catch (Exception anException) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponents: An exception occurred: This should never happen."
+                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: An exception occurred: This should never happen."
+            );
+            throw anException;
+        }
+    }
+
+    /**
+     * Sets calculated descriptor components in vectors of a aMatrix (that corresponds to anAtomContainerArray)
+     * beginning with aStartIndex by (optional) parallelization of descriptors.
+     *
+     * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
+     * @param anAtomContainerArray Array of molecules. Note: anAtomContainerArray[i] corresponds to aMatrix[i] data
+     *                              vector. (IS NOT CHANGED)
+     * @param aMatrix Matrix of component vectors of molecules. Note: Data vector aMatrix[i] corresponds to molecule
+     *               anAtomContainerArray[i]. (MAY BE CHANGED)
+     * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors
+     * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
+     * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a descriptor
+     * calculation is NaN
+     * @throws IllegalArgumentException Thrown if an argument is illegal
+     * @throws Exception Thrown if fatal error occurs (this should never happen)
+     */
+    public static boolean setCalculatedDescriptorComponentsByDescriptorParallelization(
+            Descriptor[] aDescriptors,
+            IAtomContainer[] anAtomContainerArray,
+            float[][] aMatrix,
+            int aStartIndex,
+            boolean anIsParallelCalculation
+    ) throws IllegalArgumentException, Exception {
+        //<editor-fold desc="Checks">
+        if (aDescriptors == null || aDescriptors.length == 0) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aDescriptors is null or has length 0."
+            );
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aDescriptor is null or has length 0.");
+        }
+        for (Descriptor tmpDescriptor : aDescriptors) {
+            if (tmpDescriptor == null) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: A descriptor in aDescriptors is null."
+                );
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: A descriptor in aDescriptors is null.");
+            }
+        }
+        if (anAtomContainerArray == null || anAtomContainerArray.length == 0) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: anAtomContainerArray is null or has length 0."
+            );
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: anAtomContainerArray is null or has length 0.");
+        }
+        for (IAtomContainer tmpMolecule : anAtomContainerArray) {
+            if (tmpMolecule == null || tmpMolecule.isEmpty()) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: A molecule in anAtomContainerArray is null or empty."
+                );
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: A molecule in anAtomContainerArray is null or empty.");
+            }
+        }
+        if (aMatrix == null || aMatrix.length == 0) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aMatrix is null or has length 0."
+            );
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aMatrix is null or has length 0.");
+        }
+        if (aMatrix.length != anAtomContainerArray.length) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aMatrix and anAtomContainerArray must have the same length."
+            );
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aMatrix and anAtomContainerArray must have the same length.");
+        }
+        for (float[] tmpVector : aMatrix) {
+            if (tmpVector == null || tmpVector.length == 0) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: A vector is null or has length 0."
+                );
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: A vector is null or has length 0.");
+            }
+            if (aStartIndex >= tmpVector.length) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aStartIndex is illegal."
+                );
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aStartIndex is illegal.");
+            }
+            try {
+                if (aStartIndex + Descriptor.getNumberOfComponents(aDescriptors) > tmpVector.length) {
+                    Descriptor.LOGGER.log(
+                            Level.SEVERE,
+                            "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aStartIndex is illegal."
+                    );
+                    throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aStartIndex is illegal.");
+                }
+            } catch (Exception anException) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aStartIndex is illegal."
+                );
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aStartIndex is illegal.");
+            }
+        }
+        //</editor-fold>
+
+        try {
+            int[] tmpDescriptorStartPositions = new int[aDescriptors.length];
+            for (int i = 0; i < aDescriptors.length; i++) {
+                tmpDescriptorStartPositions[i] = aStartIndex;
+                aStartIndex += descriptorToComponentNumberMap.get(aDescriptors[i]);
+            }
+            if (anIsParallelCalculation) {
+                try {
+                    boolean[] tmpIsMoleculeCalculations = new boolean[aDescriptors.length];
+                    // Advise by Oracle: Parallel streams should use the common Fork-join pool
+                    IntStream.range(0, aDescriptors.length).parallel().forEach(
+                            i ->
+                            {
+                                try {
+                                    tmpIsMoleculeCalculations[i] =
+                                            Descriptor.setCalculatedDescriptorComponents(
+                                                    aDescriptors[i],
+                                                    anAtomContainerArray,
+                                                    aMatrix,
+                                                    tmpDescriptorStartPositions[i]
+                                            );
+                                } catch (Exception anException) {
+                                    tmpIsMoleculeCalculations[i] = false;
+                                }
+                            }
+                    );
+                    for (int i = 0; i < aDescriptors.length; i++) {
+                        if (!tmpIsMoleculeCalculations[i]) {
+                            return false;
+                        }
+                    }
+                    return true;
+                } catch (Exception anException) {
+                    return false;
+                }
+            } else {
+                boolean tmpIsSuccessful = true;
+                for (int i = 0; i < aDescriptors.length; i++) {
+                    if (!Descriptor.setCalculatedDescriptorComponents(aDescriptors[i], anAtomContainerArray, aMatrix, tmpDescriptorStartPositions[i])) {
+                        tmpIsSuccessful = false;
+                    }
+                }
+                return tmpIsSuccessful;
+            }
+        } catch (Exception anException) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: An exception occurred: This should never happen."
             );
             throw anException;
         }
@@ -305,9 +461,9 @@ public enum Descriptor {
      * Sets calculated descriptor components in aVector (that corresponds to anAtomContainer) beginning with aStartIndex
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
-     * @param aDescriptors Array of descriptors to be calculated
-     * @param anAtomContainer Molecule
-     * @param aVector Component vector of molecule
+     * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Component vector of molecule (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
@@ -322,7 +478,7 @@ public enum Descriptor {
         try {
             boolean tmpIsSuccessful = true;
             for (Descriptor tmpDescriptor : aDescriptors) {
-                if (!Descriptor.setComponentValues(tmpDescriptor, anAtomContainer, aVector, aStartIndex)) {
+                if (!Descriptor.setComponentValuesWithSynchronizedDescriptorCalculation(tmpDescriptor, anAtomContainer, aVector, aStartIndex)) {
                     tmpIsSuccessful = false;
                 }
                 aStartIndex += descriptorToComponentNumberMap.get(tmpDescriptor);
@@ -338,17 +494,55 @@ public enum Descriptor {
     }
 
     /**
-     * Sets component values of aDescriptor for anAtomContainer in aVector beginning with aStartIndex.
+     * Sets calculated descriptor components in aVector (that corresponds to anAtomContainer) beginning with aStartIndex
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param aDescriptor Descriptor to be calculated
-     * @param anAtomContainer Molecule
-     * @param aVector Vector of molecule to be filled with calculated components of descriptors
+     * @param anAtomContainerArray Array of molecules. Note: anAtomContainerArray[i] corresponds to aMatrix[i] data
+     *                              vector. (IS NOT CHANGED)
+     * @param aMatrix Matrix of component vectors of molecules. Note: Data vector aMatrix[i] corresponds to molecule
+     *               anAtomContainerArray[i]. (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
+     * descriptor calculation is NaN
+     * @throws Exception Thrown if fatal error occurs (this should never happen)
+     */
+    private static boolean setCalculatedDescriptorComponents (
+        Descriptor aDescriptor,
+        IAtomContainer[] anAtomContainerArray,
+        float[][] aMatrix,
+        int aStartIndex
+    ) throws Exception {
+        try {
+            boolean tmpIsSuccessful = true;
+            for (int i = 0; i < anAtomContainerArray.length; i++) {
+                if (!Descriptor.setComponentValuesWithoutSynchronization(aDescriptor, anAtomContainerArray[i], aMatrix[i], aStartIndex)) {
+                    tmpIsSuccessful = false;
+                }
+            }
+            return tmpIsSuccessful;
+        } catch (Exception anException) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setCalculatedDescriptorComponents: An exception occurred: This should never happen."
+            );
+            throw new Exception("Descriptor.setCalculatedDescriptorComponents: An exception occurred: This should never happen.");
+        }
+    }
+
+    /**
+     * Sets component values of aDescriptor for anAtomContainer in aVector beginning with aStartIndex by using
+     * synchronized descriptor calculation methods.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     *
+     * @param aDescriptor Descriptor to be calculated (IS NOT CHANGED)
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      */
-    private static boolean setComponentValues(
+    private static boolean setComponentValuesWithSynchronizedDescriptorCalculation(
         Descriptor aDescriptor,
         IAtomContainer anAtomContainer,
         float[] aVector,
@@ -374,6 +568,49 @@ public enum Descriptor {
             return false;
         }
     }
+
+    /**
+     * Sets component values of aDescriptor for anAtomContainer in aVector beginning with aStartIndex WITHOUT any
+     * synchronization.
+     * Note: This method is NOT made for parallelized access of the SAME non thread-safe descriptor, only parallelized
+     * access of DIFFERENT non-thread-safe descriptors is advised.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     *
+     * @param aDescriptor Descriptor to be calculated (IS NOT CHANGED)
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
+     * descriptor calculation is NaN
+     */
+    private static boolean setComponentValuesWithoutSynchronization(
+            Descriptor aDescriptor,
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        try {
+            switch (aDescriptor) {
+                case MOLECULER_WEIGHT:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(MOLECULER_WEIGHT).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case WIENER_NUMBER:
+                    DoubleArrayResult tmpResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(WIENER_NUMBER).calculate(anAtomContainer).getValue();
+                    aVector[aStartIndex] = (float) tmpResult.get(0); //Wiener path number
+                    aVector[aStartIndex + 1] = (float) tmpResult.get(1); //Wiener polarity number
+                    break;
+                // Add new descriptor information here!
+                default:
+                    throw new UnsupportedOperationException("This descriptor does not have a routine yet!");
+            }
+            return true;
+        } catch (Exception anException) {
+            for (int i = aStartIndex; i < descriptorToComponentNumberMap.get(aDescriptor); i++) {
+                aVector[i] = Float.NaN;
+            }
+            return false;
+        }
+    }
     //</editor-fold>
     //<editor-fold desc="Private static synchronized descriptor calculation methods">
     /**
@@ -381,8 +618,8 @@ public enum Descriptor {
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
-     * @param anAtomContainer Molecule
-     * @param aVector Vector of molecule to be filled with calculated components of descriptors
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
     private static synchronized void setMoleculerWeight(
@@ -398,8 +635,8 @@ public enum Descriptor {
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
-     * @param anAtomContainer Molecule
-     * @param aVector Vector of molecule to be filled with calculated components of descriptors
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
     private static synchronized void setWienerNumber(
