@@ -252,6 +252,11 @@ public enum Descriptor {
         //</editor-fold>
 
         try {
+            int[] tmpStartIndices = new int[aDescriptors.length];
+            for (int i = 0; i < aDescriptors.length; i++) {
+                tmpStartIndices[i] = aStartIndex;
+                aStartIndex += descriptorToComponentNumberMap.get(aDescriptors[i]);
+            }
             if (anIsParallelCalculation) {
                 try {
                     boolean[] tmpIsDescriptorCalculations = new boolean[anAtomContainerArray.length];
@@ -265,7 +270,7 @@ public enum Descriptor {
                                         aDescriptors,
                                         anAtomContainerArray[i],
                                         aMatrix[i],
-                                        aStartIndex
+                                        tmpStartIndices
                                     );
                             } catch (Exception anException) {
                                 tmpIsDescriptorCalculations[i] = false;
@@ -284,7 +289,7 @@ public enum Descriptor {
             } else {
                 boolean tmpIsSuccessful = true;
                 for (int i = 0; i < anAtomContainerArray.length; i++) {
-                    if (!Descriptor.setCalculatedDescriptorComponents(aDescriptors, anAtomContainerArray[i], aMatrix[i], aStartIndex)) {
+                    if (!Descriptor.setCalculatedDescriptorComponents(aDescriptors, anAtomContainerArray[i], aMatrix[i], tmpStartIndices)) {
                         tmpIsSuccessful = false;
                     }
                 }
@@ -403,9 +408,9 @@ public enum Descriptor {
         //</editor-fold>
 
         try {
-            int[] tmpDescriptorStartPositions = new int[aDescriptors.length];
+            int[] tmpStartIndices = new int[aDescriptors.length];
             for (int i = 0; i < aDescriptors.length; i++) {
-                tmpDescriptorStartPositions[i] = aStartIndex;
+                tmpStartIndices[i] = aStartIndex;
                 aStartIndex += descriptorToComponentNumberMap.get(aDescriptors[i]);
             }
             if (anIsParallelCalculation) {
@@ -421,7 +426,7 @@ public enum Descriptor {
                                                     aDescriptors[i],
                                                     anAtomContainerArray,
                                                     aMatrix,
-                                                    tmpDescriptorStartPositions[i]
+                                                    tmpStartIndices[i]
                                             );
                                 } catch (Exception anException) {
                                     tmpIsMoleculeCalculations[i] = false;
@@ -440,7 +445,7 @@ public enum Descriptor {
             } else {
                 boolean tmpIsSuccessful = true;
                 for (int i = 0; i < aDescriptors.length; i++) {
-                    if (!Descriptor.setCalculatedDescriptorComponents(aDescriptors[i], anAtomContainerArray, aMatrix, tmpDescriptorStartPositions[i])) {
+                    if (!Descriptor.setCalculatedDescriptorComponents(aDescriptors[i], anAtomContainerArray, aMatrix, tmpStartIndices[i])) {
                         tmpIsSuccessful = false;
                     }
                 }
@@ -458,13 +463,13 @@ public enum Descriptor {
 
     //<editor-fold desc="Private static methods">
     /**
-     * Sets calculated descriptor components in aVector (that corresponds to anAtomContainer) beginning with aStartIndex
+     * Sets calculated descriptor components in aVector (that corresponds to anAtomContainer) at aStartIndices
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Component vector of molecule (MAY BE CHANGED)
-     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     * @param aStartIndices Start indices in aVector to be filled with calculated components of descriptors
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      * @throws Exception Thrown if fatal error occurs (this should never happen)
@@ -473,15 +478,14 @@ public enum Descriptor {
             Descriptor[] aDescriptors,
             IAtomContainer anAtomContainer,
             float[] aVector,
-            int aStartIndex
+            int[] aStartIndices
     ) throws Exception {
         try {
             boolean tmpIsSuccessful = true;
-            for (Descriptor tmpDescriptor : aDescriptors) {
-                if (!Descriptor.setComponentValuesWithSynchronizedDescriptorCalculation(tmpDescriptor, anAtomContainer, aVector, aStartIndex)) {
+            for (int i = 0; i < aDescriptors.length; i++) {
+                if (!Descriptor.setComponentValuesWithSynchronizedDescriptorCalculation(aDescriptors[i], anAtomContainer, aVector, aStartIndices[i])) {
                     tmpIsSuccessful = false;
                 }
-                aStartIndex += descriptorToComponentNumberMap.get(tmpDescriptor);
             }
             return tmpIsSuccessful;
         } catch (Exception anException) {
