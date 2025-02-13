@@ -59,7 +59,7 @@ class DescriptorTest {
             };
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT};
-        int tmpNumberOfConcurrentCalculationThreads = 0;
+        boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
 
@@ -71,7 +71,7 @@ class DescriptorTest {
                     tmpMoleculesArray,
                     tmpMatrix,
                     tmpStartIndex,
-                    tmpNumberOfConcurrentCalculationThreads
+                    tmpIsParallelCalculation
                 )
             );
             Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
@@ -96,7 +96,7 @@ class DescriptorTest {
                 };
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.WIENER_NUMBER};
-        int tmpNumberOfConcurrentCalculationThreads = 0;
+        boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
@@ -108,7 +108,7 @@ class DescriptorTest {
                     tmpMoleculesArray,
                     tmpMatrix,
                     tmpStartIndex,
-                    tmpNumberOfConcurrentCalculationThreads
+                    tmpIsParallelCalculation
                 )
             );
             Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
@@ -134,7 +134,7 @@ class DescriptorTest {
                         {0f, 0f, 0f}
                 };
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT, Descriptor.WIENER_NUMBER};
-        int tmpNumberOfConcurrentCalculationThreads = 0;
+        boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
 
@@ -146,7 +146,7 @@ class DescriptorTest {
                     tmpMoleculesArray,
                     tmpMatrix,
                     tmpStartIndex,
-                    tmpNumberOfConcurrentCalculationThreads
+                    tmpIsParallelCalculation
                 )
             );
             Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
@@ -182,14 +182,14 @@ class DescriptorTest {
 
         try {
             // Sequential code
-            int tmpNumberOfConcurrentCalculationThreads = 0;
+            boolean tmpIsParallelCalculation = false;
             Assertions.assertTrue(
                 Descriptor.setCalculatedDescriptorComponents(
                     tmpDescriptors,
                     tmpMoleculesArray,
                     tmpMatrix,
                     tmpStartIndex,
-                    tmpNumberOfConcurrentCalculationThreads
+                    tmpIsParallelCalculation
                 )
             );
             for (int i = 0; i < tmpNumberOfMolecules; i++) {
@@ -209,14 +209,14 @@ class DescriptorTest {
 
         try {
             // Parallel code
-            int tmpNumberOfConcurrentCalculationThreads = 8;
+            boolean tmpIsParallelCalculation = true;
             Assertions.assertTrue(
                 Descriptor.setCalculatedDescriptorComponents(
                     tmpDescriptors,
                     tmpMoleculesArray,
                     tmpMatrix,
                     tmpStartIndex,
-                    tmpNumberOfConcurrentCalculationThreads
+                    tmpIsParallelCalculation
                 )
             );
             for (int i = 0; i < tmpNumberOfMolecules; i++) {

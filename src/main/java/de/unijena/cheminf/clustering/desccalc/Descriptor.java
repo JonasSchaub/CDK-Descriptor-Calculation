@@ -33,7 +33,6 @@ import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import org.openscience.cdk.qsar.result.DoubleResult;
 
 import java.util.EnumMap;
-import java.util.concurrent.ForkJoinPool;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -159,11 +158,7 @@ public enum Descriptor {
      * @param aMatrix Matrix of component vectors of molecules. Note: Data vector aMatrix[i] corresponds to molecule
      *               anAtomContainerArray[i]. (MAY BE CHANGED)
      * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors
-     * @param aNumberOfConcurrentCalculationThreads Number of concurrent calculation threads. If 0 (zero),
-     *                                              then all calculations are performed one after another
-     *                                              (sequentially). Note: If 1 (one), then the calculation is
-     *                                              also effectively sequential, but the parallel implementation code
-     *                                              is used (may be helpful for tests).
+     * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a descriptor
      * calculation is NaN
      * @throws IllegalArgumentException Thrown if an argument is illegal
@@ -174,7 +169,7 @@ public enum Descriptor {
         IAtomContainer[] anAtomContainerArray,
         float[][] aMatrix,
         int aStartIndex,
-        int aNumberOfConcurrentCalculationThreads
+        boolean anIsParallelCalculation
     ) throws IllegalArgumentException, Exception {
         //<editor-fold desc="Checks">
         if (aDescriptors == null || aDescriptors.length == 0) {
@@ -254,39 +249,29 @@ public enum Descriptor {
                 throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aStartIndex is illegal.");
             }
         }
-        if (aNumberOfConcurrentCalculationThreads < 0) {
-            Descriptor.LOGGER.log(
-                Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponents: aNumberOfConcurrentCalculationThreads is illegal."
-            );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponents: aNumberOfConcurrentCalculationThreads is illegal.");
-        }
         //</editor-fold>
 
         try {
-            if (aNumberOfConcurrentCalculationThreads > 0) {
-                ForkJoinPool tmpForkJoinPool = null;
+            if (anIsParallelCalculation) {
                 try {
                     boolean[] tmpIsDescriptorCalculations = new boolean[anAtomContainerArray.length];
-                    tmpForkJoinPool = new ForkJoinPool(aNumberOfConcurrentCalculationThreads);
-                    tmpForkJoinPool.submit(
-                            () -> IntStream.range(0, anAtomContainerArray.length).parallel().forEach(
-                                    i ->
-                                    {
-                                        try {
-                                            tmpIsDescriptorCalculations[i] =
-                                                Descriptor.setCalculatedDescriptorComponents(
-                                                    aDescriptors,
-                                                    anAtomContainerArray[i],
-                                                    aMatrix[i],
-                                                    aStartIndex
-                                                );
-                                        } catch (Exception anException) {
-                                            tmpIsDescriptorCalculations[i] = false;
-                                        }
-                                    }
-                            )
-                    ).invoke();
+                    // Advise by Oracle: Parallel streams should use the common Fork-join pool
+                    IntStream.range(0, anAtomContainerArray.length).parallel().forEach(
+                        i ->
+                        {
+                            try {
+                                tmpIsDescriptorCalculations[i] =
+                                    Descriptor.setCalculatedDescriptorComponents(
+                                        aDescriptors,
+                                        anAtomContainerArray[i],
+                                        aMatrix[i],
+                                        aStartIndex
+                                    );
+                            } catch (Exception anException) {
+                                tmpIsDescriptorCalculations[i] = false;
+                            }
+                        }
+                    );
                     for (int i = 0; i < anAtomContainerArray.length; i++) {
                         if (!tmpIsDescriptorCalculations[i]) {
                             return false;
@@ -295,10 +280,6 @@ public enum Descriptor {
                     return true;
                 } catch (Exception anException) {
                     return false;
-                } finally {
-                    if (tmpForkJoinPool != null) {
-                        tmpForkJoinPool.shutdown();
-                    }
                 }
             } else {
                 boolean tmpIsSuccessful = true;
