@@ -33,6 +33,7 @@ import org.openscience.cdk.smiles.SmilesParser;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -44,7 +45,7 @@ import java.util.Locale;
 class DescriptorTest {
 
     /**
-     * Test method for descriptor MOLECULAR_WEIGHT
+     * Tests method for descriptor MOLECULAR_WEIGHT
      */
     @Test
     public void test_MOLECULAR_WEIGHT() throws Exception {
@@ -53,10 +54,6 @@ class DescriptorTest {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
-        float[][] tmpMatrix = new float[][]
-            {
-                {0f}
-            };
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT};
         boolean tmpIsParallelCalculation = false;
@@ -65,8 +62,13 @@ class DescriptorTest {
 
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[][]
+                {
+                    {0f}
+                };
             Assertions.assertTrue(
-                Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization(
+                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
                     tmpDescriptors,
                     tmpMoleculesArray,
                     tmpMatrix,
@@ -75,25 +77,51 @@ class DescriptorTest {
                 )
             );
             Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
+
+            tmpMatrix = new float[][]
+                {
+                    {0f}
+                };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
+
+            tmpMatrix = new float[][]
+                {
+                    {0f}
+                };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
         } catch (Exception anException) {
             Assertions.fail();
         }
     }
 
     /**
-     * Test method for descriptor WIENER_INDEX
+     * Tests method for descriptor WIENER_NUMBER
      */
     @Test
-    public void test_WIENER_INDEX() throws Exception {
+    public void test_WIENER_NUMBER() throws Exception {
         // Acetic acid
         String tmpSmiles = "CC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
-        float[][] tmpMatrix = new float[][]
-                {
-                    {0f, 0f}
-                };
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.WIENER_NUMBER};
         boolean tmpIsParallelCalculation = false;
@@ -102,8 +130,45 @@ class DescriptorTest {
 
         try {
             Assertions.assertEquals(2, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[][]
+                {
+                    {0f, 0f}
+                };
             Assertions.assertTrue(
-                Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization(
+                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                    tmpDescriptors,
+                    tmpMoleculesArray,
+                    tmpMatrix,
+                    tmpStartIndex,
+                    tmpIsParallelCalculation
+                )
+            );
+            Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1])); // there are no atoms that are 3 bonds apart
+
+            tmpMatrix = new float[][]
+                {
+                    {0f, 0f}
+                };
+            Assertions.assertTrue(
+                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                    tmpDescriptors,
+                    tmpMoleculesArray,
+                    tmpMatrix,
+                    tmpStartIndex,
+                    tmpIsParallelCalculation
+                )
+            );
+            Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1])); // there are no atoms that are 3 bonds apart
+
+            tmpMatrix = new float[][]
+                {
+                    {0f, 0f}
+                };
+            Assertions.assertTrue(
+                Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                     tmpDescriptors,
                     tmpMoleculesArray,
                     tmpMatrix,
@@ -119,29 +184,63 @@ class DescriptorTest {
     }
 
     /**
-     * Test multiple descriptors
+     * Tests all descriptors
      */
     @Test
-    public void test_MultipleDescriptors() throws Exception {
+    public void test_AllDescriptors() throws Exception {
         // Acetic acid
         String tmpSmiles = "CC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
         int tmpStartIndex = 0;
-        float[][] tmpMatrix = new float[][]
+        Descriptor[] tmpDescriptors =
+            new Descriptor[]
                 {
-                        {0f, 0f, 0f}
+                    Descriptor.MOLECULER_WEIGHT,
+                    Descriptor.WIENER_NUMBER
                 };
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT, Descriptor.WIENER_NUMBER};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
 
         try {
             Assertions.assertEquals(3, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[1][];
+            tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
             Assertions.assertTrue(
-                Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization(
+                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                    tmpDescriptors,
+                    tmpMoleculesArray,
+                    tmpMatrix,
+                    tmpStartIndex,
+                    tmpIsParallelCalculation
+                )
+            );
+            Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[0][1]));
+            Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[0][2]));
+
+            tmpMatrix = new float[1][];
+            tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
+            Assertions.assertTrue(
+                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                    tmpDescriptors,
+                    tmpMoleculesArray,
+                    tmpMatrix,
+                    tmpStartIndex,
+                    tmpIsParallelCalculation
+                )
+            );
+            Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[0][1]));
+            Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[0][2]));
+
+            tmpMatrix = new float[1][];
+            tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
+            Assertions.assertTrue(
+                Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                     tmpDescriptors,
                     tmpMoleculesArray,
                     tmpMatrix,
@@ -158,261 +257,204 @@ class DescriptorTest {
     }
 
     /**
-     * Test multiple molecules with multiple descriptors: Sequential
+     * Tests parallelization
      */
     @Test
-    public void test_MultipleMoleculesAndDescriptors_Sequential() throws Exception {
+    public void test_Parallelization() throws Exception {
         // Acetic acid
         String tmpSmiles = "CC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         int tmpNumberOfMolecules = 10;
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
-        float[][] tmpMatrix = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMoleculesArray[i] = tmpMolecule;
-            tmpMatrix[i] = new float[] {0f, 0f, 0f};
-        }
+        Arrays.fill(tmpMoleculesArray, tmpMolecule);
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT, Descriptor.WIENER_NUMBER};
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
+        Descriptor[] tmpDescriptors = Descriptor.getAllDescriptors();
+        int tmpNumberOfComponents = Descriptor.getNumberOfComponents(tmpDescriptors);
 
-        Assertions.assertEquals(3, Descriptor.getNumberOfComponents(tmpDescriptors));
-
-        // Molecule Parallelization
         try {
-            // Sequential code
+
+            float[][] tmpMatrixSequential = new float[tmpNumberOfMolecules][];
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
+            }
             boolean tmpIsParallelCalculation = false;
             Assertions.assertTrue(
-                Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization(
-                    tmpDescriptors,
-                    tmpMoleculesArray,
-                    tmpMatrix,
-                    tmpStartIndex,
-                    tmpIsParallelCalculation
-                )
-            );
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[i][0]));
-                Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[i][1]));
-                Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[i][2]));
-            }
-        } catch (Exception anException) {
-            Assertions.fail();
-        }
-
-        // Reset descriptor matrix
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMoleculesArray[i] = tmpMolecule;
-            tmpMatrix[i] = new float[] {0f, 0f, 0f};
-        }
-
-        // Descriptor Parallelization
-        try {
-            // Sequential code
-            boolean tmpIsParallelCalculation = false;
-            Assertions.assertTrue(
-                    Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
                             tmpDescriptors,
                             tmpMoleculesArray,
-                            tmpMatrix,
+                            tmpMatrixSequential,
                             tmpStartIndex,
                             tmpIsParallelCalculation
                     )
             );
+
+            float[][] tmpMatrixParallel = new float[tmpNumberOfMolecules][];
             for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[i][0]));
-                Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[i][1]));
-                Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[i][2]));
+                tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
             }
+            tmpIsParallelCalculation = true;
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrixParallel,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                for (int j = 0; j < tmpNumberOfComponents; j++) {
+                    Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
+                }
+            }
+
+            tmpMatrixSequential = new float[tmpNumberOfMolecules][];
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
+            }
+            tmpIsParallelCalculation = false;
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrixSequential,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+
+            tmpMatrixParallel = new float[tmpNumberOfMolecules][];
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
+            }
+            tmpIsParallelCalculation = true;
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrixParallel,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                for (int j = 0; j < tmpNumberOfComponents; j++) {
+                    Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
+                }
+            }
+
+            tmpMatrixSequential = new float[tmpNumberOfMolecules][];
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
+            }
+            tmpIsParallelCalculation = false;
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrixSequential,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+
+            tmpMatrixParallel = new float[tmpNumberOfMolecules][];
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
+            }
+            tmpIsParallelCalculation = true;
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrixParallel,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                for (int j = 0; j < tmpNumberOfComponents; j++) {
+                    Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
+                }
+            }
+
         } catch (Exception anException) {
             Assertions.fail();
         }
     }
 
     /**
-     * Test multiple molecules with multiple descriptors: Molecule parallelization
+     * Tests integrity
      */
     @Test
-    public void test_MultipleMoleculesAndDescriptors_MoleculeParallelizationWithSynchronization() throws Exception {
+    public void test_Integrity() throws Exception {
         // Acetic acid
         String tmpSmiles = "CC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        int tmpNumberOfMolecules = 10;
+        int tmpNumberOfMolecules = 1000;
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
-        float[][] tmpMatrix = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMoleculesArray[i] = tmpMolecule;
-            tmpMatrix[i] = new float[] {0f, 0f, 0f};
-        }
+        Arrays.fill(tmpMoleculesArray, tmpMolecule);
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT, Descriptor.WIENER_NUMBER};
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
+        Descriptor[] tmpDescriptors = Descriptor.getAllDescriptors();
+        int tmpNumberOfComponents = Descriptor.getNumberOfComponents(tmpDescriptors);
+        boolean tmpIsParallelCalculation = false;
 
-        Assertions.assertEquals(3, Descriptor.getNumberOfComponents(tmpDescriptors));
-
-        // Molecule Parallelization
         try {
-            // Parallel code
-            boolean tmpIsParallelCalculation = true;
+
+            float[][] tmpMatrix1 = new float[tmpNumberOfMolecules][];
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                tmpMatrix1[i] = new float[tmpNumberOfComponents];
+            }
             Assertions.assertTrue(
-                    Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
                             tmpDescriptors,
                             tmpMoleculesArray,
-                            tmpMatrix,
+                            tmpMatrix1,
                             tmpStartIndex,
                             tmpIsParallelCalculation
                     )
             );
+
+            float[][] tmpMatrix2 = new float[tmpNumberOfMolecules][];
             for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[i][0]));
-                Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[i][1]));
-                Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[i][2]));
+                tmpMatrix2[i] = new float[tmpNumberOfComponents];
             }
-        } catch (Exception anException) {
-            Assertions.fail();
-        }
-    }
-
-    /**
-     * Test multiple molecules with multiple descriptors: Molecule parallelization
-     * Note: This test may fail!
-     */
-    @Test
-    public void test_MultipleMoleculesAndDescriptors_MoleculeParallelizationWithoutSynchronization() throws Exception {
-        // Acetic acid
-        String tmpSmiles = "CC(=O)O";
-        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        int tmpNumberOfMolecules = 10;
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
-        float[][] tmpMatrix = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMoleculesArray[i] = tmpMolecule;
-            tmpMatrix[i] = new float[] {0f, 0f, 0f};
-        }
-        int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT, Descriptor.WIENER_NUMBER};
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
-
-        Assertions.assertEquals(3, Descriptor.getNumberOfComponents(tmpDescriptors));
-
-        // Molecule Parallelization
-        try {
-            // Parallel code
-            boolean tmpIsParallelCalculation = true;
             Assertions.assertTrue(
-                    Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationWithoutSynchronization(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
-                            tmpMatrix,
+                            tmpMatrix2,
                             tmpStartIndex,
                             tmpIsParallelCalculation
                     )
             );
+
+            float[][] tmpMatrix3 = new float[tmpNumberOfMolecules][];
             for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[i][0]));
-                Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[i][1]));
-                Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[i][2]));
+                tmpMatrix3[i] = new float[tmpNumberOfComponents];
             }
-        } catch (Exception anException) {
-            Assertions.fail();
-        }
-    }
-
-    /**
-     * Test multiple molecules with multiple descriptors: Molecule parallelization
-     * Note: This test may fail!
-     */
-    @Test
-    public void test_MultipleMoleculesAndDescriptors_MoleculeParallelizationWithoutSynchronization_DifferentMolecules() throws Exception {
-        // Acetic acid
-        int tmpNumberOfMolecules = 10;
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            String tmpSmiles = "CC(=O)O";
-            SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-            tmpMoleculesArray[i] = tmpSmilesParser.parseSmiles(tmpSmiles);
-        }
-        float[][] tmpMatrix = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrix[i] = new float[] {0f, 0f, 0f};
-        }
-        int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT, Descriptor.WIENER_NUMBER};
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
-
-        Assertions.assertEquals(3, Descriptor.getNumberOfComponents(tmpDescriptors));
-
-        // Molecule Parallelization
-        try {
-            // Parallel code
-            boolean tmpIsParallelCalculation = true;
             Assertions.assertTrue(
-                    Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationWithoutSynchronization(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
-                            tmpMatrix,
+                            tmpMatrix3,
                             tmpStartIndex,
                             tmpIsParallelCalculation
                     )
             );
+
             for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[i][0]));
-                Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[i][1]));
-                Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[i][2]));
+                for (int j = 0; j < tmpNumberOfComponents; j++) {
+                    Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix2[i][j]);
+                    Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix3[i][j]);
+                }
             }
-        } catch (Exception anException) {
-            Assertions.fail();
-        }
-    }
 
-    /**
-     * Test multiple molecules with multiple descriptors: Descriptor parallelization
-     */
-    @Test
-    public void test_MultipleMoleculesAndDescriptors_DescriptorParallelization() throws Exception {
-        // Acetic acid
-        String tmpSmiles = "CC(=O)O";
-        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        int tmpNumberOfMolecules = 10;
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
-        float[][] tmpMatrix = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMoleculesArray[i] = tmpMolecule;
-            tmpMatrix[i] = new float[] {0f, 0f, 0f};
-        }
-        int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULER_WEIGHT, Descriptor.WIENER_NUMBER};
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
-
-        Assertions.assertEquals(3, Descriptor.getNumberOfComponents(tmpDescriptors));
-
-        // Descriptor Parallelization
-        try {
-            // Parallel code
-            boolean tmpIsParallelCalculation = true;
-            Assertions.assertTrue(
-                    Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation
-                    )
-            );
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[i][0]));
-                Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[i][1]));
-                Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[i][2]));
-            }
         } catch (Exception anException) {
             Assertions.fail();
         }
