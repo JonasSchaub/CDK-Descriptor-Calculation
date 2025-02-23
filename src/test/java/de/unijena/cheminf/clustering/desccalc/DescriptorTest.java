@@ -38,12 +38,14 @@ import java.util.Locale;
 
 /**
  * Test class for Descriptor class.
+ * Note: For adding tests of a new descriptor goto "Add new descriptor tests here!"
  *
  * @author Achim Zielesny
  * @author Jonas Schaub
  */
 class DescriptorTest {
 
+    //<editor-fold desc="Single descriptor tests">
     /**
      * Tests method for descriptor MOLECULAR_WEIGHT
      */
@@ -183,17 +185,23 @@ class DescriptorTest {
         }
     }
 
+    // Add new descriptor tests here!
+
+    //</editor-fold>
+
+    //<editor-fold desc="Combined descriptor tests">
     /**
-     * Tests all descriptors
+     * Tests combined descriptors
      */
     @Test
-    public void test_AllDescriptors() throws Exception {
+    public void test_CombinedDescriptors() throws Exception {
         // Acetic acid
         String tmpSmiles = "CC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
         int tmpStartIndex = 0;
+        // Add new descriptor tests here!
         Descriptor[] tmpDescriptors =
             new Descriptor[]
                 {
@@ -255,7 +263,9 @@ class DescriptorTest {
             Assertions.fail();
         }
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Tests with all implemented descriptors">
     /**
      * Tests parallelization
      */
@@ -459,5 +469,6 @@ class DescriptorTest {
             Assertions.fail();
         }
     }
+    //</editor-fold>
 
 }

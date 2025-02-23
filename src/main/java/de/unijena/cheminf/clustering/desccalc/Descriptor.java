@@ -105,6 +105,32 @@ public enum Descriptor {
     }
 
     /**
+     * Returns specified available descriptors.
+     * Note: If both flags are false, then null is returned. If both flags are true, then all descriptors are returned.
+     *
+     * @param isQuicklyCalculableDescriptorInclusion True: Quickly calculable descriptors are returned, false: Otherwise.
+     * @param isSlowlyCalculableDescriptorInclusion True: Slowly calculable descriptors are returned, false: Otherwise.
+     * @return Specified descriptors
+     */
+    public static Descriptor[] getSpecifiedDescriptors(
+        boolean isQuicklyCalculableDescriptorInclusion,
+        boolean isSlowlyCalculableDescriptorInclusion
+    ){
+        if (isQuicklyCalculableDescriptorInclusion && isSlowlyCalculableDescriptorInclusion) {
+            return values();
+        } else if (!isQuicklyCalculableDescriptorInclusion && !isSlowlyCalculableDescriptorInclusion) {
+            return null;
+        } else if (isQuicklyCalculableDescriptorInclusion) {
+            // TODO: Implement after analytical data are evaluated.
+            return null;
+        } else {
+            // MUST be isSlowlyCalculableDescriptorInclusion only
+            // TODO: Implement after analytical data are evaluated.
+            return null;
+        }
+    }
+
+    /**
      * Returns sum of number of calculated components of an array of defined descriptors
      *
      * @param aDescriptors Array of descriptors (IS NOT CHANGED)
