@@ -61,13 +61,26 @@ repositories {
     mavenCentral()
 }
 
-def cdkVersion = '2.9'
+def cdkVersion = '2.10'
 
 dependencies {
     implementation group: 'org.jetbrains', name : 'annotations', version: '23.0.0'
     testImplementation(platform('org.junit:junit-bom:5.9.1'))
     testImplementation('org.junit.jupiter:junit-jupiter')
+    //TODO: we probably do not need all of them, so reduce again later
     implementation group: 'org.openscience.cdk', name: 'cdk-bundle', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-base', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-descriptor', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-data', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-ioformats', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-smiles', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-core', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-fingerprint', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-silent', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-io', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-interfaces', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-qsar', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-qsarmolecular', version: cdkVersion
 }
 
 tasks.withType(Test).configureEach {
