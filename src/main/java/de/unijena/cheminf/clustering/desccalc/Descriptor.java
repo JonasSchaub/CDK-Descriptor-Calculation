@@ -27,10 +27,14 @@ package de.unijena.cheminf.clustering.desccalc;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.AtomCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.WienerNumbersDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.HBondAcceptorCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.HBondDonorCountDescriptor;
 import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import org.openscience.cdk.qsar.result.DoubleResult;
+import org.openscience.cdk.qsar.result.IntegerResult;
 
 import java.util.EnumMap;
 import java.util.logging.Level;
@@ -61,7 +65,21 @@ public enum Descriptor {
      * Polarity number: number of pairs of atoms which are separated by exactly three bonds.
      * Note: the CDK implementation counts all distances, not just those of carbon atoms or only carbon-carbon bonds.
      */
-    WIENER_NUMBER;
+    WIENER_NUMBER,
+    /**
+     * Atom count, counts the number of all atoms in the given molecule.
+     */
+    ATOM_COUNT,
+    /**
+     * HBondAcceptorCount, counts the number of hydrogen bond acceptor atoms in a molecule
+     * according to a simple rule: N, O, F atoms with at least one connected hydrogen.
+     */
+    H_BOND_ACCEPTOR_COUNT,
+    /**
+     * HBondDonorCount, counts the number of hydrogen bond donor atoms in a molecule
+     * according to a simple rule: N, O, F atoms with at least one connected hydrogen.
+     */
+    H_BOND_DONOR_COUNT;
 
     // Add new descriptor information here!
 
@@ -81,6 +99,18 @@ public enum Descriptor {
         // WIENER_NUMBER has 2 components, Wiener path number and Wiener polarity number
         descriptorToComponentNumberMap.put(WIENER_NUMBER, 2);
         descriptorToCdkObjectMap.put(WIENER_NUMBER, new WienerNumbersDescriptor());
+
+        // ATOM_COUNT has 1 component
+        descriptorToComponentNumberMap.put(ATOM_COUNT, 1);
+        descriptorToCdkObjectMap.put(ATOM_COUNT, new AtomCountDescriptor());
+
+        // H_BOND_ACCEPTOR_COUNT has 1 component
+        descriptorToComponentNumberMap.put(H_BOND_ACCEPTOR_COUNT, 1);
+        descriptorToCdkObjectMap.put(H_BOND_ACCEPTOR_COUNT, new HBondAcceptorCountDescriptor());
+
+        // H_BOND_DONOR_COUNT has 1 component
+        descriptorToComponentNumberMap.put(H_BOND_DONOR_COUNT, 1);
+        descriptorToCdkObjectMap.put(H_BOND_DONOR_COUNT, new HBondDonorCountDescriptor());
 
         // Add new descriptor information here!
 
@@ -786,6 +816,15 @@ public enum Descriptor {
                 case WIENER_NUMBER:
                     setWienerNumber(anAtomContainer, aVector, aStartIndex);
                     break;
+                case ATOM_COUNT:
+                    setAtomCount(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case H_BOND_ACCEPTOR_COUNT:
+                    setHBondAcceptorCount(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case H_BOND_DONOR_COUNT:
+                    setHBondDonorCount(anAtomContainer, aVector, aStartIndex);
+                    break;
                 // Add new descriptor information here!
                 default:
                     throw new UnsupportedOperationException("This descriptor does not have a routine yet!");
@@ -827,6 +866,15 @@ public enum Descriptor {
                     DoubleArrayResult tmpResult = (DoubleArrayResult) (new WienerNumbersDescriptor()).calculate(anAtomContainer).getValue();
                     aVector[aStartIndex] = (float) tmpResult.get(0); //Wiener path number
                     aVector[aStartIndex + 1] = (float) tmpResult.get(1); //Wiener polarity number
+                    break;
+                case ATOM_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new AtomCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case H_BOND_ACCEPTOR_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new HBondAcceptorCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case H_BOND_DONOR_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new HBondDonorCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
                     break;
                 // Add new descriptor information here!
                 default:
@@ -870,6 +918,16 @@ public enum Descriptor {
                     aVector[aStartIndex] = (float) tmpResult.get(0); //Wiener path number
                     aVector[aStartIndex + 1] = (float) tmpResult.get(1); //Wiener polarity number
                     break;
+                case ATOM_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case H_BOND_ACCEPTOR_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(H_BOND_ACCEPTOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case H_BOND_DONOR_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(H_BOND_DONOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+
                 // Add new descriptor information here!
                 default:
                     throw new UnsupportedOperationException("This descriptor does not have a routine yet!");
@@ -918,6 +976,60 @@ public enum Descriptor {
         DoubleArrayResult tmpResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(WIENER_NUMBER).calculate(anAtomContainer).getValue();
         aVector[aStartIndex] = (float) tmpResult.get(0); //Wiener path number
         aVector[aStartIndex + 1] = (float) tmpResult.get(1); //Wiener polarity number
+    }
+
+    /**
+     * Sets atom count
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAtomCount(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult)
+                descriptorToCdkObjectMap.get(ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets hydrogen bond acceptor count
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setHBondAcceptorCount(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult)
+                descriptorToCdkObjectMap.get(H_BOND_ACCEPTOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets hydrogen bond donor count
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setHBondDonorCount(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult)
+                descriptorToCdkObjectMap.get(H_BOND_DONOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
     // Add new descriptor information here!
