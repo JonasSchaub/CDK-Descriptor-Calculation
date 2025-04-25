@@ -28,10 +28,13 @@ package de.unijena.cheminf.clustering.desccalc;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AtomCountDescriptor;
-import org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor;
-import org.openscience.cdk.qsar.descriptors.molecular.WienerNumbersDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.HBondAcceptorCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.HBondDonorCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.LargestChainDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.LongestAliphaticChainDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.TPSADescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.WienerNumbersDescriptor;
 import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
@@ -58,7 +61,7 @@ public enum Descriptor {
      * isotopes of the particular element based on their natural abundances) of every atom
      * in the given molecule, it is NOT the exact mass.
      */
-    MOLECULER_WEIGHT,
+    MOLECULAR_WEIGHT,
     /**
      * Wiener number, returns Wiener path number and Wiener polarity number.
      * Path number: sum of the distances between any two atoms in the molecule.
@@ -71,15 +74,39 @@ public enum Descriptor {
      */
     ATOM_COUNT,
     /**
-     * HBondAcceptorCount, counts the number of hydrogen bond acceptor atoms in a molecule
-     * according to a simple rule: N, O, F atoms with at least one connected hydrogen.
+     * HBondAcceptorCount, counts hydrogen bond acceptors based on a simplified PHACIR scheme.
+     * It includes:
+     * Oxygen atoms with formal charge ≤ 0, excluding:
+     * 		 Aromatic ether oxygens
+     *       Oxygens adjacent to nitrogen
+     * Nitrogen atoms with formal charge ≤ 0, excluding:
+     *       Nitrogens adjacent to oxygen
      */
     H_BOND_ACCEPTOR_COUNT,
     /**
-     * HBondDonorCount, counts the number of hydrogen bond donor atoms in a molecule
-     * according to a simple rule: N, O, F atoms with at least one connected hydrogen.
+     * HBondDonorCount, counts hydrogen bond donors based on a simplified PHACIR classification.
+     * It includes:
+     * 		OH groups where the oxygen has a formal charge ≥ 0
+     * 		NH groups where the nitrogen has a formal charge ≥ 0
      */
-    H_BOND_DONOR_COUNT;
+    H_BOND_DONOR_COUNT,
+    /**
+     * TPSADescriptor, calculates the topological polar surface area (TPSA) of a molecule.
+     * TPSA is the sum of the surface areas of polar atoms (typically oxygen and nitrogen)
+     * and their attached hydrogens, based on a topological approximation (2D structure only).
+     */
+    TPSA,
+    /**
+     * LargestChain descriptor, calculates the number of atoms in the longest chain in the molecule.
+     * This is a simple topological descriptor that provides a measure of molecular linearity.
+     */
+    LARGEST_CHAIN,
+    /**
+     * LongestAliphaticChain descriptor, calculates the number of atoms in the longest aliphatic chain.
+     * This descriptor provides information about the maximum linear extent of non-aromatic
+     * portions of the molecular structure, which relates to molecular shape properties.
+     */
+    LONGEST_ALIPHATIC_CHAIN;
 
     // Add new descriptor information here!
 
@@ -93,8 +120,8 @@ public enum Descriptor {
     private static final EnumMap<Descriptor, IMolecularDescriptor> descriptorToCdkObjectMap = new EnumMap<>(Descriptor.class);
     static {
         // MOLECULER_WEIGHT has 1 component
-        descriptorToComponentNumberMap.put(MOLECULER_WEIGHT, 1);
-        descriptorToCdkObjectMap.put(MOLECULER_WEIGHT, new WeightDescriptor());
+        descriptorToComponentNumberMap.put(MOLECULAR_WEIGHT, 1);
+        descriptorToCdkObjectMap.put(MOLECULAR_WEIGHT, new WeightDescriptor());
 
         // WIENER_NUMBER has 2 components, Wiener path number and Wiener polarity number
         descriptorToComponentNumberMap.put(WIENER_NUMBER, 2);
@@ -111,6 +138,18 @@ public enum Descriptor {
         // H_BOND_DONOR_COUNT has 1 component
         descriptorToComponentNumberMap.put(H_BOND_DONOR_COUNT, 1);
         descriptorToCdkObjectMap.put(H_BOND_DONOR_COUNT, new HBondDonorCountDescriptor());
+
+        // TPSA has 1 component
+        descriptorToComponentNumberMap.put(TPSA, 1);
+        descriptorToCdkObjectMap.put(TPSA, new TPSADescriptor());
+
+        // LARGEST_CHAIN has 1 component
+        descriptorToComponentNumberMap.put(LARGEST_CHAIN, 1);
+        descriptorToCdkObjectMap.put(LARGEST_CHAIN, new LargestChainDescriptor());
+
+        // LONGEST_ALIPHATIC_CHAIN has 1 component
+        descriptorToComponentNumberMap.put(LONGEST_ALIPHATIC_CHAIN, 1);
+        descriptorToCdkObjectMap.put(LONGEST_ALIPHATIC_CHAIN, new LongestAliphaticChainDescriptor());
 
         // Add new descriptor information here!
 
@@ -810,7 +849,7 @@ public enum Descriptor {
     ) {
         try {
             switch (aDescriptor) {
-                case MOLECULER_WEIGHT:
+                case MOLECULAR_WEIGHT:
                     setMolecularWeight(anAtomContainer, aVector, aStartIndex);
                     break;
                 case WIENER_NUMBER:
@@ -825,6 +864,16 @@ public enum Descriptor {
                 case H_BOND_DONOR_COUNT:
                     setHBondDonorCount(anAtomContainer, aVector, aStartIndex);
                     break;
+                case TPSA:
+                    setTPSA(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case LARGEST_CHAIN:
+                    setLargestChain(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case LONGEST_ALIPHATIC_CHAIN:
+                    setLongestAliphaticChain(anAtomContainer, aVector, aStartIndex);
+                    break;
+
                 // Add new descriptor information here!
                 default:
                     throw new UnsupportedOperationException("This descriptor does not have a routine yet!");
@@ -859,7 +908,7 @@ public enum Descriptor {
     ) {
         try {
             switch (aDescriptor) {
-                case MOLECULER_WEIGHT:
+                case MOLECULAR_WEIGHT:
                     aVector[aStartIndex] = (float) ((DoubleResult) (new WeightDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case WIENER_NUMBER:
@@ -876,6 +925,16 @@ public enum Descriptor {
                 case H_BOND_DONOR_COUNT:
                     aVector[aStartIndex] = (float) ((IntegerResult) (new HBondDonorCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
                     break;
+                case TPSA:
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new TPSADescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case LARGEST_CHAIN:
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new LargestChainDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case LONGEST_ALIPHATIC_CHAIN:
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new LongestAliphaticChainDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+
                 // Add new descriptor information here!
                 default:
                     throw new UnsupportedOperationException("This descriptor does not have a routine yet!");
@@ -910,8 +969,8 @@ public enum Descriptor {
     ) {
         try {
             switch (aDescriptor) {
-                case MOLECULER_WEIGHT:
-                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(MOLECULER_WEIGHT).calculate(anAtomContainer).getValue()).doubleValue();
+                case MOLECULAR_WEIGHT:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(MOLECULAR_WEIGHT).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case WIENER_NUMBER:
                     DoubleArrayResult tmpResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(WIENER_NUMBER).calculate(anAtomContainer).getValue();
@@ -926,6 +985,15 @@ public enum Descriptor {
                     break;
                 case H_BOND_DONOR_COUNT:
                     aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(H_BOND_DONOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case TPSA:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(TPSA).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case LARGEST_CHAIN:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LARGEST_CHAIN).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case LONGEST_ALIPHATIC_CHAIN:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LONGEST_ALIPHATIC_CHAIN).calculate(anAtomContainer).getValue()).intValue();
                     break;
 
                 // Add new descriptor information here!
@@ -956,7 +1024,7 @@ public enum Descriptor {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(MOLECULER_WEIGHT).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(MOLECULAR_WEIGHT).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -992,8 +1060,7 @@ public enum Descriptor {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult)
-                descriptorToCdkObjectMap.get(ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -1010,8 +1077,7 @@ public enum Descriptor {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult)
-                descriptorToCdkObjectMap.get(H_BOND_ACCEPTOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(H_BOND_ACCEPTOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -1028,8 +1094,59 @@ public enum Descriptor {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult)
-                descriptorToCdkObjectMap.get(H_BOND_DONOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(H_BOND_DONOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets the topological polar surface area (TPSA)
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setTPSA(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(TPSA).calculate(anAtomContainer).getValue()).doubleValue();
+    }
+
+    /**
+     * Sets largest chain size
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setLargestChain(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LARGEST_CHAIN).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+
+    /**
+     * Sets longest aliphatic chain size
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setLongestAliphaticChain(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LONGEST_ALIPHATIC_CHAIN).calculate(anAtomContainer).getValue()).intValue();
     }
 
     // Add new descriptor information here!
