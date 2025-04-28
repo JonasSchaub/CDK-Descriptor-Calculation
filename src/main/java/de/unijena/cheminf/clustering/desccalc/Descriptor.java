@@ -27,14 +27,31 @@ package de.unijena.cheminf.clustering.desccalc;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.AromaticAtomsCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.AromaticBondsCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AtomCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.BCUTDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.BPolDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.BondCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.FMFDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.FractionalCSP3Descriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.HBondAcceptorCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.HBondDonorCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.HybridizationRatioDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.KappaShapeIndicesDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.LargestChainDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.LongestAliphaticChainDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.MannholdLogPDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.PetitjeanNumberDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.RotatableBondsCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.RuleOfFiveDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.SpiroAtomCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.TPSADescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.VAdjMaDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.WeightedPathDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.WienerNumbersDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.ZagrebIndexDescriptor;
 import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
@@ -106,7 +123,133 @@ public enum Descriptor {
      * This descriptor provides information about the maximum linear extent of non-aromatic
      * portions of the molecular structure, which relates to molecular shape properties.
      */
-    LONGEST_ALIPHATIC_CHAIN;
+    LONGEST_ALIPHATIC_CHAIN,
+    /**
+     * MannholdLogPDescriptor, calculates the octanol-water partition coefficient (logP) using the Mannhold method.
+     * LogP describes the hydrophilicity or lipophilicity of a compound and is crucial for
+     * predicting solubility, permeability, and bioavailability.
+     */
+    MANNHOLD_LOGP,
+    /**
+     * BCUT descriptor, calculates Burden matrix modified eigenvalues with different weighting schemes.
+     * 1. BCUTw-1l, BCUTw-2l ... - nhigh lowest atom weighted BCUTS
+     * 2. BCUTw-1h, BCUTw-2h ... - nlow highest atom weighted BCUTS
+     * 3. BCUTc-1l, BCUTc-2l ... - nhigh lowest partial charge weighted BCUTS
+     * 4. BCUTc-1h, BCUTc-2h ... - nlow highest partial charge weighted BCUTS
+     * 5. BCUTp-1l, BCUTp-2l ... - nhigh lowest polarizability weighted BCUTS
+     * 6. BCUTp-1h, BCUTp-2h ... - nlow highest polarizability weighted BCUTS
+     * Note: No array for one parameter is returned, just the highest and lowest numbers
+     * nhigh = 1 as default parameter
+     * nlow = 1 as default parameter
+     */
+    BCUT,
+    /**
+     * BondCount, counts the number of bonds in a molecule with a specific bond order.
+     * Default: counts all bonds (total bond count), no bonds to hydrogen atoms are counted.
+     */
+    BOND_COUNT_ALL,
+    /**
+     * BondCount Specified, counts the number of bonds in a molecule with specified bond orders.
+     * Returns an array with counts for single, double and triple bonds.
+     * For aromatic bonds counts use AROMATIC_BONDS_COUNT
+     * No bonds to hydrogen atoms are counted.
+     */
+    BOND_COUNT_SPECIFIED,
+    /**
+     * Bond polarizability descriptor.
+     * The BPolDescriptor calculates the bond polarizability of a molecule.
+     * Bond polarizability is a simple sum of polarizability contributions from all bonds, based on bond types and involved atoms.
+     * It provides a rough estimate of how easily the electron cloud in a molecule can be distorted,
+     * which relates to intermolecular interactions, polarizability and refractive behavior.
+     */
+    B_POL,
+    /**
+     * RuleOfFive descriptor, calculates the number of failures of Lipinski's Rule of Five.
+     * The descriptor returns the number of violations (0-4).
+     */
+    RULE_OF_FIVE,
+    /**
+     * AromaticAtomsCount, counts the number of aromatic atoms in a molecule.
+     * Note: Requires that aromatic atoms in the molecule have already been detected and marked.
+     */
+    AROMATIC_ATOMS_COUNT,
+    /**
+     * AromaticBondsCount, counts the number of aromatic bonds in a molecule.
+     * Note: Requires that aromatic bonds in the molecule have already been detected and marked.
+     */
+    AROMATIC_BONDS_COUNT,
+    /**
+     * RotatableBondsCount, counts the number of rotatable bonds in a molecule.
+     * A rotatable bond is defined as any single non-ring bond, where atoms on both sides
+     * have at least two heavy-atom neighbors. Amide C-N bonds are not counted as rotatable.
+     * Excluding terminal bonds.
+     * TODO: Include terminal bonds? Exclude Amide C-N bonds?
+     */
+    ROTATABLE_BONDS_COUNT,
+    /**
+     * FMF (Framework Match Fraction) descriptor, calculates the ratio of heavy atoms in
+     * the framework to the total number of heavy atoms in the molecule.
+     * This provides an indication of the proportion of the molecule that is part of the
+     * scaffold or core structure, versus the proportion that is in side chains.
+     */
+    FMF,
+    /**
+     * FractionalCSP3 descriptor, characterizes the non-flatness of a molecule by calculating
+     * the fraction of sp3 hybridized carbon atoms over the total carbon count.
+     * This provides information about the three-dimensionality and complexity
+     * of a molecule, which relates to drug-likeness properties.
+     */
+    FRACTIONAL_CSP3,
+    /**
+     * HybridizationRatio descriptor, calculates the ratio of sp3 carbons to sp2 carbons.
+     * This provides valuable information about the three-dimensionality and flatness
+     * of a molecule, which can be useful for predicting drug-like properties and
+     * comparing structural characteristics.
+     */
+    HYBRIDIZATION_RATIO,
+    /**
+     * KappaShapeIndices descriptor, calculates Kier and Hall kappa molecular shape indices.
+     * These indices compare the molecular graph with minimal and maximal molecular graphs:
+     * Kier1 - First kappa shape index
+     * Kier2 - Second kappa shape index
+     * Kier3 - Third kappa shape index
+     * Note: Hydrogens are ignored in the calculation.
+     */
+    KAPPA_SHAPE_INDICES,
+    /**
+     * PetitjeanNumber descriptor, calculates an index characterizing molecular graph topology.
+     * This topological descriptor is based on the calculation of the graph eccentricity
+     * and provides information about the molecular shape and branching pattern.
+     */
+    PETITJEAN_NUMBER,
+    /**
+     * Spiro atom count descriptor
+     * Returns the number of spiro atoms in a molecule.
+     */
+    SPIRO_ATOM_COUNT,
+    /**
+     * VAdjMa descriptor, calculates the Vertex adjacency information (magnitude).
+     * This is calculated as 1 + log2 m, where m is the number of heavy-heavy bonds.
+     * If m is zero, then zero is returned.
+     * This descriptor characterizes molecular complexity in terms of edge connectivity.
+     */
+    V_ADJ_MAT,
+    /**
+     * WeightedPath descriptor, evaluates the weighted path descriptors for a molecule.
+     * Returns five values:
+     * WTPT1 - molecular ID
+     * WTPT2 - molecular ID / number of atoms
+     * WTPT3 - sum of path lengths starting from heteroatoms
+     * WTPT4 - sum of path lengths starting from oxygens
+     * WTPT5 - sum of path lengths starting from nitrogens
+     */
+    WEIGHTED_PATH,
+    /**
+     * ZagrebIndex descriptor, calculates the Zagreb index of a molecule.
+     * The Zagreb index is the sum of the squares of atom degrees over all heavy atoms,
+     * which provides information about the molecular complexity and topological structure.
+     */
+    ZAGREB_INDEX;
 
     // Add new descriptor information here!
 
@@ -151,6 +294,78 @@ public enum Descriptor {
         descriptorToComponentNumberMap.put(LONGEST_ALIPHATIC_CHAIN, 1);
         descriptorToCdkObjectMap.put(LONGEST_ALIPHATIC_CHAIN, new LongestAliphaticChainDescriptor());
 
+        // MANNHOLD_LOGP has 1 component
+        descriptorToComponentNumberMap.put(MANNHOLD_LOGP, 1);
+        descriptorToCdkObjectMap.put(MANNHOLD_LOGP, new MannholdLogPDescriptor());
+
+        // BCUT has 6 components
+        descriptorToComponentNumberMap.put(BCUT, 6);
+        descriptorToCdkObjectMap.put(BCUT, new BCUTDescriptor());
+
+        // BOND_COUNT has 1 component
+        descriptorToComponentNumberMap.put(BOND_COUNT_ALL, 1);
+        descriptorToCdkObjectMap.put(BOND_COUNT_ALL, new BondCountDescriptor());
+
+        // BOND_COUNT_SPECIFIED has 3 components (single, double, triple bonds)
+        descriptorToComponentNumberMap.put(BOND_COUNT_SPECIFIED, 3);
+        descriptorToCdkObjectMap.put(BOND_COUNT_SPECIFIED, new BondCountDescriptor());
+
+        // B_POL has 1 component
+        descriptorToComponentNumberMap.put(B_POL, 1);
+        descriptorToCdkObjectMap.put(B_POL, new BPolDescriptor());
+
+        // RULE_OF_FIVE has 1 component
+        descriptorToComponentNumberMap.put(RULE_OF_FIVE, 1);
+        descriptorToCdkObjectMap.put(RULE_OF_FIVE, new RuleOfFiveDescriptor());
+
+        // AROMATIC_ATOMS_COUNT has 1 component
+        descriptorToComponentNumberMap.put(AROMATIC_ATOMS_COUNT, 1);
+        descriptorToCdkObjectMap.put(AROMATIC_ATOMS_COUNT, new AromaticAtomsCountDescriptor());
+
+        // AROMATIC_BONDS_COUNT has 1 component
+        descriptorToComponentNumberMap.put(AROMATIC_BONDS_COUNT, 1);
+        descriptorToCdkObjectMap.put(AROMATIC_BONDS_COUNT, new AromaticBondsCountDescriptor());
+
+        // ROTATABLE_BONDS_COUNT has 1 component
+        descriptorToComponentNumberMap.put(ROTATABLE_BONDS_COUNT, 1);
+        descriptorToCdkObjectMap.put(ROTATABLE_BONDS_COUNT, new RotatableBondsCountDescriptor());
+
+        // FMF has 1 component
+        descriptorToComponentNumberMap.put(FMF, 1);
+        descriptorToCdkObjectMap.put(FMF, new FMFDescriptor());
+
+        // FRACTIONAL_CSP3 has 1 component
+        descriptorToComponentNumberMap.put(FRACTIONAL_CSP3, 1);
+        descriptorToCdkObjectMap.put(FRACTIONAL_CSP3, new FractionalCSP3Descriptor());
+
+        // HYBRIDIZATION_RATIO has 1 component
+        descriptorToComponentNumberMap.put(HYBRIDIZATION_RATIO, 1);
+        descriptorToCdkObjectMap.put(HYBRIDIZATION_RATIO, new HybridizationRatioDescriptor());
+
+        // KAPPA_SHAPE_INDICES has 3 components
+        descriptorToComponentNumberMap.put(KAPPA_SHAPE_INDICES, 3);
+        descriptorToCdkObjectMap.put(KAPPA_SHAPE_INDICES, new KappaShapeIndicesDescriptor());
+
+        // PETITJEAN_NUMBER has 1 component
+        descriptorToComponentNumberMap.put(PETITJEAN_NUMBER, 1);
+        descriptorToCdkObjectMap.put(PETITJEAN_NUMBER, new PetitjeanNumberDescriptor());
+
+        // SPIRO_ATOM_COUNT has 1 component
+        descriptorToComponentNumberMap.put(SPIRO_ATOM_COUNT, 1);
+        descriptorToCdkObjectMap.put(SPIRO_ATOM_COUNT, new SpiroAtomCountDescriptor());
+
+        // V_ADJ_MAT has 1 component
+        descriptorToComponentNumberMap.put(V_ADJ_MAT, 1);
+        descriptorToCdkObjectMap.put(V_ADJ_MAT, new VAdjMaDescriptor());
+
+        // WEIGHTED_PATH has 5 components
+        descriptorToComponentNumberMap.put(WEIGHTED_PATH, 5);
+        descriptorToCdkObjectMap.put(WEIGHTED_PATH, new WeightedPathDescriptor());
+
+        // ZAGREB_INDEX has 1 component
+        descriptorToComponentNumberMap.put(ZAGREB_INDEX, 1);
+        descriptorToCdkObjectMap.put(ZAGREB_INDEX, new ZagrebIndexDescriptor());
+
         // Add new descriptor information here!
 
     }
@@ -164,6 +379,7 @@ public enum Descriptor {
     //</editor-fold>
 
     //<editor-fold desc="Public static methods">
+    //TODO: Implement Method that sets the Aromaticity Model which should be used -> include in Tests
     /**
      * Returns all available descriptors
      *
@@ -873,6 +1089,60 @@ public enum Descriptor {
                 case LONGEST_ALIPHATIC_CHAIN:
                     setLongestAliphaticChain(anAtomContainer, aVector, aStartIndex);
                     break;
+                case MANNHOLD_LOGP:
+                    setMannholdLogP(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case BCUT:
+                    setBCUT(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case BOND_COUNT_ALL:
+                    setBondCountAll(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case BOND_COUNT_SPECIFIED:
+                    setBondCountSpecified(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case B_POL:
+                    setBPol(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case RULE_OF_FIVE:
+                    setRuleOfFive(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case AROMATIC_ATOMS_COUNT:
+                    setAromaticAtomsCount(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case AROMATIC_BONDS_COUNT:
+                    setAromaticBondsCount(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ROTATABLE_BONDS_COUNT:
+                    setRotatableBondsCount(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case FMF:
+                    setFMF(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case FRACTIONAL_CSP3:
+                    setFractionalCSP3(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case HYBRIDIZATION_RATIO:
+                    setHybridizationRatio(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case KAPPA_SHAPE_INDICES:
+                    setKappaShapeIndices(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case PETITJEAN_NUMBER:
+                    setPetitjeanNumber(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case SPIRO_ATOM_COUNT:
+                    setSpiroAtomCount(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case V_ADJ_MAT:
+                    setVAdjMat(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case WEIGHTED_PATH:
+                    setWeightedPath(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ZAGREB_INDEX:
+                    setZagrebIndex(anAtomContainer, aVector, aStartIndex);
+                    break;
 
                 // Add new descriptor information here!
                 default:
@@ -934,6 +1204,79 @@ public enum Descriptor {
                 case LONGEST_ALIPHATIC_CHAIN:
                     aVector[aStartIndex] = (float) ((IntegerResult) (new LongestAliphaticChainDescriptor()).calculate(anAtomContainer).getValue()).intValue();
                     break;
+                case MANNHOLD_LOGP:
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new MannholdLogPDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case BCUT:
+                    DoubleArrayResult bcutResult = (DoubleArrayResult) (new BCUTDescriptor()).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 6; i++) {
+                        aVector[aStartIndex + i] = (float) bcutResult.get(i);
+                    }
+                    break;
+                case BOND_COUNT_ALL:
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new BondCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case BOND_COUNT_SPECIFIED:
+                    BondCountDescriptor singleBondDesc = new BondCountDescriptor();
+                    singleBondDesc.setParameters(new Object[]{"s"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) singleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+
+                    BondCountDescriptor doubleBondDesc = new BondCountDescriptor();
+                    doubleBondDesc.setParameters(new Object[]{"d"});
+                    aVector[aStartIndex + 1] = (float) ((IntegerResult) doubleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+
+                    BondCountDescriptor tripleBondDesc = new BondCountDescriptor();
+                    tripleBondDesc.setParameters(new Object[]{"t"});
+                    aVector[aStartIndex + 2] = (float) ((IntegerResult) tripleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case B_POL:
+                    aVector[aStartIndex] = (float) ((DoubleResult) new BPolDescriptor().calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case RULE_OF_FIVE:
+                    aVector[aStartIndex] = (float) ((IntegerResult) new RuleOfFiveDescriptor().calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case AROMATIC_ATOMS_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new AromaticAtomsCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case AROMATIC_BONDS_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) new AromaticBondsCountDescriptor().calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ROTATABLE_BONDS_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) new RotatableBondsCountDescriptor().calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case FMF:
+                    aVector[aStartIndex] = (float) ((DoubleResult) new FMFDescriptor().calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case FRACTIONAL_CSP3:
+                    aVector[aStartIndex] = (float) ((DoubleResult) new FractionalCSP3Descriptor().calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case HYBRIDIZATION_RATIO:
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new HybridizationRatioDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case KAPPA_SHAPE_INDICES:
+                    DoubleArrayResult kappaResult = (DoubleArrayResult) new KappaShapeIndicesDescriptor().calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 3; i++) {
+                        aVector[aStartIndex + i] = (float) kappaResult.get(i);
+                    }
+                    break;
+                case PETITJEAN_NUMBER:
+                    aVector[aStartIndex] = (float) ((DoubleResult) new PetitjeanNumberDescriptor().calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case SPIRO_ATOM_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) new SpiroAtomCountDescriptor().calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case V_ADJ_MAT:
+                    aVector[aStartIndex] = (float) ((DoubleResult) new VAdjMaDescriptor().calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case WEIGHTED_PATH:
+                    DoubleArrayResult tmpWeightedPathResultNew = (DoubleArrayResult) new WeightedPathDescriptor().calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 5; i++) {
+                        aVector[aStartIndex + i] = (float) tmpWeightedPathResultNew.get(i);
+                    }
+                    break;
+                case ZAGREB_INDEX:
+                    aVector[aStartIndex] = (float) ((DoubleResult) new ZagrebIndexDescriptor().calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
 
                 // Add new descriptor information here!
                 default:
@@ -994,6 +1337,84 @@ public enum Descriptor {
                     break;
                 case LONGEST_ALIPHATIC_CHAIN:
                     aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LONGEST_ALIPHATIC_CHAIN).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case MANNHOLD_LOGP:
+                    aVector[aStartIndex] = (float) ((DoubleResult)
+                            descriptorToCdkObjectMap.get(MANNHOLD_LOGP).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case BCUT:
+                    DoubleArrayResult bcutResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(BCUT).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 6; i++) {
+                        aVector[aStartIndex + i] = (float) bcutResult.get(i);
+                    }
+                    break;
+                case BOND_COUNT_ALL:
+                    aVector[aStartIndex] = (float) ((IntegerResult)
+                            descriptorToCdkObjectMap.get(BOND_COUNT_ALL).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case BOND_COUNT_SPECIFIED:
+                    // Single bonds (s)
+                    BondCountDescriptor singleBondDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED).getClass().getDeclaredConstructor().newInstance();
+                    singleBondDesc.setParameters(new Object[]{"s"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) singleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+
+                    // Double bonds (d)
+                    BondCountDescriptor doubleBondDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED).getClass().getDeclaredConstructor().newInstance();
+                    doubleBondDesc.setParameters(new Object[]{"d"});
+                    aVector[aStartIndex + 1] = (float) ((IntegerResult) doubleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+
+                    // Triple bonds (t)
+                    BondCountDescriptor tripleBondDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED).getClass().getDeclaredConstructor().newInstance();
+                    tripleBondDesc.setParameters(new Object[]{"t"});
+                    aVector[aStartIndex + 2] = (float) ((IntegerResult) tripleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case B_POL:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(B_POL).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case RULE_OF_FIVE:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(RULE_OF_FIVE).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case AROMATIC_ATOMS_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(AROMATIC_ATOMS_COUNT).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case AROMATIC_BONDS_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(AROMATIC_BONDS_COUNT).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ROTATABLE_BONDS_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ROTATABLE_BONDS_COUNT).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case FMF:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FMF).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case FRACTIONAL_CSP3:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FRACTIONAL_CSP3).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case HYBRIDIZATION_RATIO:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(HYBRIDIZATION_RATIO).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case KAPPA_SHAPE_INDICES:
+                    DoubleArrayResult kappaResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(KAPPA_SHAPE_INDICES).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 3; i++) {
+                        aVector[aStartIndex + i] = (float) kappaResult.get(i);
+                    }
+                    break;
+                case PETITJEAN_NUMBER:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(PETITJEAN_NUMBER).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case SPIRO_ATOM_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(SPIRO_ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case V_ADJ_MAT:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(V_ADJ_MAT).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case WEIGHTED_PATH:
+                    DoubleArrayResult tmpWeightedPathResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(WEIGHTED_PATH).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 5; i++) {
+                        aVector[aStartIndex + i] = (float) tmpWeightedPathResult.get(i);
+                    }
+                    break;
+                case ZAGREB_INDEX:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(ZAGREB_INDEX).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
 
                 // Add new descriptor information here!
@@ -1131,7 +1552,6 @@ public enum Descriptor {
         aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LARGEST_CHAIN).calculate(anAtomContainer).getValue()).intValue();
     }
 
-
     /**
      * Sets longest aliphatic chain size
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
@@ -1147,6 +1567,341 @@ public enum Descriptor {
             int aStartIndex
     ) {
         aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LONGEST_ALIPHATIC_CHAIN).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets the Mannhold LogP value (octanol-water partition coefficient)
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods.
+     * Note: Method must be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of the molecule to be filled with calculated descriptor components (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector where the calculated descriptor components will be stored
+     */
+    private static synchronized void setMannholdLogP(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult)
+                descriptorToCdkObjectMap.get(MANNHOLD_LOGP).calculate(anAtomContainer).getValue()).doubleValue();
+    }
+
+    /**
+     * Sets BCUT descriptor values
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setBCUT(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(BCUT).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < 6; i++) {
+            aVector[aStartIndex + i] = (float) result.get(i);
+        }
+    }
+
+    /**
+     * Sets bond count
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setBondCountAll(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_ALL).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets specific bond counts (single, double, triple)
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setBondCountSpecified(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        try {
+            BondCountDescriptor singleBondDesc = BondCountDescriptor.class.getDeclaredConstructor().newInstance();
+            singleBondDesc.setParameters(new Object[]{"s"});
+            aVector[aStartIndex] = (float) ((IntegerResult) singleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+
+            // Double bonds (d)
+            BondCountDescriptor doubleBondDesc = BondCountDescriptor.class.getDeclaredConstructor().newInstance();
+            doubleBondDesc.setParameters(new Object[]{"d"});
+            aVector[aStartIndex + 1] = (float) ((IntegerResult) doubleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+
+            // Triple bonds (t)
+            BondCountDescriptor tripleBondDesc = BondCountDescriptor.class.getDeclaredConstructor().newInstance();
+            tripleBondDesc.setParameters(new Object[]{"t"});
+            aVector[aStartIndex + 2] = (float) ((IntegerResult) tripleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+        } catch (Exception e) {
+            for (int i = 0; i < 3; i++) {
+                aVector[aStartIndex + i] = Float.NaN;
+            }
+        }
+    }
+
+    /**
+     * Sets bond polarizability value
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setBPol(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(B_POL).calculate(anAtomContainer).getValue()).doubleValue();
+    }
+
+    /**
+     * Sets Lipinski's Rule of Five violations count
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     * TODO: Test works check if we need to addExplicitHydrogens to the molecule
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setRuleOfFive(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(RULE_OF_FIVE).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets the number of aromatic atoms
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAromaticAtomsCount(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(AROMATIC_ATOMS_COUNT).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets the number of aromatic bonds
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAromaticBondsCount(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(AROMATIC_BONDS_COUNT).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets rotatable bonds count
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setRotatableBondsCount(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ROTATABLE_BONDS_COUNT).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets the FMF (Framework Match Fraction) value
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setFMF(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FMF).calculate(anAtomContainer).getValue()).doubleValue();
+    }
+
+    /**
+     * Sets the FractionalCSP3 value (fraction of sp3 hybridized carbon atoms)
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setFractionalCSP3(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FRACTIONAL_CSP3).calculate(anAtomContainer).getValue()).doubleValue();
+    }
+
+    /**
+     * Sets hybridization ratio (sp3 carbons to sp2 carbons)
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setHybridizationRatio(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(HYBRIDIZATION_RATIO).calculate(anAtomContainer).getValue()).doubleValue();
+    }
+
+    /**
+     * Sets Kappa shape indices
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setKappaShapeIndices(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(KAPPA_SHAPE_INDICES).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < 3; i++) {
+            aVector[aStartIndex + i] = (float) result.get(i);
+        }
+    }
+
+    /**
+     * Sets Petitjean number value
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setPetitjeanNumber(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(PETITJEAN_NUMBER).calculate(anAtomContainer).getValue()).doubleValue();
+    }
+
+    /**
+     * Sets spiro atom count
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setSpiroAtomCount(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(SPIRO_ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets the vertex adjacency information (magnitude)
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setVAdjMat(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(V_ADJ_MAT).calculate(anAtomContainer).getValue()).doubleValue();
+    }
+
+    /**
+     * Sets weighted path descriptor values
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setWeightedPath(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(WEIGHTED_PATH).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < 5; i++) {
+            aVector[aStartIndex + i] = (float) result.get(i);
+        }
+    }
+
+    /**
+     * Sets Zagreb index value
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setZagrebIndex(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(ZAGREB_INDEX).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     // Add new descriptor information here!
