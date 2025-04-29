@@ -448,7 +448,6 @@ public enum Descriptor {
     //</editor-fold>
 
     //<editor-fold desc="Public static methods">
-    //TODO: Implement Method that sets the Aromaticity Model which should be used -> include in Test
     /**
      * Returns all available descriptors
      *
