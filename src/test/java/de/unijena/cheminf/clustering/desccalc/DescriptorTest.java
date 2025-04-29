@@ -907,7 +907,10 @@ class DescriptorTest {
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
-            float[][] tmpMatrix = new float[tmpMoleculesArray.length][1];
+            float[][] tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
@@ -919,7 +922,10 @@ class DescriptorTest {
             );
             Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
 
-            tmpMatrix = new float[tmpMoleculesArray.length][1];
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
@@ -931,7 +937,10 @@ class DescriptorTest {
             );
             Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
 
-            tmpMatrix = new float[tmpMoleculesArray.length][1];
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
                             tmpDescriptors,
@@ -969,8 +978,10 @@ class DescriptorTest {
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
-            float[][] tmpMatrix = new float[1][];
-            tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
+            float[][] tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
@@ -982,8 +993,10 @@ class DescriptorTest {
             );
             Assertions.assertEquals("1.57", tmpFormat.format(tmpMatrix[0][0]));
 
-            tmpMatrix = new float[1][];
-            tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
@@ -995,8 +1008,10 @@ class DescriptorTest {
             );
             Assertions.assertEquals("1.57", tmpFormat.format(tmpMatrix[0][0]));
 
-            tmpMatrix = new float[1][];
-            tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
                             tmpDescriptors,
@@ -2390,9 +2405,10 @@ class DescriptorTest {
         try {
             Assertions.assertEquals(5, Descriptor.getNumberOfComponents(tmpDescriptors));
 
-            float[][] tmpMatrix = new float[][]{
-                    {0f, 0f, 0f, 0f, 0f}
-            };
+            float[][] tmpMatrix = new float[][]
+                    {
+                            {0f, 0f, 0f, 0f, 0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
                             tmpDescriptors,
@@ -2408,9 +2424,10 @@ class DescriptorTest {
             Assertions.assertEquals(0.0, tmpMatrix[0][3], epsilon);
             Assertions.assertEquals(0.0, tmpMatrix[0][4], epsilon);
 
-            tmpMatrix = new float[][]{
-                    {0f, 0f, 0f, 0f, 0f}
-            };
+            tmpMatrix = new float[][]
+                    {
+                            {0f, 0f, 0f, 0f, 0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
@@ -2426,9 +2443,10 @@ class DescriptorTest {
             Assertions.assertEquals(0.0, tmpMatrix[0][3], epsilon);
             Assertions.assertEquals(0.0, tmpMatrix[0][4], epsilon);
 
-            tmpMatrix = new float[][]{
-                    {0f, 0f, 0f, 0f, 0f}
-            };
+            tmpMatrix = new float[][]
+                    {
+                            {0f, 0f, 0f, 0f, 0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
@@ -2469,9 +2487,10 @@ class DescriptorTest {
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
-            float[][] tmpMatrix = new float[][]{
-                    {0f}
-            };
+            float[][] tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
                             tmpDescriptors,
@@ -2483,9 +2502,10 @@ class DescriptorTest {
             );
             Assertions.assertEquals(16, tmpMatrix[0][0], epsilon);
 
-            tmpMatrix = new float[][]{
-                    {0f}
-            };
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
@@ -2497,9 +2517,10 @@ class DescriptorTest {
             );
             Assertions.assertEquals(16, tmpMatrix[0][0], epsilon);
 
-            tmpMatrix = new float[][]{
-                    {0f}
-            };
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
