@@ -27,17 +27,21 @@ package de.unijena.cheminf.clustering.desccalc;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.ALOGPDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.APolDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AromaticAtomsCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AromaticBondsCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AtomCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.BCUTDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.BPolDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.BondCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.CarbonTypesDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.FMFDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.FractionalCSP3Descriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.HBondAcceptorCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.HBondDonorCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.HybridizationRatioDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.JPlogPDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.KappaShapeIndicesDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.LargestChainDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.LongestAliphaticChainDescriptor;
@@ -51,9 +55,11 @@ import org.openscience.cdk.qsar.descriptors.molecular.VAdjMaDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.WeightedPathDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.WienerNumbersDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.XLogPDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.ZagrebIndexDescriptor;
 import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import org.openscience.cdk.qsar.result.DoubleResult;
+import org.openscience.cdk.qsar.result.IntegerArrayResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
 
 import java.util.EnumMap;
@@ -249,7 +255,43 @@ public enum Descriptor {
      * The Zagreb index is the sum of the squares of atom degrees over all heavy atoms,
      * which provides information about the molecular complexity and topological structure.
      */
-    ZAGREB_INDEX;
+    ZAGREB_INDEX,
+    /**
+     * CarbonTypes descriptor, calculates the frequency of occurrence of 9 different types of carbon atoms:
+     * C1SP1 - triply bound carbon bound to one other carbon
+     * C2SP1 - triply bound carbon bound to two other carbons
+     * C1SP2 - doubly bound carbon bound to one other carbon
+     * C2SP2 - doubly bound carbon bound to two other carbons
+     * C3SP2 - doubly bound carbon bound to three other carbons
+     * C1SP3 - singly bound carbon bound to one other carbon
+     * C2SP3 - singly bound carbon bound to two other carbons
+     * C3SP3 - singly bound carbon bound to three other carbons
+     * C4SP3 - singly bound carbon bound to four other carbons
+     */
+    CARBON_TYPES,
+    /**
+     * ALogP descriptor, calculates Ghose-Crippen LogP values, molar refractivity values
+     * and ALogP squared values.
+     * 1. ALogP (logP value) is the Ghose-Crippen octanol-water partition coefficient.
+     * 2. ALogP² is the squared ALogP value.
+     * 3. Molar Refractivity (MR) measures the volume occupied by an atom or group of atoms.
+     */
+    A_LOG_P,
+    /**
+     * XLogP descriptor
+     * Prediction of logP based on the atom-type method called XLogP.
+     * Requires all hydrogens to be explicit.
+     */
+    X_LOG_P,
+    /**
+     * Calculates the JP_LOG_P descriptor (octanol-water partition coefficient based on JPlogP method)
+     * Original publication: Junghwan Lee et al. "Estimation of partition coefficients...".
+     */
+    JP_LOG_P,
+    /**
+     * APol descriptor, calculates the sum of the atomic polarizabilities (including implicit hydrogens).
+     */
+    A_POL;
 
     // Add new descriptor information here!
 
@@ -257,129 +299,156 @@ public enum Descriptor {
      * EnumMap that maps a descriptor to its number of calculated components
      */
     private static final EnumMap<Descriptor, Integer> descriptorToComponentNumberMap = new EnumMap<>(Descriptor.class);
-    /**
-     * EnumMap that maps a descriptor to an instance of its CDK descriptor class
-     */
-    private static final EnumMap<Descriptor, IMolecularDescriptor> descriptorToCdkObjectMap = new EnumMap<>(Descriptor.class);
-    static {
-        // MOLECULER_WEIGHT has 1 component
-        descriptorToComponentNumberMap.put(MOLECULAR_WEIGHT, 1);
-        descriptorToCdkObjectMap.put(MOLECULAR_WEIGHT, new WeightDescriptor());
-
-        // WIENER_NUMBER has 2 components, Wiener path number and Wiener polarity number
-        descriptorToComponentNumberMap.put(WIENER_NUMBER, 2);
-        descriptorToCdkObjectMap.put(WIENER_NUMBER, new WienerNumbersDescriptor());
-
-        // ATOM_COUNT has 1 component
-        descriptorToComponentNumberMap.put(ATOM_COUNT, 1);
-        descriptorToCdkObjectMap.put(ATOM_COUNT, new AtomCountDescriptor());
-
-        // H_BOND_ACCEPTOR_COUNT has 1 component
-        descriptorToComponentNumberMap.put(H_BOND_ACCEPTOR_COUNT, 1);
-        descriptorToCdkObjectMap.put(H_BOND_ACCEPTOR_COUNT, new HBondAcceptorCountDescriptor());
-
-        // H_BOND_DONOR_COUNT has 1 component
-        descriptorToComponentNumberMap.put(H_BOND_DONOR_COUNT, 1);
-        descriptorToCdkObjectMap.put(H_BOND_DONOR_COUNT, new HBondDonorCountDescriptor());
-
-        // TPSA has 1 component
-        descriptorToComponentNumberMap.put(TPSA, 1);
-        descriptorToCdkObjectMap.put(TPSA, new TPSADescriptor());
-
-        // LARGEST_CHAIN has 1 component
-        descriptorToComponentNumberMap.put(LARGEST_CHAIN, 1);
-        descriptorToCdkObjectMap.put(LARGEST_CHAIN, new LargestChainDescriptor());
-
-        // LONGEST_ALIPHATIC_CHAIN has 1 component
-        descriptorToComponentNumberMap.put(LONGEST_ALIPHATIC_CHAIN, 1);
-        descriptorToCdkObjectMap.put(LONGEST_ALIPHATIC_CHAIN, new LongestAliphaticChainDescriptor());
-
-        // MANNHOLD_LOGP has 1 component
-        descriptorToComponentNumberMap.put(MANNHOLD_LOGP, 1);
-        descriptorToCdkObjectMap.put(MANNHOLD_LOGP, new MannholdLogPDescriptor());
-
-        // BCUT has 6 components
-        descriptorToComponentNumberMap.put(BCUT, 6);
-        descriptorToCdkObjectMap.put(BCUT, new BCUTDescriptor());
-
-        // BOND_COUNT has 1 component
-        descriptorToComponentNumberMap.put(BOND_COUNT_ALL, 1);
-        descriptorToCdkObjectMap.put(BOND_COUNT_ALL, new BondCountDescriptor());
-
-        // BOND_COUNT_SPECIFIED has 3 components (single, double, triple bonds)
-        descriptorToComponentNumberMap.put(BOND_COUNT_SPECIFIED, 3);
-        descriptorToCdkObjectMap.put(BOND_COUNT_SPECIFIED, new BondCountDescriptor());
-
-        // B_POL has 1 component
-        descriptorToComponentNumberMap.put(B_POL, 1);
-        descriptorToCdkObjectMap.put(B_POL, new BPolDescriptor());
-
-        // RULE_OF_FIVE has 1 component
-        descriptorToComponentNumberMap.put(RULE_OF_FIVE, 1);
-        descriptorToCdkObjectMap.put(RULE_OF_FIVE, new RuleOfFiveDescriptor());
-
-        // AROMATIC_ATOMS_COUNT has 1 component
-        descriptorToComponentNumberMap.put(AROMATIC_ATOMS_COUNT, 1);
-        descriptorToCdkObjectMap.put(AROMATIC_ATOMS_COUNT, new AromaticAtomsCountDescriptor());
-
-        // AROMATIC_BONDS_COUNT has 1 component
-        descriptorToComponentNumberMap.put(AROMATIC_BONDS_COUNT, 1);
-        descriptorToCdkObjectMap.put(AROMATIC_BONDS_COUNT, new AromaticBondsCountDescriptor());
-
-        // ROTATABLE_BONDS_COUNT has 1 component
-        descriptorToComponentNumberMap.put(ROTATABLE_BONDS_COUNT, 1);
-        descriptorToCdkObjectMap.put(ROTATABLE_BONDS_COUNT, new RotatableBondsCountDescriptor());
-
-        // FMF has 1 component
-        descriptorToComponentNumberMap.put(FMF, 1);
-        descriptorToCdkObjectMap.put(FMF, new FMFDescriptor());
-
-        // FRACTIONAL_CSP3 has 1 component
-        descriptorToComponentNumberMap.put(FRACTIONAL_CSP3, 1);
-        descriptorToCdkObjectMap.put(FRACTIONAL_CSP3, new FractionalCSP3Descriptor());
-
-        // HYBRIDIZATION_RATIO has 1 component
-        descriptorToComponentNumberMap.put(HYBRIDIZATION_RATIO, 1);
-        descriptorToCdkObjectMap.put(HYBRIDIZATION_RATIO, new HybridizationRatioDescriptor());
-
-        // KAPPA_SHAPE_INDICES has 3 components
-        descriptorToComponentNumberMap.put(KAPPA_SHAPE_INDICES, 3);
-        descriptorToCdkObjectMap.put(KAPPA_SHAPE_INDICES, new KappaShapeIndicesDescriptor());
-
-        // PETITJEAN_NUMBER has 1 component
-        descriptorToComponentNumberMap.put(PETITJEAN_NUMBER, 1);
-        descriptorToCdkObjectMap.put(PETITJEAN_NUMBER, new PetitjeanNumberDescriptor());
-
-        // SPIRO_ATOM_COUNT has 1 component
-        descriptorToComponentNumberMap.put(SPIRO_ATOM_COUNT, 1);
-        descriptorToCdkObjectMap.put(SPIRO_ATOM_COUNT, new SpiroAtomCountDescriptor());
-
-        // V_ADJ_MAT has 1 component
-        descriptorToComponentNumberMap.put(V_ADJ_MAT, 1);
-        descriptorToCdkObjectMap.put(V_ADJ_MAT, new VAdjMaDescriptor());
-
-        // WEIGHTED_PATH has 5 components
-        descriptorToComponentNumberMap.put(WEIGHTED_PATH, 5);
-        descriptorToCdkObjectMap.put(WEIGHTED_PATH, new WeightedPathDescriptor());
-
-        // ZAGREB_INDEX has 1 component
-        descriptorToComponentNumberMap.put(ZAGREB_INDEX, 1);
-        descriptorToCdkObjectMap.put(ZAGREB_INDEX, new ZagrebIndexDescriptor());
-
-        // Add new descriptor information here!
-
-    }
-    //</editor-fold>
-
     //<editor-fold desc="Private static final LOGGER">
     /**
      * Logger of this class
      */
     private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());
     //</editor-fold>
+    /**
+     * EnumMap that maps a descriptor to an instance of its CDK descriptor class
+     */
+    private static final EnumMap<Descriptor, IMolecularDescriptor> descriptorToCdkObjectMap = new EnumMap<>(Descriptor.class);
+    static {
+        try {
+            // MOLECULER_WEIGHT has 1 component
+            descriptorToComponentNumberMap.put(MOLECULAR_WEIGHT, 1);
+            descriptorToCdkObjectMap.put(MOLECULAR_WEIGHT, new WeightDescriptor());
+
+            // WIENER_NUMBER has 2 components, Wiener path number and Wiener polarity number
+            descriptorToComponentNumberMap.put(WIENER_NUMBER, 2);
+            descriptorToCdkObjectMap.put(WIENER_NUMBER, new WienerNumbersDescriptor());
+
+            // ATOM_COUNT has 1 component
+            descriptorToComponentNumberMap.put(ATOM_COUNT, 1);
+            descriptorToCdkObjectMap.put(ATOM_COUNT, new AtomCountDescriptor());
+
+            // H_BOND_ACCEPTOR_COUNT has 1 component
+            descriptorToComponentNumberMap.put(H_BOND_ACCEPTOR_COUNT, 1);
+            descriptorToCdkObjectMap.put(H_BOND_ACCEPTOR_COUNT, new HBondAcceptorCountDescriptor());
+
+            // H_BOND_DONOR_COUNT has 1 component
+            descriptorToComponentNumberMap.put(H_BOND_DONOR_COUNT, 1);
+            descriptorToCdkObjectMap.put(H_BOND_DONOR_COUNT, new HBondDonorCountDescriptor());
+
+            // TPSA has 1 component
+            descriptorToComponentNumberMap.put(TPSA, 1);
+            descriptorToCdkObjectMap.put(TPSA, new TPSADescriptor());
+
+            // LARGEST_CHAIN has 1 component
+            descriptorToComponentNumberMap.put(LARGEST_CHAIN, 1);
+            descriptorToCdkObjectMap.put(LARGEST_CHAIN, new LargestChainDescriptor());
+
+            // LONGEST_ALIPHATIC_CHAIN has 1 component
+            descriptorToComponentNumberMap.put(LONGEST_ALIPHATIC_CHAIN, 1);
+            descriptorToCdkObjectMap.put(LONGEST_ALIPHATIC_CHAIN, new LongestAliphaticChainDescriptor());
+
+            // MANNHOLD_LOGP has 1 component
+            descriptorToComponentNumberMap.put(MANNHOLD_LOGP, 1);
+            descriptorToCdkObjectMap.put(MANNHOLD_LOGP, new MannholdLogPDescriptor());
+
+            // BCUT has 6 components
+            descriptorToComponentNumberMap.put(BCUT, 6);
+            descriptorToCdkObjectMap.put(BCUT, new BCUTDescriptor());
+
+            // BOND_COUNT has 1 component
+            descriptorToComponentNumberMap.put(BOND_COUNT_ALL, 1);
+            descriptorToCdkObjectMap.put(BOND_COUNT_ALL, new BondCountDescriptor());
+
+            // BOND_COUNT_SPECIFIED has 3 components (single, double, triple bonds)
+            descriptorToComponentNumberMap.put(BOND_COUNT_SPECIFIED, 3);
+            descriptorToCdkObjectMap.put(BOND_COUNT_SPECIFIED, new BondCountDescriptor());
+
+            // B_POL has 1 component
+            descriptorToComponentNumberMap.put(B_POL, 1);
+            descriptorToCdkObjectMap.put(B_POL, new BPolDescriptor());
+
+            // RULE_OF_FIVE has 1 component
+            descriptorToComponentNumberMap.put(RULE_OF_FIVE, 1);
+            descriptorToCdkObjectMap.put(RULE_OF_FIVE, new RuleOfFiveDescriptor());
+
+            // AROMATIC_ATOMS_COUNT has 1 component
+            descriptorToComponentNumberMap.put(AROMATIC_ATOMS_COUNT, 1);
+            descriptorToCdkObjectMap.put(AROMATIC_ATOMS_COUNT, new AromaticAtomsCountDescriptor());
+
+            // AROMATIC_BONDS_COUNT has 1 component
+            descriptorToComponentNumberMap.put(AROMATIC_BONDS_COUNT, 1);
+            descriptorToCdkObjectMap.put(AROMATIC_BONDS_COUNT, new AromaticBondsCountDescriptor());
+
+            // ROTATABLE_BONDS_COUNT has 1 component
+            descriptorToComponentNumberMap.put(ROTATABLE_BONDS_COUNT, 1);
+            descriptorToCdkObjectMap.put(ROTATABLE_BONDS_COUNT, new RotatableBondsCountDescriptor());
+
+            // FMF has 1 component
+            descriptorToComponentNumberMap.put(FMF, 1);
+            descriptorToCdkObjectMap.put(FMF, new FMFDescriptor());
+
+            // FRACTIONAL_CSP3 has 1 component
+            descriptorToComponentNumberMap.put(FRACTIONAL_CSP3, 1);
+            descriptorToCdkObjectMap.put(FRACTIONAL_CSP3, new FractionalCSP3Descriptor());
+
+            // HYBRIDIZATION_RATIO has 1 component
+            descriptorToComponentNumberMap.put(HYBRIDIZATION_RATIO, 1);
+            descriptorToCdkObjectMap.put(HYBRIDIZATION_RATIO, new HybridizationRatioDescriptor());
+
+            // KAPPA_SHAPE_INDICES has 3 components
+            descriptorToComponentNumberMap.put(KAPPA_SHAPE_INDICES, 3);
+            descriptorToCdkObjectMap.put(KAPPA_SHAPE_INDICES, new KappaShapeIndicesDescriptor());
+
+            // PETITJEAN_NUMBER has 1 component
+            descriptorToComponentNumberMap.put(PETITJEAN_NUMBER, 1);
+            descriptorToCdkObjectMap.put(PETITJEAN_NUMBER, new PetitjeanNumberDescriptor());
+
+            // SPIRO_ATOM_COUNT has 1 component
+            descriptorToComponentNumberMap.put(SPIRO_ATOM_COUNT, 1);
+            descriptorToCdkObjectMap.put(SPIRO_ATOM_COUNT, new SpiroAtomCountDescriptor());
+
+            // V_ADJ_MAT has 1 component
+            descriptorToComponentNumberMap.put(V_ADJ_MAT, 1);
+            descriptorToCdkObjectMap.put(V_ADJ_MAT, new VAdjMaDescriptor());
+
+            // WEIGHTED_PATH has 5 components
+            descriptorToComponentNumberMap.put(WEIGHTED_PATH, 5);
+            descriptorToCdkObjectMap.put(WEIGHTED_PATH, new WeightedPathDescriptor());
+
+            // ZAGREB_INDEX has 1 component
+            descriptorToComponentNumberMap.put(ZAGREB_INDEX, 1);
+            descriptorToCdkObjectMap.put(ZAGREB_INDEX, new ZagrebIndexDescriptor());
+
+            // CARBON_TYPES has 9 components
+            descriptorToComponentNumberMap.put(CARBON_TYPES, 9);
+            descriptorToCdkObjectMap.put(CARBON_TYPES, new CarbonTypesDescriptor());
+
+            // A_LOG_P has 3 components
+            descriptorToComponentNumberMap.put(A_LOG_P, 3);
+            descriptorToCdkObjectMap.put(A_LOG_P, new ALOGPDescriptor());
+
+            // X_LOG_P has 1 component
+            descriptorToComponentNumberMap.put(X_LOG_P, 1);
+            descriptorToCdkObjectMap.put(X_LOG_P, new XLogPDescriptor());
+
+            // JP_LOG_P has 1 component
+            descriptorToComponentNumberMap.put(JP_LOG_P, 1);
+            descriptorToCdkObjectMap.put(JP_LOG_P, new JPlogPDescriptor());
+
+            // A_POL has 1 component
+            descriptorToComponentNumberMap.put(A_POL, 1);
+            descriptorToCdkObjectMap.put(A_POL, new APolDescriptor());
+
+            // Add new descriptor information here!
+
+        } catch (Exception anException) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Failed to initialize descriptors", anException
+            );
+        }
+
+    }
+    //</editor-fold>
 
     //<editor-fold desc="Public static methods">
-    //TODO: Implement Method that sets the Aromaticity Model which should be used -> include in Tests
+    //TODO: Implement Method that sets the Aromaticity Model which should be used -> include in Test
     /**
      * Returns all available descriptors
      *
@@ -1143,7 +1212,21 @@ public enum Descriptor {
                 case ZAGREB_INDEX:
                     setZagrebIndex(anAtomContainer, aVector, aStartIndex);
                     break;
-
+                case CARBON_TYPES:
+                    setCarbonTypesDescriptor(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case A_LOG_P:
+                    setALogP(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case X_LOG_P:
+                    setXLogP(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case JP_LOG_P:
+                    setJPLogP(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case A_POL:
+                    setAPol(anAtomContainer, aVector, aStartIndex);
+                    break;
                 // Add new descriptor information here!
                 default:
                     throw new UnsupportedOperationException("This descriptor does not have a routine yet!");
@@ -1230,52 +1313,73 @@ public enum Descriptor {
                     aVector[aStartIndex + 2] = (float) ((IntegerResult) tripleBondDesc.calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case B_POL:
-                    aVector[aStartIndex] = (float) ((DoubleResult) new BPolDescriptor().calculate(anAtomContainer).getValue()).doubleValue();
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new BPolDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case RULE_OF_FIVE:
-                    aVector[aStartIndex] = (float) ((IntegerResult) new RuleOfFiveDescriptor().calculate(anAtomContainer).getValue()).intValue();
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new RuleOfFiveDescriptor()).calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case AROMATIC_ATOMS_COUNT:
                     aVector[aStartIndex] = (float) ((IntegerResult) (new AromaticAtomsCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case AROMATIC_BONDS_COUNT:
-                    aVector[aStartIndex] = (float) ((IntegerResult) new AromaticBondsCountDescriptor().calculate(anAtomContainer).getValue()).intValue();
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new AromaticBondsCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case ROTATABLE_BONDS_COUNT:
-                    aVector[aStartIndex] = (float) ((IntegerResult) new RotatableBondsCountDescriptor().calculate(anAtomContainer).getValue()).intValue();
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new RotatableBondsCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case FMF:
-                    aVector[aStartIndex] = (float) ((DoubleResult) new FMFDescriptor().calculate(anAtomContainer).getValue()).doubleValue();
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new FMFDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case FRACTIONAL_CSP3:
-                    aVector[aStartIndex] = (float) ((DoubleResult) new FractionalCSP3Descriptor().calculate(anAtomContainer).getValue()).doubleValue();
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new FractionalCSP3Descriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case HYBRIDIZATION_RATIO:
                     aVector[aStartIndex] = (float) ((DoubleResult) (new HybridizationRatioDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case KAPPA_SHAPE_INDICES:
-                    DoubleArrayResult kappaResult = (DoubleArrayResult) new KappaShapeIndicesDescriptor().calculate(anAtomContainer).getValue();
+                    DoubleArrayResult kappaResult = (DoubleArrayResult) (new KappaShapeIndicesDescriptor()).calculate(anAtomContainer).getValue();
                     for (int i = 0; i < 3; i++) {
                         aVector[aStartIndex + i] = (float) kappaResult.get(i);
                     }
                     break;
                 case PETITJEAN_NUMBER:
-                    aVector[aStartIndex] = (float) ((DoubleResult) new PetitjeanNumberDescriptor().calculate(anAtomContainer).getValue()).doubleValue();
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new PetitjeanNumberDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case SPIRO_ATOM_COUNT:
-                    aVector[aStartIndex] = (float) ((IntegerResult) new SpiroAtomCountDescriptor().calculate(anAtomContainer).getValue()).intValue();
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new SpiroAtomCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case V_ADJ_MAT:
-                    aVector[aStartIndex] = (float) ((DoubleResult) new VAdjMaDescriptor().calculate(anAtomContainer).getValue()).doubleValue();
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new VAdjMaDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case WEIGHTED_PATH:
-                    DoubleArrayResult tmpWeightedPathResultNew = (DoubleArrayResult) new WeightedPathDescriptor().calculate(anAtomContainer).getValue();
+                    DoubleArrayResult tmpWeightedPathResultNew = (DoubleArrayResult) (new WeightedPathDescriptor()).calculate(anAtomContainer).getValue();
                     for (int i = 0; i < 5; i++) {
                         aVector[aStartIndex + i] = (float) tmpWeightedPathResultNew.get(i);
                     }
                     break;
                 case ZAGREB_INDEX:
-                    aVector[aStartIndex] = (float) ((DoubleResult) new ZagrebIndexDescriptor().calculate(anAtomContainer).getValue()).doubleValue();
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new ZagrebIndexDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case CARBON_TYPES:
+                    IntegerArrayResult carbonTypesResultNew = (IntegerArrayResult) (new CarbonTypesDescriptor()).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 9; i++) {
+                        aVector[aStartIndex + i] = carbonTypesResultNew.get(i);
+                    }
+                    break;
+                case A_LOG_P:
+                    DoubleArrayResult alogpResult = (DoubleArrayResult) (new ALOGPDescriptor()).calculate(anAtomContainer).getValue();
+                    aVector[aStartIndex] = (float) alogpResult.get(0); // ALogP
+                    aVector[aStartIndex + 1] = (float) alogpResult.get(1); // Molar Refractivity
+                    aVector[aStartIndex + 2] = (float) alogpResult.get(2); // ALogP squared
+                    break;
+                case X_LOG_P:
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new XLogPDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case JP_LOG_P:
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new JPlogPDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case A_POL:
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new APolDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
 
                 // Add new descriptor information here!
@@ -1415,6 +1519,27 @@ public enum Descriptor {
                     break;
                 case ZAGREB_INDEX:
                     aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(ZAGREB_INDEX).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case CARBON_TYPES:
+                    IntegerArrayResult carbonTypesResult = (IntegerArrayResult) descriptorToCdkObjectMap.get(CARBON_TYPES).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 9; i++) {
+                        aVector[aStartIndex + i] = carbonTypesResult.get(i);
+                    }
+                    break;
+                case A_LOG_P:
+                    DoubleArrayResult alogpResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(A_LOG_P).calculate(anAtomContainer).getValue();
+                    aVector[aStartIndex] = (float) alogpResult.get(0); // ALogP
+                    aVector[aStartIndex + 1] = (float) alogpResult.get(1); // Molar Refractivity
+                    aVector[aStartIndex + 2] = (float) alogpResult.get(2); // ALogP squared
+                    break;
+                case X_LOG_P:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(X_LOG_P).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case JP_LOG_P:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(JP_LOG_P).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case A_POL:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(A_POL).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
 
                 // Add new descriptor information here!
@@ -1904,7 +2029,103 @@ public enum Descriptor {
         aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(ZAGREB_INDEX).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
+    /**
+     * Sets carbon types descriptor values
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setCarbonTypesDescriptor(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        IntegerArrayResult result = (IntegerArrayResult) descriptorToCdkObjectMap.get(CARBON_TYPES).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < 9; i++) {
+            aVector[aStartIndex + i] = result.get(i);
+        }
+    }
+
+    /**
+     * Sets ALogP values (Ghose-Crippen LogP,ALogP squared and molar refractivity)
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setALogP(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(A_LOG_P).calculate(anAtomContainer).getValue();
+        aVector[aStartIndex] = (float) result.get(0); // ALogP
+        aVector[aStartIndex + 1] = (float) result.get(1); // Molar Refractivity
+        aVector[aStartIndex + 2] = (float) result.get(2); // ALogP squared
+    }
+
+    /**
+     * Sets XLogP value (prediction of logP based on the atom-type method)
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     * Note: XLogP requires explicit hydrogens for correct calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setXLogP(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult)
+                descriptorToCdkObjectMap.get(X_LOG_P).calculate(anAtomContainer).getValue()).doubleValue();
+    }
+    /**
+     * Sets JP LogP value (octanol-water partition coefficient based on JPlogP method)
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setJPLogP(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(JP_LOG_P).calculate(anAtomContainer).getValue()).doubleValue();
+    }
+
+    /**
+     * Sets APol value (sum of the atomic polarizabilities)
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAPol(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(A_POL).calculate(anAtomContainer).getValue()).doubleValue();
+    }
+
     // Add new descriptor information here!
+    //</editor-fold>
+
+    //<editor-fold desc="Public static molecule preparation methods">
+    //TODO: Include Method to convert implicit to explicit Hydrogens -> add to X_LOG_P and A_LOG_P
     //</editor-fold>
 
 }

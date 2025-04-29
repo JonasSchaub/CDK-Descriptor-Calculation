@@ -32,6 +32,7 @@ import org.openscience.cdk.graph.Cycles;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
+import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -57,9 +58,9 @@ class DescriptorTest {
         String tmpSmiles = "CC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MOLECULAR_WEIGHT};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.MOLECULAR_WEIGHT};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
@@ -68,24 +69,24 @@ class DescriptorTest {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
             float[][] tmpMatrix = new float[][]
-                {
-                    {0f}
-                };
+                    {
+                            {0f}
+                    };
             Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                    tmpDescriptors,
-                    tmpMoleculesArray,
-                    tmpMatrix,
-                    tmpStartIndex,
-                    tmpIsParallelCalculation
-                )
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
             );
             Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
 
             tmpMatrix = new float[][]
-                {
-                    {0f}
-                };
+                    {
+                            {0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
@@ -98,9 +99,9 @@ class DescriptorTest {
             Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
 
             tmpMatrix = new float[][]
-                {
-                    {0f}
-                };
+                    {
+                            {0f}
+                    };
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
@@ -125,9 +126,9 @@ class DescriptorTest {
         String tmpSmiles = "CC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.WIENER_NUMBER};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.WIENER_NUMBER};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -136,49 +137,49 @@ class DescriptorTest {
             Assertions.assertEquals(2, Descriptor.getNumberOfComponents(tmpDescriptors));
 
             float[][] tmpMatrix = new float[][]
-                {
-                    {0f, 0f}
-                };
+                    {
+                            {0f, 0f}
+                    };
             Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                    tmpDescriptors,
-                    tmpMoleculesArray,
-                    tmpMatrix,
-                    tmpStartIndex,
-                    tmpIsParallelCalculation
-                )
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
             );
             Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
             Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1])); // there are no atoms that are 3 bonds apart
 
             tmpMatrix = new float[][]
-                {
-                    {0f, 0f}
-                };
+                    {
+                            {0f, 0f}
+                    };
             Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                    tmpDescriptors,
-                    tmpMoleculesArray,
-                    tmpMatrix,
-                    tmpStartIndex,
-                    tmpIsParallelCalculation
-                )
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
             );
             Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
             Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1])); // there are no atoms that are 3 bonds apart
 
             tmpMatrix = new float[][]
-                {
-                    {0f, 0f}
-                };
+                    {
+                            {0f, 0f}
+                    };
             Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
-                    tmpDescriptors,
-                    tmpMoleculesArray,
-                    tmpMatrix,
-                    tmpStartIndex,
-                    tmpIsParallelCalculation
-                )
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
             );
             Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
             Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1])); // there are no atoms that are 3 bonds apart
@@ -196,9 +197,9 @@ class DescriptorTest {
         String tmpSmiles = "CC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.ATOM_COUNT};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ATOM_COUNT};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -259,7 +260,6 @@ class DescriptorTest {
 
     /**
      * Tests method for descriptor H_BOND_ACCEPTOR_COUNT_1
-     * Acetic Acid
      */
     @Test
     public void test_H_BOND_ACCEPTOR_COUNT_1() throws Exception {
@@ -267,9 +267,9 @@ class DescriptorTest {
         String tmpSmiles = "CC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.H_BOND_ACCEPTOR_COUNT};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.H_BOND_ACCEPTOR_COUNT};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -328,7 +328,6 @@ class DescriptorTest {
 
     /**
      * Tests method for descriptor H_BOND_ACCEPTOR_COUNT_2
-     * Nitro-indazole derivative
      */
     @Test
     public void test_H_BOND_ACCEPTOR_COUNT_2() throws Exception {
@@ -336,9 +335,9 @@ class DescriptorTest {
         String tmpSmiles = "O=N(=O)c1cccc2cn[nH]c12";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.H_BOND_ACCEPTOR_COUNT};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.H_BOND_ACCEPTOR_COUNT};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -397,7 +396,6 @@ class DescriptorTest {
 
     /**
      * Tests method for descriptor H_BOND_DONOR_COUNT_1
-     * Acetic acid
      */
     @Test
     public void test_H_BOND_DONOR_COUNT_1() throws Exception {
@@ -405,9 +403,9 @@ class DescriptorTest {
         String tmpSmiles = "CC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.H_BOND_DONOR_COUNT};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.H_BOND_DONOR_COUNT};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -466,7 +464,6 @@ class DescriptorTest {
 
     /**
      * Tests method for descriptor H_BOND_DONOR_COUNT_2
-     * Phenol
      */
     @Test
     public void test_H_BOND_DONOR_COUNT_2() throws Exception {
@@ -474,9 +471,9 @@ class DescriptorTest {
         String tmpSmiles = "Oc1ccccc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.H_BOND_DONOR_COUNT};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.H_BOND_DONOR_COUNT};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -545,9 +542,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.TPSA};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.TPSA};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
@@ -616,9 +613,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.TPSA};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.TPSA};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
@@ -687,9 +684,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.LARGEST_CHAIN};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LARGEST_CHAIN};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -758,9 +755,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.LARGEST_CHAIN};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LARGEST_CHAIN};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -829,9 +826,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.LONGEST_ALIPHATIC_CHAIN};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LONGEST_ALIPHATIC_CHAIN};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -900,9 +897,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.LONGEST_ALIPHATIC_CHAIN};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LONGEST_ALIPHATIC_CHAIN};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -962,9 +959,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.MANNHOLD_LOGP};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.MANNHOLD_LOGP};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
@@ -1027,9 +1024,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.BCUT};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BCUT};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.00001; // tolerance range
 
@@ -1108,9 +1105,9 @@ class DescriptorTest {
         String tmpSmiles = "CCO";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.BOND_COUNT_ALL};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BOND_COUNT_ALL};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -1175,9 +1172,9 @@ class DescriptorTest {
         String tmpSmiles = "C=C=C";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.BOND_COUNT_ALL};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BOND_COUNT_ALL};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -1242,9 +1239,9 @@ class DescriptorTest {
         String tmpSmiles = "CC#N";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.BOND_COUNT_ALL};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BOND_COUNT_ALL};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -1309,9 +1306,9 @@ class DescriptorTest {
         String tmpSmiles = "C=C=C";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.BOND_COUNT_SPECIFIED};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BOND_COUNT_SPECIFIED};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -1382,9 +1379,9 @@ class DescriptorTest {
         String tmpSmiles = "CCO";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.BOND_COUNT_SPECIFIED};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BOND_COUNT_SPECIFIED};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -1455,9 +1452,9 @@ class DescriptorTest {
         String tmpSmiles = "C#N";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.BOND_COUNT_SPECIFIED};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BOND_COUNT_SPECIFIED};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -1532,9 +1529,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.B_POL};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.B_POL};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.01; // tolerance range
 
@@ -1602,9 +1599,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.RULE_OF_FIVE};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.RULE_OF_FIVE};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -1673,9 +1670,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.AROMATIC_ATOMS_COUNT};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AROMATIC_ATOMS_COUNT};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -1744,9 +1741,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.AROMATIC_BONDS_COUNT};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AROMATIC_BONDS_COUNT};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -1815,9 +1812,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.ROTATABLE_BONDS_COUNT};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ROTATABLE_BONDS_COUNT};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -1886,9 +1883,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.FMF};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.FMF};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.01; // tolerance range
 
@@ -1956,9 +1953,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.FRACTIONAL_CSP3};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.FRACTIONAL_CSP3};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.01; // tolerance range
 
@@ -2026,9 +2023,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.HYBRIDIZATION_RATIO};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.HYBRIDIZATION_RATIO};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
@@ -2097,9 +2094,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.KAPPA_SHAPE_INDICES};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.KAPPA_SHAPE_INDICES};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.0001; // tolerance range
 
@@ -2173,9 +2170,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.PETITJEAN_NUMBER};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.PETITJEAN_NUMBER};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.01; // tolerance range
 
@@ -2243,9 +2240,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.SPIRO_ATOM_COUNT};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.SPIRO_ATOM_COUNT};
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -2314,9 +2311,9 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.V_ADJ_MAT};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.V_ADJ_MAT};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.001; // tolerance range
 
@@ -2384,16 +2381,16 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.WEIGHTED_PATH};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.WEIGHTED_PATH};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.00001; // tolerance range
 
         try {
             Assertions.assertEquals(5, Descriptor.getNumberOfComponents(tmpDescriptors));
 
-            float[][] tmpMatrix = new float[][] {
+            float[][] tmpMatrix = new float[][]{
                     {0f, 0f, 0f, 0f, 0f}
             };
             Assertions.assertTrue(
@@ -2411,7 +2408,7 @@ class DescriptorTest {
             Assertions.assertEquals(0.0, tmpMatrix[0][3], epsilon);
             Assertions.assertEquals(0.0, tmpMatrix[0][4], epsilon);
 
-            tmpMatrix = new float[][] {
+            tmpMatrix = new float[][]{
                     {0f, 0f, 0f, 0f, 0f}
             };
             Assertions.assertTrue(
@@ -2429,7 +2426,7 @@ class DescriptorTest {
             Assertions.assertEquals(0.0, tmpMatrix[0][3], epsilon);
             Assertions.assertEquals(0.0, tmpMatrix[0][4], epsilon);
 
-            tmpMatrix = new float[][] {
+            tmpMatrix = new float[][]{
                     {0f, 0f, 0f, 0f, 0f}
             };
             Assertions.assertTrue(
@@ -2463,16 +2460,16 @@ class DescriptorTest {
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.ZAGREB_INDEX};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ZAGREB_INDEX};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.0001; // tolerance range
 
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
-            float[][] tmpMatrix = new float[][] {
+            float[][] tmpMatrix = new float[][]{
                     {0f}
             };
             Assertions.assertTrue(
@@ -2486,7 +2483,7 @@ class DescriptorTest {
             );
             Assertions.assertEquals(16, tmpMatrix[0][0], epsilon);
 
-            tmpMatrix = new float[][] {
+            tmpMatrix = new float[][]{
                     {0f}
             };
             Assertions.assertTrue(
@@ -2500,7 +2497,7 @@ class DescriptorTest {
             );
             Assertions.assertEquals(16, tmpMatrix[0][0], epsilon);
 
-            tmpMatrix = new float[][] {
+            tmpMatrix = new float[][]{
                     {0f}
             };
             Assertions.assertTrue(
@@ -2513,6 +2510,394 @@ class DescriptorTest {
                     )
             );
             Assertions.assertEquals(16, tmpMatrix[0][0], epsilon);
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
+
+    /**
+     * Tests method for descriptor CARBON_TYPES
+     */
+    @Test
+    public void test_CARBON_TYPES() throws Exception {
+        String tmpSmiles = "CCCC";
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+        // Aromaticity detection and marking
+        Cycles.markRingAtomsAndBonds((tmpMolecule));
+        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
+
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CARBON_TYPES};
+        boolean tmpIsParallelCalculation = false;
+        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
+        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
+
+        try {
+            Assertions.assertEquals(9, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[][]
+                    {
+                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][2]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][3]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][4]));
+            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][5]));
+            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][6]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][7]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][8]));
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][2]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][3]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][4]));
+            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][5]));
+            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][6]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][7]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][8]));
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][2]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][3]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][4]));
+            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][5]));
+            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][6]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][7]));
+            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][8]));
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
+
+    /**
+     * Tests method for descriptor A_LOG_P
+     */
+    @Test
+    public void test_A_LOG_P() throws Exception {
+        String tmpSmiles = "CCCCl";
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+
+        AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(tmpMolecule);
+        // Aromaticity detection and marking
+        AtomContainerManipulator.convertImplicitToExplicitHydrogens(tmpMolecule);
+        Cycles.markRingAtomsAndBonds((tmpMolecule));
+        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
+
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.A_LOG_P};
+        boolean tmpIsParallelCalculation = false;
+        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
+        DecimalFormat tmpFormat = new DecimalFormat("0.000", tmpSymbols);
+
+        try {
+            Assertions.assertEquals(3, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[][]
+                    {
+                            {0f, 0f, 0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals("1.719", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals("2.955", tmpFormat.format(tmpMatrix[0][1]));
+            Assertions.assertEquals("20.584", tmpFormat.format(tmpMatrix[0][2]));
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f, 0f, 0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals("1.719", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals("2.955", tmpFormat.format(tmpMatrix[0][1]));
+            Assertions.assertEquals("20.584", tmpFormat.format(tmpMatrix[0][2]));
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f, 0f, 0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals("1.719", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals("2.955", tmpFormat.format(tmpMatrix[0][1]));
+            Assertions.assertEquals("20.584", tmpFormat.format(tmpMatrix[0][2]));
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
+
+    /**
+     * Tests method for descriptor X_LOG_P
+     */
+    @Test
+    public void test_X_LOG_P() throws Exception {
+        String tmpSmiles = "O=C(O)C(N)CCCN";
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+
+        AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(tmpMolecule);
+        // Aromaticity detection and marking
+        AtomContainerManipulator.convertImplicitToExplicitHydrogens(tmpMolecule);
+        Cycles.markRingAtomsAndBonds((tmpMolecule));
+        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
+
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.X_LOG_P};
+        boolean tmpIsParallelCalculation = false;
+        double epsilon = 0.1; // tolerance range
+
+        try {
+            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(-3.30, tmpMatrix[0][0], epsilon);
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(-3.30, tmpMatrix[0][0], epsilon);
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(-3.30, tmpMatrix[0][0], epsilon);
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
+
+    /**
+     * Tests method for descriptor JP_LOG_P
+     */
+    @Test
+    public void test_JP_LOG_P() throws Exception {
+        String tmpSmiles = "CCC(=O)O";
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+        // Aromaticity detection and marking
+        Cycles.markRingAtomsAndBonds((tmpMolecule));
+        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
+
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.JP_LOG_P};
+        boolean tmpIsParallelCalculation = false;
+        double epsilon = 0.1; // tolerance range
+
+        try {
+            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(0.3, tmpMatrix[0][0], epsilon);
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(0.3, tmpMatrix[0][0], epsilon);
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(0.3, tmpMatrix[0][0], epsilon);
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
+
+    /**
+     * Tests method for descriptor A_POL
+     */
+    @Test
+    public void test_A_POL() throws Exception {
+        String tmpSmiles = "O=C(O)CC";
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+        // Aromaticity detection and marking
+        Cycles.markRingAtomsAndBonds((tmpMolecule));
+        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
+
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.A_POL};
+        boolean tmpIsParallelCalculation = false;
+        double epsilon = 0.01; // tolerance range
+
+        try {
+            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(10.88, tmpMatrix[0][0], epsilon);
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(10.88, tmpMatrix[0][0], epsilon);
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(10.88, tmpMatrix[0][0], epsilon);
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -2532,19 +2917,19 @@ class DescriptorTest {
         String tmpSmiles = "CC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         // Add new descriptor tests here!
         Descriptor[] tmpDescriptors =
-            new Descriptor[]
-                {
-                    Descriptor.MOLECULAR_WEIGHT,
-                    Descriptor.WIENER_NUMBER,
-                    Descriptor.ATOM_COUNT,
-                    Descriptor.H_BOND_ACCEPTOR_COUNT,
-                    Descriptor.H_BOND_DONOR_COUNT
+                new Descriptor[]
+                        {
+                                Descriptor.MOLECULAR_WEIGHT,
+                                Descriptor.WIENER_NUMBER,
+                                Descriptor.ATOM_COUNT,
+                                Descriptor.H_BOND_ACCEPTOR_COUNT,
+                                Descriptor.H_BOND_DONOR_COUNT
 
-                };
+                        };
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
@@ -2555,13 +2940,13 @@ class DescriptorTest {
             float[][] tmpMatrix = new float[1][];
             tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
             Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                    tmpDescriptors,
-                    tmpMoleculesArray,
-                    tmpMatrix,
-                    tmpStartIndex,
-                    tmpIsParallelCalculation
-                )
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
             );
             Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
             Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[0][1]));
@@ -2573,13 +2958,13 @@ class DescriptorTest {
             tmpMatrix = new float[1][];
             tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
             Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                    tmpDescriptors,
-                    tmpMoleculesArray,
-                    tmpMatrix,
-                    tmpStartIndex,
-                    tmpIsParallelCalculation
-                )
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
             );
             Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
             Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[0][1]));
@@ -2591,13 +2976,13 @@ class DescriptorTest {
             tmpMatrix = new float[1][];
             tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
             Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
-                    tmpDescriptors,
-                    tmpMoleculesArray,
-                    tmpMatrix,
-                    tmpStartIndex,
-                    tmpIsParallelCalculation
-                )
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
             );
             Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
             Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[0][1]));
