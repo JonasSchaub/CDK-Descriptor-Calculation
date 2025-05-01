@@ -25,7 +25,9 @@
 
 package de.unijena.cheminf.clustering.desccalc;
 
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.ALOGPDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.APolDescriptor;
@@ -61,6 +63,7 @@ import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.IntegerArrayResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
+import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import java.util.EnumMap;
 import java.util.logging.Level;
@@ -1366,13 +1369,15 @@ public enum Descriptor {
                     }
                     break;
                 case A_LOG_P:
-                    DoubleArrayResult alogpResult = (DoubleArrayResult) (new ALOGPDescriptor()).calculate(anAtomContainer).getValue();
-                    aVector[aStartIndex] = (float) alogpResult.get(0); // ALogP
-                    aVector[aStartIndex + 1] = (float) alogpResult.get(1); // Molar Refractivity
-                    aVector[aStartIndex + 2] = (float) alogpResult.get(2); // ALogP squared
+                    IAtomContainer ALogPMoleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
+                    DoubleArrayResult aLogPResult = (DoubleArrayResult) (new ALOGPDescriptor()).calculate(ALogPMoleculeWithExplicitH).getValue();
+                    aVector[aStartIndex] = (float) aLogPResult.get(0);// ALogP
+                    aVector[aStartIndex + 1] = (float) aLogPResult.get(1);  // ALogP squared
+                    aVector[aStartIndex + 2] = (float) aLogPResult.get(2);  // Molar Refractivity
                     break;
                 case X_LOG_P:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new XLogPDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    IAtomContainer xLogPMoleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new XLogPDescriptor()).calculate(xLogPMoleculeWithExplicitH).getValue()).doubleValue();
                     break;
                 case JP_LOG_P:
                     aVector[aStartIndex] = (float) ((DoubleResult) (new JPlogPDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
@@ -1442,8 +1447,7 @@ public enum Descriptor {
                     aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LONGEST_ALIPHATIC_CHAIN).calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case MANNHOLD_LOGP:
-                    aVector[aStartIndex] = (float) ((DoubleResult)
-                            descriptorToCdkObjectMap.get(MANNHOLD_LOGP).calculate(anAtomContainer).getValue()).doubleValue();
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(MANNHOLD_LOGP).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case BCUT:
                     DoubleArrayResult bcutResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(BCUT).calculate(anAtomContainer).getValue();
@@ -1452,8 +1456,7 @@ public enum Descriptor {
                     }
                     break;
                 case BOND_COUNT_ALL:
-                    aVector[aStartIndex] = (float) ((IntegerResult)
-                            descriptorToCdkObjectMap.get(BOND_COUNT_ALL).calculate(anAtomContainer).getValue()).intValue();
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_ALL).calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case BOND_COUNT_SPECIFIED:
                     // Single bonds (s)
@@ -1526,13 +1529,15 @@ public enum Descriptor {
                     }
                     break;
                 case A_LOG_P:
-                    DoubleArrayResult alogpResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(A_LOG_P).calculate(anAtomContainer).getValue();
-                    aVector[aStartIndex] = (float) alogpResult.get(0); // ALogP
-                    aVector[aStartIndex + 1] = (float) alogpResult.get(1); // Molar Refractivity
-                    aVector[aStartIndex + 2] = (float) alogpResult.get(2); // ALogP squared
+                    IAtomContainer aLogPMoleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
+                    DoubleArrayResult alogpResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(A_LOG_P).calculate(aLogPMoleculeWithExplicitH).getValue();
+                    aVector[aStartIndex] = (float) alogpResult.get(0);      // ALogP
+                    aVector[aStartIndex + 1] = (float) alogpResult.get(1);  // ALogP squared
+                    aVector[aStartIndex + 2] = (float) alogpResult.get(2);  // Molar Refractivity
                     break;
                 case X_LOG_P:
-                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(X_LOG_P).calculate(anAtomContainer).getValue()).doubleValue();
+                    IAtomContainer xLogPMoleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(X_LOG_P).calculate(xLogPMoleculeWithExplicitH).getValue()).doubleValue();
                     break;
                 case JP_LOG_P:
                     aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(JP_LOG_P).calculate(anAtomContainer).getValue()).doubleValue();
@@ -1707,8 +1712,7 @@ public enum Descriptor {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult)
-                descriptorToCdkObjectMap.get(MANNHOLD_LOGP).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(MANNHOLD_LOGP).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -2062,10 +2066,26 @@ public enum Descriptor {
             float[] aVector,
             int aStartIndex
     ) {
-        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(A_LOG_P).calculate(anAtomContainer).getValue();
-        aVector[aStartIndex] = (float) result.get(0); // ALogP
-        aVector[aStartIndex + 1] = (float) result.get(1); // Molar Refractivity
-        aVector[aStartIndex + 2] = (float) result.get(2); // ALogP squared
+        try {
+            // Create a copy of the molecule with explicit hydrogen atoms
+            IAtomContainer moleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
+
+            // Calculate ALogP using the molecule copy containing explicit hydrogen atoms
+            DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(A_LOG_P).calculate(moleculeWithExplicitH).getValue();
+
+            aVector[aStartIndex] = (float) result.get(0);      // ALogP
+            aVector[aStartIndex + 1] = (float) result.get(1);  // ALogP squared
+            aVector[aStartIndex + 2] = (float) result.get(2);  // Molar Refractivity
+        } catch (Exception anException) {
+            aVector[aStartIndex] = Float.NaN;
+            aVector[aStartIndex + 1] = Float.NaN;
+            aVector[aStartIndex + 2] = Float.NaN;
+            Descriptor.LOGGER.log(
+                    Level.WARNING,
+                    "Descriptor.setALogP: An exception occurred: " + anException.getMessage(),
+                    anException
+            );
+        }
     }
 
     /**
@@ -2083,8 +2103,20 @@ public enum Descriptor {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult)
-                descriptorToCdkObjectMap.get(X_LOG_P).calculate(anAtomContainer).getValue()).doubleValue();
+        try {
+            // Create a copy of the molecule with explicit hydrogen atoms
+            IAtomContainer moleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
+
+            // Calculate XLogP using the molecule copy containing explicit hydrogen atoms
+            aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(X_LOG_P).calculate(moleculeWithExplicitH).getValue()).doubleValue();
+        } catch (Exception anException) {
+            aVector[aStartIndex] = Float.NaN;
+            Descriptor.LOGGER.log(
+                    Level.WARNING,
+                    "Descriptor.setXLogP: An exception occurred: " + anException.getMessage(),
+                    anException
+            );
+        }
     }
     /**
      * Sets JP LogP value (octanol-water partition coefficient based on JPlogP method)
@@ -2124,7 +2156,114 @@ public enum Descriptor {
     //</editor-fold>
 
     //<editor-fold desc="Public static molecule preparation methods">
-    //TODO: Include Method to convert implicit to explicit Hydrogens -> add to X_LOG_P and A_LOG_P
+    /**
+     * Creates a new molecule with explicit hydrogens from a molecule that has implicit hydrogens.
+     * Note: This method requires that the implicit hydrogen counts on atoms are properly set
+     *  before calling this method. If implicit hydrogen counts are not set or are all zero,
+     *  no explicit hydrogens will be added to the resulting molecule. Checks are NOT performed here.
+     *  All necessary checks have already been made in public methods above.
+     *
+     *
+     * @param aMolecule Molecule with implicit hydrogens (IS NOT CHANGED)
+     * @return New molecule with explicit hydrogens (Not allowed to be null or empty)
+     * @throws Exception Thrown if the molecular structure is invalid or hydrogens cannot be added
+     */
+    public static IAtomContainer createMoleculeWithExplicitHydrogens(
+            IAtomContainer aMolecule
+    ) throws Exception {
+
+        try {
+            // Create a new empty atom container with the same properties
+            IAtomContainer tmpMoleculeWithExplicitH = aMolecule.getBuilder().newInstance(IAtomContainer.class);
+
+            // Copy properties
+            for (Object key : aMolecule.getProperties().keySet()) {
+                tmpMoleculeWithExplicitH.setProperty(key, aMolecule.getProperty(key));
+            }
+
+            // Copy atoms
+            for (IAtom tmpAtom : aMolecule.atoms()) {
+                IAtom tmpNewAtom = tmpAtom.getBuilder().newInstance(IAtom.class);
+
+                // Copy atom properties
+                tmpNewAtom.setSymbol(tmpAtom.getSymbol());
+                tmpNewAtom.setAtomicNumber(tmpAtom.getAtomicNumber());
+                tmpNewAtom.setMassNumber(tmpAtom.getMassNumber());
+                tmpNewAtom.setFormalCharge(tmpAtom.getFormalCharge());
+                tmpNewAtom.setImplicitHydrogenCount(tmpAtom.getImplicitHydrogenCount());
+                tmpNewAtom.setCharge(tmpAtom.getCharge());
+
+                // Copy atom flags
+                if (tmpAtom.isAromatic()) {
+                    tmpNewAtom.setIsAromatic(true);
+                }
+                if (tmpAtom.isInRing()) {
+                    tmpNewAtom.setIsInRing(true);
+                }
+
+                // Copy atom properties
+                for (Object key : tmpAtom.getProperties().keySet()) {
+                    tmpNewAtom.setProperty(key, tmpAtom.getProperty(key));
+                }
+
+                // Add atom to new container
+                tmpMoleculeWithExplicitH.addAtom(tmpNewAtom);
+            }
+
+            // Copy bonds
+            for (IBond tmpBond : aMolecule.bonds()) {
+                IBond tmpNewBond = tmpBond.getBuilder().newInstance(IBond.class);
+
+                // Get atoms for this bond in the new molecule
+                IAtom tmpAtom1 = tmpMoleculeWithExplicitH.getAtom(aMolecule.indexOf(tmpBond.getBegin()));
+                IAtom tmpAtom2 = tmpMoleculeWithExplicitH.getAtom(aMolecule.indexOf(tmpBond.getEnd()));
+
+                // Set bond properties
+                tmpNewBond.setOrder(tmpBond.getOrder());
+                tmpNewBond.setAtoms(new IAtom[]{tmpAtom1, tmpAtom2});
+
+                // Copy bond flags
+                if (tmpBond.isAromatic()) {
+                    tmpNewBond.setIsAromatic(true);
+                }
+                if (tmpBond.isInRing()) {
+                    tmpNewBond.setIsInRing(true);
+                }
+
+                // Copy bond properties
+                for (Object key : tmpBond.getProperties().keySet()) {
+                    tmpNewBond.setProperty(key, tmpBond.getProperty(key));
+                }
+
+                // Add bond to new container
+                tmpMoleculeWithExplicitH.addBond(tmpNewBond);
+            }
+
+            // Now that we have a copy of the original molecule, add explicit hydrogens
+            try {
+                AtomContainerManipulator.convertImplicitToExplicitHydrogens(tmpMoleculeWithExplicitH);
+            } catch (Exception anException) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.createMoleculeWithExplicitHydrogens: Error converting implicit to explicit hydrogens: " + anException.getMessage(),
+                        anException
+                );
+                throw new Exception("Failed to convert implicit to explicit hydrogens: " + anException.getMessage());
+            }
+
+            return tmpMoleculeWithExplicitH;
+
+        } catch (Exception anException) {
+            if (!(anException instanceof IllegalArgumentException)) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.createMoleculeWithExplicitHydrogens: Error creating molecule with explicit hydrogens: " + anException.getMessage(),
+                        anException
+                );
+            }
+            throw anException;
+        }
+    }
     //</editor-fold>
 
 }

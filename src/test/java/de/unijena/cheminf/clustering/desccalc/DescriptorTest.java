@@ -29,10 +29,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.aromaticity.Aromaticity;
 import org.openscience.cdk.graph.Cycles;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
-import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -886,7 +886,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor LONGEST_ALIPHATIC_CHAIN with a more complex structure
+     * Tests method for descriptor LONGEST_ALIPHATIC_CHAIN
      */
     @Test
     public void test_LONGEST_ALIPHATIC_CHAIN_2() throws Exception {
@@ -2640,9 +2640,6 @@ class DescriptorTest {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
 
-        AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(tmpMolecule);
-        // Aromaticity detection and marking
-        AtomContainerManipulator.convertImplicitToExplicitHydrogens(tmpMolecule);
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
@@ -2720,9 +2717,6 @@ class DescriptorTest {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
 
-        AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(tmpMolecule);
-        // Aromaticity detection and marking
-        AtomContainerManipulator.convertImplicitToExplicitHydrogens(tmpMolecule);
         Cycles.markRingAtomsAndBonds((tmpMolecule));
         Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
 
@@ -3228,6 +3222,59 @@ class DescriptorTest {
             Assertions.fail();
         }
     }
+    //</editor-fold>
+
+    //<editor-fold desc="Tests preperation Methods">
+
+    @Test
+    public void testCreateMoleculeWithExplicitHydrogens() throws Exception {
+        // Create a simple molecule (methane) with implicit hydrogen atoms
+        String methanSmiles = "C";
+        SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer methaneImplicit = smilesParser.parseSmiles(methanSmiles);
+
+        // Ensure the input is correct (1 atom, no bonds to H)
+        Assertions.assertEquals(1, methaneImplicit.getAtomCount(),
+                "Original methane should only have 1 atom");
+        Assertions.assertEquals(0, methaneImplicit.getBondCount(),
+                "Original methane should have no bonds");
+
+        // Convert to molecule with explicit hydrogen atoms
+        IAtomContainer methaneExplicit = Descriptor.createMoleculeWithExplicitHydrogens(methaneImplicit);
+
+        // Check that the new molecule has the expected number of atoms (C + 4H = 5)
+        Assertions.assertEquals(5, methaneExplicit.getAtomCount(),
+                "Methane with explicit H should have 5 atoms (C + 4H)");
+
+        // Check that the new molecule has the expected number of bonds (4 C-H bonds)
+        Assertions.assertEquals(4, methaneExplicit.getBondCount(),
+                "Methane with explicit H should have 4 bonds");
+        // Check count of hydrogens
+        int hydrogenCount = 0;
+        for (IAtom atom : methaneExplicit.atoms()) {
+            if ("H".equals(atom.getSymbol())) {
+                hydrogenCount++;
+            }
+        }
+        Assertions.assertEquals(4, hydrogenCount,
+                "There should be 4 explicit hydrogen atoms");
+
+        // Test with a more complex molecule
+        String ethanolSmiles = "CCO";
+        IAtomContainer ethanolImplicit = smilesParser.parseSmiles(ethanolSmiles);
+
+        // Check if input is correct
+        Assertions.assertEquals(3, ethanolImplicit.getAtomCount(),
+                "Ethanol should have 3 atoms (implicit H)");
+
+        // Convert to molecule with explicit hydrogens
+        IAtomContainer ethanolExplicit = Descriptor.createMoleculeWithExplicitHydrogens(ethanolImplicit);
+
+        // Check atom count (C + C + O + 6H = 9)
+        Assertions.assertEquals(9, ethanolExplicit.getAtomCount(),
+                "Ethanol with explicit H should have 9 atoms");
+    }
+
     //</editor-fold>
 
 }
