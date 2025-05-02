@@ -28,11 +28,14 @@ package de.unijena.cheminf.clustering.desccalc;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.aromaticity.Aromaticity;
+import org.openscience.cdk.aromaticity.ElectronDonation;
 import org.openscience.cdk.graph.Cycles;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
+import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -1680,67 +1683,79 @@ class DescriptorTest {
     public void test_AROMATIC_ATOMS_COUNT() throws Exception {
         String tmpSmiles = "c1ccccc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
+        // Array of all available electron donation models
+        ElectronDonation[] electronDonationModels = {
+                ElectronDonation.daylight(),
+                ElectronDonation.cdkAllowingExocyclic(),
+                ElectronDonation.cdk(),
+                ElectronDonation.piBonds()
+        };
 
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
-        int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AROMATIC_ATOMS_COUNT};
-        boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
-        try {
-            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+        for (ElectronDonation model : electronDonationModels) {
+            // Parse fresh molecule for each model
+            IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
 
-            float[][] tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation
-                    )
-            );
-            Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
+            // Apply aromaticity with the current model
+            Descriptor.setAromaticity(tmpMolecule, model);
 
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation
-                    )
-            );
-            Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
+            IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+            int tmpStartIndex = 0;
+            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AROMATIC_ATOMS_COUNT};
+            boolean tmpIsParallelCalculation = false;
 
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation
-                    )
-            );
-            Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
-        } catch (Exception anException) {
-            Assertions.fail();
+            try {
+                Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+                float[][] tmpMatrix = new float[][]
+                        {
+                                {0f}
+                        };
+                Assertions.assertTrue(
+                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                                tmpDescriptors,
+                                tmpMoleculesArray,
+                                tmpMatrix,
+                                tmpStartIndex,
+                                tmpIsParallelCalculation
+                        )
+                );
+                Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
+
+                tmpMatrix = new float[][]
+                        {
+                                {0f}
+                        };
+                Assertions.assertTrue(
+                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                                tmpDescriptors,
+                                tmpMoleculesArray,
+                                tmpMatrix,
+                                tmpStartIndex,
+                                tmpIsParallelCalculation
+                        )
+                );
+                Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
+
+                tmpMatrix = new float[][]
+                        {
+                                {0f}
+                        };
+                Assertions.assertTrue(
+                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                                tmpDescriptors,
+                                tmpMoleculesArray,
+                                tmpMatrix,
+                                tmpStartIndex,
+                                tmpIsParallelCalculation
+                        )
+                );
+                Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
+            } catch (Exception anException) {
+                Assertions.fail("Failed with model " + model.getClass().getSimpleName() + ": " + anException.getMessage());
+            }
         }
     }
 
@@ -3226,6 +3241,9 @@ class DescriptorTest {
 
     //<editor-fold desc="Tests preperation Methods">
 
+    /**
+     * Tests createMoleculeWithExplicitHydrogens
+     */
     @Test
     public void testCreateMoleculeWithExplicitHydrogens() throws Exception {
         // Create a simple molecule (methane) with implicit hydrogen atoms
@@ -3273,6 +3291,70 @@ class DescriptorTest {
         // Check atom count (C + C + O + 6H = 9)
         Assertions.assertEquals(9, ethanolExplicit.getAtomCount(),
                 "Ethanol with explicit H should have 9 atoms");
+    }
+
+    /**
+     * Tests setAromaticity
+     */
+    @Test
+    public void testSetAromaticity() throws Exception {
+        // Test molecule: Benzene
+        String benzeneSmiles = "c1ccccc1";
+        SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer benzene = smilesParser.parseSmiles(benzeneSmiles);
+
+        // Aromaticity models
+        ElectronDonation[] models = {
+                ElectronDonation.daylight(),
+                ElectronDonation.cdk(),
+                ElectronDonation.cdkAllowingExocyclic(),
+                ElectronDonation.piBonds()
+        };
+
+        for (ElectronDonation model : models) {
+            // Fresh molecule for each test
+            IAtomContainer testMolecule = benzene.clone();
+
+            // Critical step: Perceive atom types and configure atoms
+            AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(testMolecule);
+
+            // Reset aromaticity flags
+            for (IAtom atom : testMolecule.atoms()) {
+                atom.setIsAromatic(false);
+            }
+            for (IBond bond : testMolecule.bonds()) {
+                bond.setIsAromatic(false);
+            }
+
+            // Set aromaticity using the current model
+            // Note: This test still uses the old Descriptor.setAromaticity which takes ElectronDonation
+            // It might need updating if Descriptor.setAromaticity now expects Aromaticity.Model
+            Descriptor.setAromaticity(testMolecule, model);
+
+            // Check if aromatic elements are present
+            boolean hasAromaticAtoms = false;
+            boolean hasAromaticBonds = false;
+
+            for (IAtom atom : testMolecule.atoms()) {
+                if (atom.isAromatic()) {
+                    hasAromaticAtoms = true;
+                    break;
+                }
+            }
+
+            for (IBond bond : testMolecule.bonds()) {
+                if (bond.isAromatic()) {
+                    hasAromaticBonds = true;
+                    break;
+                }
+            }
+
+            String modelName = model.getClass().getSimpleName();
+            Assertions.assertTrue(hasAromaticAtoms,
+                    "Model " + modelName + " should identify aromatic atoms");
+            Assertions.assertTrue(hasAromaticBonds,
+                    "Model " + modelName + " should identify aromatic bonds");
+        }
     }
 
     //</editor-fold>

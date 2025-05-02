@@ -25,6 +25,9 @@
 
 package de.unijena.cheminf.clustering.desccalc;
 
+import org.openscience.cdk.aromaticity.Aromaticity;
+import org.openscience.cdk.aromaticity.ElectronDonation;
+import org.openscience.cdk.graph.Cycles;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -1369,8 +1372,8 @@ public enum Descriptor {
                     }
                     break;
                 case A_LOG_P:
-                    IAtomContainer ALogPMoleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
-                    DoubleArrayResult aLogPResult = (DoubleArrayResult) (new ALOGPDescriptor()).calculate(ALogPMoleculeWithExplicitH).getValue();
+                    IAtomContainer aLogPMoleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
+                    DoubleArrayResult aLogPResult = (DoubleArrayResult) (new ALOGPDescriptor()).calculate(aLogPMoleculeWithExplicitH).getValue();
                     aVector[aStartIndex] = (float) aLogPResult.get(0);// ALogP
                     aVector[aStartIndex + 1] = (float) aLogPResult.get(1);  // ALogP squared
                     aVector[aStartIndex + 2] = (float) aLogPResult.get(2);  // Molar Refractivity
@@ -1530,10 +1533,10 @@ public enum Descriptor {
                     break;
                 case A_LOG_P:
                     IAtomContainer aLogPMoleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
-                    DoubleArrayResult alogpResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(A_LOG_P).calculate(aLogPMoleculeWithExplicitH).getValue();
-                    aVector[aStartIndex] = (float) alogpResult.get(0);      // ALogP
-                    aVector[aStartIndex + 1] = (float) alogpResult.get(1);  // ALogP squared
-                    aVector[aStartIndex + 2] = (float) alogpResult.get(2);  // Molar Refractivity
+                    DoubleArrayResult aLogPResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(A_LOG_P).calculate(aLogPMoleculeWithExplicitH).getValue();
+                    aVector[aStartIndex] = (float) aLogPResult.get(0);      // ALogP
+                    aVector[aStartIndex + 1] = (float) aLogPResult.get(1);  // ALogP squared
+                    aVector[aStartIndex + 2] = (float) aLogPResult.get(2);  // Molar Refractivity
                     break;
                 case X_LOG_P:
                     IAtomContainer xLogPMoleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
@@ -2264,6 +2267,49 @@ public enum Descriptor {
             throw anException;
         }
     }
+
+    /**
+     * Uses a given aromaticity model to modify aMolecule.
+     * Note: This method changes the input molecule by applying the specified aromaticity model.
+     * Note: No checks are performed, all necessary checks have already been made in public methods above.
+     * TODO: Old API implementation find a way to use new implementation -> Aromaticity.apply does not take Aromaticity.Model as parameter
+     *
+     * @param aMolecule Molecule that will be modified (IS CHANGED)
+     * @param anAromaticityModel The aromaticity model that will be used for aromaticity detection
+     * @throws Exception Thrown if the aromaticity detection fails or if the aromaticity model is null
+     */
+    public static void setAromaticity(IAtomContainer aMolecule, ElectronDonation anAromaticityModel) throws Exception {
+        try {
+            // Check if aromaticity model is null
+            if (anAromaticityModel == null) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.setAromaticity: Aromaticity model cannot be null."
+                );
+                throw new IllegalArgumentException("Aromaticity model cannot be null.");
+            }
+            AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(aMolecule);
+
+            for (IAtom atom : aMolecule.atoms()) {
+                atom.setIsAromatic(false);
+            }
+            for (IBond bond : aMolecule.bonds()) {
+                bond.setIsAromatic(false);
+            }
+
+            Cycles.markRingAtomsAndBonds(aMolecule);
+            Aromaticity.apply(anAromaticityModel, aMolecule);
+
+        } catch (Exception anException) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setAromaticity: Error applying aromaticity model: " + anException.getMessage(),
+                    anException
+            );
+            throw new Exception("Failed to apply aromaticity model: " + anException.getMessage(), anException);
+        }
+    }
+
     //</editor-fold>
 
 }
