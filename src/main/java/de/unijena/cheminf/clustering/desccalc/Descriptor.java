@@ -37,12 +37,20 @@ import org.openscience.cdk.qsar.descriptors.molecular.APolDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AromaticAtomsCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AromaticBondsCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AtomCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.AutocorrelationDescriptorCharge;
+import org.openscience.cdk.qsar.descriptors.molecular.AutocorrelationDescriptorMass;
+import org.openscience.cdk.qsar.descriptors.molecular.AutocorrelationDescriptorPolarizability;
 import org.openscience.cdk.qsar.descriptors.molecular.BCUTDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.BPolDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.BondCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.CarbonTypesDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.ChiChainDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.ChiClusterDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.ChiPathClusterDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.ChiPathDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.FMFDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.FractionalCSP3Descriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.FragmentComplexityDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.HBondAcceptorCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.HBondDonorCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.HybridizationRatioDescriptor;
@@ -297,7 +305,107 @@ public enum Descriptor {
     /**
      * APol descriptor, calculates the sum of the atomic polarizabilities (including implicit hydrogens).
      */
-    A_POL;
+    A_POL,
+    /**
+     * AutocorrelationDescriptorCharge, calculates topological autocorrelation vectors
+     * that capture patterns related to charge distribution across the molecular structure.
+     * This descriptor correlates atomic partial charges along the molecular topology
+     * to characterize charge-related structural patterns in the molecule.
+     * Returns 5 values representing charge autocorrelation at different topological distances.
+     */
+    AUTOCORRELATION_CHARGE,
+    /**
+     * AutocorrelationDescriptorMass, calculates topological autocorrelation vectors
+     * that capture patterns related to atomic mass distribution across the molecular structure.
+     * This descriptor correlates atomic masses along the molecular topology
+     * to characterize mass-related structural patterns in the molecule.
+     * Returns 5 values representing mass autocorrelation at different topological distances.
+     */
+    AUTOCORRELATION_MASS,
+    /**
+     * AutocorrelationDescriptorPolarizability, calculates topological autocorrelation vectors
+     * that capture patterns related to polarizability distribution across the molecular structure.
+     * This descriptor correlates atomic polarizabilities along the molecular topology
+     * to characterize polarizability-related structural patterns in the molecule.
+     * Returns 5 values representing polarizability autocorrelation at different topological distances.
+     * NOTE: Method is not validated in the CDK so not validated in this implementation as well
+     */
+    AUTOCORRELATION_POLARIZABILITY,
+    /**
+     * FragmentComplexity descriptor, calculates the complexity of a molecular system.
+     * The complexity is defined as [Nilakantan, R. et. al.. Journal of chemical information and modeling. 2006. 46]:
+     * C = abs(B^2 - A^2 + A) + H/100
+     * where:
+     * C = complexity
+     * A = number of non-hydrogen atoms
+     * B = number of bonds
+     * H = number of heteroatoms
+     * This provides a measure of structural complexity that correlates with synthetic accessibility.
+     */
+    FRAGMENT_COMPLEXITY,
+    /**
+     * ChiChain descriptor, calculates the Kier + Hall chi chain indices of orders 3 through 7.
+     * These values characterize a molecular graph based on its chain subgraphs.
+     * Returns 10 values:
+     * SCH-3 - Simple chain, order 3
+     * SCH-4 - Simple chain, order 4
+     * SCH-5 - Simple chain, order 5
+     * SCH-6 - Simple chain, order 6
+     * SCH-7 - Simple chain, order 7
+     * VCH-3 - Valence chain, order 3
+     * VCH-4 - Valence chain, order 4
+     * VCH-5 - Valence chain, order 5
+     * VCH-6 - Valence chain, order 6
+     * VCH-7 - Valence chain, order 7
+     */
+    CHI_CHAIN,/**
+     * ChiCluster descriptor, calculates Kier + Hall chi cluster indices of orders 3 through 6.
+     * These values characterize a molecular graph based on its cluster subgraphs.
+     * Returns 8 values:
+     * SC-3 - Simple cluster, order 3
+     * SC-4 - Simple cluster, order 4
+     * SC-5 - Simple cluster, order 5
+     * SC-6 - Simple cluster, order 6
+     * VC-3 - Valence cluster, order 3
+     * VC-4 - Valence cluster, order 4
+     * VC-5 - Valence cluster, order 5
+     * VC-6 - Valence cluster, order 6
+     */
+    CHI_CLUSTER,
+    /**
+     * ChiPathCluster descriptor, calculates Kier + Hall chi path cluster indices of orders 4 through 6.
+     * These values characterize a molecular graph based on its path cluster subgraphs.
+     * Returns 6 values:
+     * SPC-4 - Simple path cluster, order 4
+     * SPC-5 - Simple path cluster, order 5
+     * SPC-6 - Simple path cluster, order 6
+     * VPC-4 - Valence path cluster, order 4
+     * VPC-5 - Valence path cluster, order 5
+     * VPC-6 - Valence path cluster, order 6
+     */
+    CHI_PATH_CLUSTER,
+    /**
+     * ChiPath descriptor, calculates Kier + Hall chi path indices of orders 0 through 7.
+     * These values characterize a molecular graph based on its path subgraphs.
+     * Returns 16 values:
+     * SP-0 - Simple path, order 0
+     * SP-1 - Simple path, order 1
+     * SP-2 - Simple path, order 2
+     * SP-3 - Simple path, order 3
+     * SP-4 - Simple path, order 4
+     * SP-5 - Simple path, order 5
+     * SP-6 - Simple path, order 6
+     * SP-7 - Simple path, order 7
+     * VP-0 - Valence path, order 0
+     * VP-1 - Valence path, order 1
+     * VP-2 - Valence path, order 2
+     * VP-3 - Valence path, order 3
+     * VP-4 - Valence path, order 4
+     * VP-5 - Valence path, order 5
+     * VP-6 - Valence path, order 6
+     * VP-7 - Valence path, order 7
+     */
+    CHI_PATH;
 
     // Add new descriptor information here!
 
@@ -440,6 +548,38 @@ public enum Descriptor {
             // A_POL has 1 component
             descriptorToComponentNumberMap.put(A_POL, 1);
             descriptorToCdkObjectMap.put(A_POL, new APolDescriptor());
+
+            // AUTOCORRELATION_CHARGE has 5 components
+            descriptorToComponentNumberMap.put(AUTOCORRELATION_CHARGE, 5);
+            descriptorToCdkObjectMap.put(AUTOCORRELATION_CHARGE, new AutocorrelationDescriptorCharge());
+
+            // AUTOCORRELATION_MASS has 5 components
+            descriptorToComponentNumberMap.put(AUTOCORRELATION_MASS, 5);
+            descriptorToCdkObjectMap.put(AUTOCORRELATION_MASS, new AutocorrelationDescriptorMass());
+
+            // AUTOCORRELATION_POLARIZABILITY has 5 components
+            descriptorToComponentNumberMap.put(AUTOCORRELATION_POLARIZABILITY, 5);
+            descriptorToCdkObjectMap.put(AUTOCORRELATION_POLARIZABILITY, new AutocorrelationDescriptorPolarizability());
+
+            // FRAGMENT_COMPLEXITY has 1 component
+            descriptorToComponentNumberMap.put(FRAGMENT_COMPLEXITY, 1);
+            descriptorToCdkObjectMap.put(FRAGMENT_COMPLEXITY, new FragmentComplexityDescriptor());
+
+            // CHI_CHAIN has 10 components
+            descriptorToComponentNumberMap.put(CHI_CHAIN, 10);
+            descriptorToCdkObjectMap.put(CHI_CHAIN, new ChiChainDescriptor());
+
+            // CHI_CLUSTER has 8 components
+            descriptorToComponentNumberMap.put(CHI_CLUSTER, 8);
+            descriptorToCdkObjectMap.put(CHI_CLUSTER, new ChiClusterDescriptor());
+
+            // CHI_PATH_CLUSTER has 6 components
+            descriptorToComponentNumberMap.put(CHI_PATH_CLUSTER, 6);
+            descriptorToCdkObjectMap.put(CHI_PATH_CLUSTER, new ChiPathClusterDescriptor());
+
+            // CHI_PATH has 16 components
+            descriptorToComponentNumberMap.put(CHI_PATH, 16);
+            descriptorToCdkObjectMap.put(CHI_PATH, new ChiPathDescriptor());
 
             // Add new descriptor information here!
 
@@ -1232,6 +1372,31 @@ public enum Descriptor {
                 case A_POL:
                     setAPol(anAtomContainer, aVector, aStartIndex);
                     break;
+                case AUTOCORRELATION_CHARGE:
+                    setAutocorrelationCharge(anAtomContainer, aVector, aStartIndex);
+                    return true;
+                case AUTOCORRELATION_MASS:
+                    setAutocorrelationMass(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case AUTOCORRELATION_POLARIZABILITY:
+                    setAutocorrelationPolarizability(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case FRAGMENT_COMPLEXITY:
+                    setFragmentComplexity(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case CHI_CHAIN:
+                    setChiChain(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case CHI_CLUSTER:
+                    setChiCluster(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case CHI_PATH_CLUSTER:
+                    setChiPathCluster(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case CHI_PATH:
+                    setChiPath(anAtomContainer, aVector, aStartIndex);
+                    break;
+
                 // Add new descriptor information here!
                 default:
                     throw new UnsupportedOperationException("This descriptor does not have a routine yet!");
@@ -1387,6 +1552,51 @@ public enum Descriptor {
                     break;
                 case A_POL:
                     aVector[aStartIndex] = (float) ((DoubleResult) (new APolDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case AUTOCORRELATION_CHARGE:
+                    DoubleArrayResult tmpAutocorrelationChargeResult = (DoubleArrayResult) (new AutocorrelationDescriptorCharge()).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 5; i++) {
+                        aVector[aStartIndex + i] = (float) tmpAutocorrelationChargeResult.get(i);
+                    }
+                    break;
+                case AUTOCORRELATION_MASS:
+                    DoubleArrayResult tmpAutocorrelationMassResult = (DoubleArrayResult) new AutocorrelationDescriptorMass().calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 5; i++) {
+                        aVector[aStartIndex + i] = (float) tmpAutocorrelationMassResult.get(i);
+                    }
+                    break;
+                case AUTOCORRELATION_POLARIZABILITY:
+                    DoubleArrayResult tmpAutocorrelationPolarizabilityResult = (DoubleArrayResult) (new AutocorrelationDescriptorPolarizability()).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 5; i++) {
+                        aVector[aStartIndex + i] = (float) tmpAutocorrelationPolarizabilityResult.get(i);
+                    }
+                    break;
+                case FRAGMENT_COMPLEXITY:
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new FragmentComplexityDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case CHI_CHAIN:
+                    DoubleArrayResult tmpChiChainResult = (DoubleArrayResult) new ChiChainDescriptor().calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 10; i++) {
+                        aVector[aStartIndex + i] = (float) tmpChiChainResult.get(i);
+                    }
+                    break;
+                case CHI_CLUSTER:
+                    DoubleArrayResult tmpChiClusterResult = (DoubleArrayResult) (new ChiClusterDescriptor()).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 8; i++) {
+                        aVector[aStartIndex + i] = (float) tmpChiClusterResult.get(i);
+                    }
+                    break;
+                case CHI_PATH_CLUSTER:
+                    DoubleArrayResult chiPathClusterResult = (DoubleArrayResult) new ChiPathClusterDescriptor().calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 6; i++) {
+                        aVector[aStartIndex + i] = (float) chiPathClusterResult.get(i);
+                    }
+                    break;
+                case CHI_PATH:
+                    DoubleArrayResult tmpArrayResultChiPath = (DoubleArrayResult) (new ChiPathDescriptor()).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 16; i++) {
+                        aVector[aStartIndex + i] = (float) tmpArrayResultChiPath.get(i);
+                    }
                     break;
 
                 // Add new descriptor information here!
@@ -1547,6 +1757,51 @@ public enum Descriptor {
                     break;
                 case A_POL:
                     aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(A_POL).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case AUTOCORRELATION_CHARGE:
+                    DoubleArrayResult tmpAutocorrelationChargeResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(AUTOCORRELATION_CHARGE).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 5; i++) {
+                        aVector[aStartIndex + i] = (float) tmpAutocorrelationChargeResult.get(i);
+                    }
+                    break;
+                case AUTOCORRELATION_MASS:
+                    DoubleArrayResult tmpAutocorrelationMassResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(AUTOCORRELATION_MASS).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 5; i++) {
+                        aVector[aStartIndex + i] = (float) tmpAutocorrelationMassResult.get(i);
+                    }
+                    break;
+                case AUTOCORRELATION_POLARIZABILITY:
+                    DoubleArrayResult tmpAutocorrelationPolarizabilityResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(AUTOCORRELATION_POLARIZABILITY).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 5; i++) {
+                        aVector[aStartIndex + i] = (float) tmpAutocorrelationPolarizabilityResult.get(i);
+                    }
+                    break;
+                case FRAGMENT_COMPLEXITY:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FRAGMENT_COMPLEXITY).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case CHI_CHAIN:
+                    DoubleArrayResult tmpChiChainResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_CHAIN).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 10; i++) {
+                        aVector[aStartIndex + i] = (float) tmpChiChainResult.get(i);
+                    }
+                    break;
+                case CHI_CLUSTER:
+                    DoubleArrayResult tmpChiClusterResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_CLUSTER).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 8; i++) {
+                        aVector[aStartIndex + i] = (float) tmpChiClusterResult.get(i);
+                    }
+                    break;
+                case CHI_PATH_CLUSTER:
+                    DoubleArrayResult tmpChiPathClusterResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_PATH_CLUSTER).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 6; i++) {
+                        aVector[aStartIndex + i] = (float) tmpChiPathClusterResult.get(i);
+                    }
+                    break;
+                case CHI_PATH:
+                    DoubleArrayResult tmpArrayResultChiPath = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_PATH).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 16; i++) {
+                        aVector[aStartIndex + i] = (float) tmpArrayResultChiPath.get(i);
+                    }
                     break;
 
                 // Add new descriptor information here!
@@ -2155,9 +2410,165 @@ public enum Descriptor {
         aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(A_POL).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
+    /**
+     * Sets AutocorrelationDescriptorCharge values
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAutocorrelationCharge(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(AUTOCORRELATION_CHARGE).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < 5; i++) {
+            aVector[aStartIndex + i] = (float) result.get(i);
+        }
+    }
+
+    /**
+     * Sets AutocorrelationDescriptorMass values
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAutocorrelationMass(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(AUTOCORRELATION_MASS).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < 5; i++) {
+            aVector[aStartIndex + i] = (float) result.get(i);
+        }
+    }
+
+    /**
+     * Sets AutocorrelationDescriptorPolarizability values
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAutocorrelationPolarizability(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(AUTOCORRELATION_POLARIZABILITY).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < 5; i++) {
+            aVector[aStartIndex + i] = (float) result.get(i);
+        }
+    }
+
+    /**
+     * Sets fragment complexity value
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setFragmentComplexity(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FRAGMENT_COMPLEXITY).calculate(anAtomContainer).getValue()).doubleValue();
+    }
+
+    /**
+     * Sets ChiChain descriptor values
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setChiChain(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_CHAIN).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < 10; i++) {
+            aVector[aStartIndex + i] = (float) result.get(i);
+        }
+    }
+
+    /**
+     * Sets ChiCluster descriptor values
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setChiCluster(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_CLUSTER).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < 8; i++) {
+            aVector[aStartIndex + i] = (float) result.get(i);
+        }
+    }
+
+    /**
+     * Sets ChiPathCluster descriptor values
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setChiPathCluster(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_PATH_CLUSTER).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < 6; i++) {
+            aVector[aStartIndex + i] = (float) result.get(i);
+        }
+    }
+
+    /**
+     * Sets ChiPath descriptor values
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setChiPath(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_PATH).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < 16; i++) {
+            aVector[aStartIndex + i] = (float) result.get(i);
+        }
+    }
+
     // Add new descriptor information here!
     //</editor-fold>
-
     //<editor-fold desc="Public static molecule preparation methods">
     /**
      * Creates a new molecule with explicit hydrogens from a molecule that has implicit hydrogens.
@@ -2269,10 +2680,9 @@ public enum Descriptor {
     }
 
     /**
-     * Uses a given aromaticity model to modify aMolecule.
+     * Uses a specified aromaticity model to modify aMolecule.
      * Note: This method changes the input molecule by applying the specified aromaticity model.
      * Note: No checks are performed, all necessary checks have already been made in public methods above.
-     * TODO: Old API implementation find a way to use new implementation -> Aromaticity.apply does not take Aromaticity.Model as parameter
      *
      * @param aMolecule Molecule that will be modified (IS CHANGED)
      * @param anAromaticityModel The aromaticity model that will be used for aromaticity detection
@@ -2280,7 +2690,7 @@ public enum Descriptor {
      */
     public static void setAromaticity(IAtomContainer aMolecule, ElectronDonation anAromaticityModel) throws Exception {
         try {
-            // Check if aromaticity model is null
+            // Check if anAromaticityModel is null
             if (anAromaticityModel == null) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
