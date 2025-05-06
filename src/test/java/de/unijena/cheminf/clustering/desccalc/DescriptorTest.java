@@ -3608,6 +3608,257 @@ class DescriptorTest {
         }
     }
 
+    /**
+     * Tests method for descriptor FRACTIONAL_PSA
+     * Expected result is calculated by TPSADescriptor / MolecularWeightDescriptor
+     */
+    @Test
+    public void test_FRACTIONAL_PSA() throws Exception {
+        String tmpSmiles = "O=C(O)c1ccncc1";
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+        // Aromaticity detection and marking
+        Cycles.markRingAtomsAndBonds((tmpMolecule));
+        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
+
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.FRACTIONAL_PSA};
+        boolean tmpIsParallelCalculation = false;
+        double epsilon = 0.001; // tolerance range
+
+        try {
+            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(0.4077, tmpMatrix[0][0], epsilon);
+
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(0.4077, tmpMatrix[0][0], epsilon);
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(0.4077, tmpMatrix[0][0], epsilon);
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
+
+    /**
+     * Tests method for descriptor LARGEST_PI_SYSTEM
+     */
+    @Test
+    public void test_LARGEST_PI_SYSTEM() throws Exception {
+        String tmpSmiles = "C=CC=CCc2ccc(Cc1ccncc1C=C)cc2";
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+
+        ElectronDonation[] models = {
+                Aromaticity.Model.Daylight,
+                Aromaticity.Model.CDK_2x,
+                Aromaticity.Model.CDK_1x,
+                Aromaticity.Model.CDK_AtomTypes,
+                Aromaticity.Model.Mdl,
+                Aromaticity.Model.OpenSmiles,
+                Aromaticity.Model.PiBonds
+        };
+
+        for (ElectronDonation model : models) {
+            // Parse fresh molecule for each model
+            IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+
+            // Apply aromaticity with the current model
+            Descriptor.setAromaticity(tmpMolecule, model);
+
+            IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+            int tmpStartIndex = 0;
+            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LARGEST_PI_SYSTEM};
+            boolean tmpIsParallelCalculation = false;
+
+            try {
+                Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+                float[][] tmpMatrix = new float[][]
+                        {
+                                {0f}
+                        };
+                Assertions.assertTrue(
+                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                                tmpDescriptors,
+                                tmpMoleculesArray,
+                                tmpMatrix,
+                                tmpStartIndex,
+                                tmpIsParallelCalculation
+                        )
+                );
+                Assertions.assertEquals(8, tmpMatrix[0][0]);
+
+                tmpMatrix = new float[][]
+                        {
+                                {0f}
+                        };
+                Assertions.assertTrue(
+                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                                tmpDescriptors,
+                                tmpMoleculesArray,
+                                tmpMatrix,
+                                tmpStartIndex,
+                                tmpIsParallelCalculation
+                        )
+                );
+                Assertions.assertEquals(8, tmpMatrix[0][0]);
+
+                tmpMatrix = new float[][]
+                        {
+                                {0f}
+                        };
+                Assertions.assertTrue(
+                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                                tmpDescriptors,
+                                tmpMoleculesArray,
+                                tmpMatrix,
+                                tmpStartIndex,
+                                tmpIsParallelCalculation
+                        )
+                );
+                Assertions.assertEquals(8, tmpMatrix[0][0]);
+
+            } catch (Exception anException) {
+                Assertions.fail("Failed with model " + model.getClass().getSimpleName() + ": " + anException.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Tests method for descriptor SMALL_RING
+     */
+    @Test
+    public void test_SMALL_RING() throws Exception {
+        String tmpSmiles = "O=C1c2ccccc2C(=O)c2cc3cc4ccccc4cc3cc21";
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+
+        ElectronDonation[] models = {
+                Aromaticity.Model.Daylight,
+                Aromaticity.Model.CDK_2x,
+                Aromaticity.Model.CDK_1x,
+                Aromaticity.Model.CDK_AtomTypes,
+                Aromaticity.Model.Mdl,
+                Aromaticity.Model.OpenSmiles,
+                Aromaticity.Model.PiBonds
+        };
+
+        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
+        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
+
+        for (ElectronDonation model : models) {
+            // Parse fresh molecule for each model
+            IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+
+            // Apply aromaticity with the current model
+            Descriptor.setAromaticity(tmpMolecule, model);
+
+            IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+            int tmpStartIndex = 0;
+            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.SMALL_RING};
+            boolean tmpIsParallelCalculation = false;
+
+            try {
+                Assertions.assertEquals(4, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+                float[][] tmpMatrix = new float[][]
+                        {
+                                {0f, 0f, 0f, 0f}
+                        };
+                Assertions.assertTrue(
+                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                                tmpDescriptors,
+                                tmpMoleculesArray,
+                                tmpMatrix,
+                                tmpStartIndex,
+                                tmpIsParallelCalculation
+                        )
+                );
+                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][1]));
+                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][2]));
+                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][3]));
+
+                tmpMatrix = new float[][]
+                        {
+                                {0f, 0f, 0f, 0f}
+                        };
+                Assertions.assertTrue(
+                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                                tmpDescriptors,
+                                tmpMoleculesArray,
+                                tmpMatrix,
+                                tmpStartIndex,
+                                tmpIsParallelCalculation
+                        )
+                );
+                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][1]));
+                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][2]));
+                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][3]));
+
+                tmpMatrix = new float[][]
+                        {
+                                {0f, 0f, 0f, 0f}
+                        };
+                Assertions.assertTrue(
+                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                                tmpDescriptors,
+                                tmpMoleculesArray,
+                                tmpMatrix,
+                                tmpStartIndex,
+                                tmpIsParallelCalculation
+                        )
+                );
+                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][1]));
+                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][2]));
+                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][3]));
+            } catch (Exception anException) {
+                Assertions.fail();
+            }
+        }
+    }
+
     // Add new descriptor tests here!
 
     //</editor-fold>

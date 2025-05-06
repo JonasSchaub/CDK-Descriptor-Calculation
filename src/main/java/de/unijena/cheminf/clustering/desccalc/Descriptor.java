@@ -50,6 +50,7 @@ import org.openscience.cdk.qsar.descriptors.molecular.ChiPathClusterDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.ChiPathDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.FMFDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.FractionalCSP3Descriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.FractionalPSADescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.FragmentComplexityDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.HBondAcceptorCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.HBondDonorCountDescriptor;
@@ -57,11 +58,13 @@ import org.openscience.cdk.qsar.descriptors.molecular.HybridizationRatioDescript
 import org.openscience.cdk.qsar.descriptors.molecular.JPlogPDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.KappaShapeIndicesDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.LargestChainDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.LargestPiSystemDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.LongestAliphaticChainDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.MannholdLogPDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.PetitjeanNumberDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.RotatableBondsCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.RuleOfFiveDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.SmallRingDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.SpiroAtomCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.TPSADescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.VAdjMaDescriptor;
@@ -405,7 +408,28 @@ public enum Descriptor {
      * VP-6 - Valence path, order 6
      * VP-7 - Valence path, order 7
      */
-    CHI_PATH;
+    CHI_PATH,
+    /**
+     * FractionalPSA descriptor, calculates the ratio of polar surface are to molecular weight.
+     * This descriptor provides the polar surface area efficiency, which is the TPSADescriptor value divided by the
+     * molecular weight, measure in square Angstroms per Dalton.
+     */
+    FRACTIONAL_PSA,
+    /**
+     * LargestPiSystem descriptor, calculates the number of atoms in the largest pi system.
+     * This descriptor identifies the largest conjugated pi system within a molecule and
+     * returns the count of atoms participating in it.
+     */
+    LARGEST_PI_SYSTEM,
+    /**
+     * Descriptor that calculates small ring information.
+     * 1. nSmallRings - total number of small rings (of size 3 through 9)
+     * 2. nAromRings - total number of small aromatic rings
+     * 3. nRingBlocks - total number of distinct ring blocks
+     * 4. nAromBlocks - total number of aromatically connected components
+     * TODO: Expand to specific ring sizes?
+     */
+    SMALL_RING;
 
     // Add new descriptor information here!
 
@@ -580,6 +604,19 @@ public enum Descriptor {
             // CHI_PATH has 16 components
             descriptorToComponentNumberMap.put(CHI_PATH, 16);
             descriptorToCdkObjectMap.put(CHI_PATH, new ChiPathDescriptor());
+
+            // FRACTIONAL_PSA has 1 component
+            descriptorToComponentNumberMap.put(FRACTIONAL_PSA, 1);
+            descriptorToCdkObjectMap.put(FRACTIONAL_PSA, new FractionalPSADescriptor());
+
+
+            // LARGEST_PI_SYSTEM has 1 component
+            descriptorToComponentNumberMap.put(LARGEST_PI_SYSTEM, 1);
+            descriptorToCdkObjectMap.put(LARGEST_PI_SYSTEM, new LargestPiSystemDescriptor());
+
+            // SMALL_RING has 4 components
+            descriptorToComponentNumberMap.put(SMALL_RING, 4);
+            descriptorToCdkObjectMap.put(SMALL_RING, new SmallRingDescriptor());
 
             // Add new descriptor information here!
 
@@ -1396,6 +1433,15 @@ public enum Descriptor {
                 case CHI_PATH:
                     setChiPath(anAtomContainer, aVector, aStartIndex);
                     break;
+                case FRACTIONAL_PSA:
+                    setFractionalPSA(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case LARGEST_PI_SYSTEM:
+                    setLargestPiSystem(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case SMALL_RING:
+                    setSmallRing(anAtomContainer, aVector, aStartIndex);
+                    break;
 
                 // Add new descriptor information here!
                 default:
@@ -1596,6 +1642,18 @@ public enum Descriptor {
                     DoubleArrayResult tmpArrayResultChiPath = (DoubleArrayResult) (new ChiPathDescriptor()).calculate(anAtomContainer).getValue();
                     for (int i = 0; i < 16; i++) {
                         aVector[aStartIndex + i] = (float) tmpArrayResultChiPath.get(i);
+                    }
+                    break;
+                case FRACTIONAL_PSA:
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new FractionalPSADescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case LARGEST_PI_SYSTEM:
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new LargestPiSystemDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case SMALL_RING:
+                    IntegerArrayResult smallRingResult = (IntegerArrayResult) (new SmallRingDescriptor()).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 4; i++) {
+                        aVector[aStartIndex + i] = smallRingResult.get(i);
                     }
                     break;
 
@@ -1801,6 +1859,18 @@ public enum Descriptor {
                     DoubleArrayResult tmpArrayResultChiPath = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_PATH).calculate(anAtomContainer).getValue();
                     for (int i = 0; i < 16; i++) {
                         aVector[aStartIndex + i] = (float) tmpArrayResultChiPath.get(i);
+                    }
+                    break;
+                case FRACTIONAL_PSA:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FRACTIONAL_PSA).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
+                case LARGEST_PI_SYSTEM:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LARGEST_PI_SYSTEM).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case SMALL_RING:
+                    IntegerArrayResult smallRingResult = (IntegerArrayResult) descriptorToCdkObjectMap.get(SMALL_RING).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 4; i++) {
+                        aVector[aStartIndex + i] = smallRingResult.get(i);
                     }
                     break;
 
@@ -2564,6 +2634,60 @@ public enum Descriptor {
         DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_PATH).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 16; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
+        }
+    }
+
+    /**
+     * Sets FractionalPSA descriptor values
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     *  @param anAtomContainer Molecule (IS NOT CHANGED)
+     *  @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     *  @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setFractionalPSA(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FRACTIONAL_PSA).calculate(anAtomContainer).getValue()).doubleValue();
+    }
+
+    /**
+     * Sets LargestPiSystem descriptor value
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setLargestPiSystem(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LARGEST_PI_SYSTEM).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets SmallRing descriptor values
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setSmallRing(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        IntegerArrayResult result = (IntegerArrayResult) descriptorToCdkObjectMap.get(SMALL_RING).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < 4; i++) {
+            aVector[aStartIndex + i] = result.get(i);
         }
     }
 
