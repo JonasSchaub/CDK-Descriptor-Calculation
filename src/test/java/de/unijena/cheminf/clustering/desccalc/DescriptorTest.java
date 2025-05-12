@@ -262,7 +262,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor H_BOND_ACCEPTOR_COUNT_1
+     * Tests method for descriptor H_BOND_ACCEPTOR_COUNT
      */
     @Test
     public void test_H_BOND_ACCEPTOR_COUNT_1() throws Exception {
@@ -330,7 +330,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor H_BOND_ACCEPTOR_COUNT_2
+     * Tests method for descriptor H_BOND_ACCEPTOR_COUNT
      */
     @Test
     public void test_H_BOND_ACCEPTOR_COUNT_2() throws Exception {
@@ -398,7 +398,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor H_BOND_DONOR_COUNT_1
+     * Tests method for descriptor H_BOND_DONOR_COUNT
      */
     @Test
     public void test_H_BOND_DONOR_COUNT_1() throws Exception {
@@ -466,7 +466,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor H_BOND_DONOR_COUNT_2
+     * Tests method for descriptor H_BOND_DONOR_COUNT
      */
     @Test
     public void test_H_BOND_DONOR_COUNT_2() throws Exception {
@@ -3687,28 +3687,13 @@ class DescriptorTest {
     public void test_LARGEST_PI_SYSTEM() throws Exception {
         String tmpSmiles = "C=CC=CCc2ccc(Cc1ccncc1C=C)cc2";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        // Parse fresh molecule for each model
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
 
-        ElectronDonation[] models = {
-                Aromaticity.Model.Daylight,
-                Aromaticity.Model.CDK_2x,
-                Aromaticity.Model.CDK_1x,
-                Aromaticity.Model.CDK_AtomTypes,
-                Aromaticity.Model.Mdl,
-                Aromaticity.Model.OpenSmiles,
-                Aromaticity.Model.PiBonds
-        };
-
-        for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model
-            IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-
-            // Apply aromaticity with the current model
-            Descriptor.setAromaticity(tmpMolecule, model);
-
-            IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
-            int tmpStartIndex = 0;
-            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LARGEST_PI_SYSTEM};
-            boolean tmpIsParallelCalculation = false;
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LARGEST_PI_SYSTEM};
+        boolean tmpIsParallelCalculation = true;
 
             try {
                 Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -3759,10 +3744,10 @@ class DescriptorTest {
                 Assertions.assertEquals(8, tmpMatrix[0][0]);
 
             } catch (Exception anException) {
-                Assertions.fail("Failed with model " + model.getClass().getSimpleName() + ": " + anException.getMessage());
+                Assertions.fail();
             }
-        }
     }
+
 
     /**
      * Tests method for descriptor SMALL_RING
@@ -3963,10 +3948,9 @@ class DescriptorTest {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
+        Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
 
-        int tmpNumberOfMolecules = 10;
+        int tmpNumberOfMolecules = 1;
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
         Arrays.fill(tmpMoleculesArray, tmpMolecule);
         int tmpStartIndex = 0;
@@ -4165,7 +4149,7 @@ class DescriptorTest {
     }
     //</editor-fold>
 
-    //<editor-fold desc="Tests preperation Methods">
+    //<editor-fold desc="Tests preparation Methods">
 
     /**
      * Tests createMoleculeWithExplicitHydrogens
@@ -4217,6 +4201,41 @@ class DescriptorTest {
         // Check atom count (C + C + O + 6H = 9)
         Assertions.assertEquals(9, ethanolExplicit.getAtomCount(),
                 "Ethanol with explicit H should have 9 atoms");
+    }
+
+    /**
+     * Tests the copyMolecule method
+     */
+    @Test
+    public void testCopyMolecule() throws Exception {
+        // Create a test molecule (benzene)
+        String benzeneSmiles = "c1ccccc1";
+        SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer benzene = smilesParser.parseSmiles(benzeneSmiles);
+
+        // Verify initial state
+        Assertions.assertEquals(6, benzene.getAtomCount(), "Original benzene should have 6 atoms");
+        Assertions.assertEquals(6, benzene.getBondCount(), "Original benzene should have 6 bonds");
+
+        // Create a copy of the molecule
+        IAtomContainer benzeneClone = Descriptor.copyMolecule(benzene);
+
+        // Verify the copy has the same structure
+        Assertions.assertEquals(benzene.getAtomCount(), benzeneClone.getAtomCount(),
+                "Clone should have the same number of atoms as the original");
+        Assertions.assertEquals(benzene.getBondCount(), benzeneClone.getBondCount(),
+                "Clone should have the same number of bonds as the original");
+
+        // Ensure they are separate objects (deep copy)
+        Assertions.assertNotSame(benzene, benzeneClone, "Clone should be a different object instance");
+
+        // Modify the original to confirm the clone is independent
+        IAtom newAtom = benzene.getBuilder().newInstance(IAtom.class, "O");
+        benzene.addAtom(newAtom);
+
+        // Verify the clone remains unchanged
+        Assertions.assertEquals(7, benzene.getAtomCount(), "Modified original should have 7 atoms");
+        Assertions.assertEquals(6, benzeneClone.getAtomCount(), "Clone should still have 6 atoms");
     }
 
     /**

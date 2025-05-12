@@ -104,8 +104,8 @@ public enum Descriptor {
     MOLECULAR_WEIGHT,
     /**
      * Wiener number, returns Wiener path number and Wiener polarity number.
-     * Path number: sum of the distances between any two atoms in the molecule.
-     * Polarity number: number of pairs of atoms which are separated by exactly three bonds.
+     * Path number: sum of the distances between any two atoms in the molecule.<br>
+     * Polarity number: number of pairs of atoms which are separated by exactly three bonds.<br>
      * Note: the CDK implementation counts all distances, not just those of carbon atoms or only carbon-carbon bonds.
      */
     WIENER_NUMBER,
@@ -115,19 +115,13 @@ public enum Descriptor {
     ATOM_COUNT,
     /**
      * HBondAcceptorCount, counts hydrogen bond acceptors based on a simplified PHACIR scheme.
-     * It includes:
-     * Oxygen atoms with formal charge ≤ 0, excluding:
-     * 		 Aromatic ether oxygens
-     *       Oxygens adjacent to nitrogen
-     * Nitrogen atoms with formal charge ≤ 0, excluding:
-     *       Nitrogens adjacent to oxygen
+     * It includes: Oxygen atoms with formal charge ≤ 0 (excluding: Aromatic ether oxygens and oxygens adjacent to nitrogen).
+     * Nitrogen atoms with formal charge ≤ 0 (excluding: Nitrogens adjacent to oxygen).
      */
     H_BOND_ACCEPTOR_COUNT,
     /**
      * HBondDonorCount, counts hydrogen bond donors based on a simplified PHACIR classification.
-     * It includes:
-     * 		OH groups where the oxygen has a formal charge ≥ 0
-     * 		NH groups where the nitrogen has a formal charge ≥ 0
+     * It includes: OH groups where the oxygen has a formal charge ≥ 0 and NH groups where the nitrogen has a formal charge ≥ 0
      */
     H_BOND_DONOR_COUNT,
     /**
@@ -154,16 +148,14 @@ public enum Descriptor {
      */
     MANNHOLD_LOGP,
     /**
-     * BCUT descriptor, calculates Burden matrix modified eigenvalues with different weighting schemes.
-     * 1. BCUTw-1l, BCUTw-2l ... - nhigh lowest atom weighted BCUTS
-     * 2. BCUTw-1h, BCUTw-2h ... - nlow highest atom weighted BCUTS
-     * 3. BCUTc-1l, BCUTc-2l ... - nhigh lowest partial charge weighted BCUTS
-     * 4. BCUTc-1h, BCUTc-2h ... - nlow highest partial charge weighted BCUTS
-     * 5. BCUTp-1l, BCUTp-2l ... - nhigh lowest polarizability weighted BCUTS
-     * 6. BCUTp-1h, BCUTp-2h ... - nlow highest polarizability weighted BCUTS
-     * Note: No array for one parameter is returned, just the highest and lowest numbers
-     * nhigh = 1 as default parameter
-     * nlow = 1 as default parameter
+     * BCUT descriptor, calculates Burden matrix modified eigenvalues with different weighting schemes. Returns 6 values:<br>
+     * 1. BCUTw-1l, BCUTw-2l ... - nhigh lowest atom weighted BCUTS<br>
+     * 2. BCUTw-1h, BCUTw-2h ... - nlow highest atom weighted BCUTS<br>
+     * 3. BCUTc-1l, BCUTc-2l ... - nhigh lowest partial charge weighted BCUTS<br>
+     * 4. BCUTc-1h, BCUTc-2h ... - nlow highest partial charge weighted BCUTS<br>
+     * 5. BCUTp-1l, BCUTp-2l ... - nhigh lowest polarizability weighted BCUTS<br>
+     * 6. BCUTp-1h, BCUTp-2h ... - nlow highest polarizability weighted BCUTS<br>
+     * Note: No array for one parameter is returned, just the highest and lowest numbers. (Default Parameters: nhigh = 1 and nlow = 1)
      */
     BCUT,
     /**
@@ -174,7 +166,7 @@ public enum Descriptor {
     /**
      * BondCount Specified, counts the number of bonds in a molecule with specified bond orders.
      * Returns an array with counts for single, double and triple bonds.
-     * For aromatic bonds counts use AROMATIC_BONDS_COUNT
+     * For aromatic bonds counts use AROMATIC_BONDS_COUNT.
      * No bonds to hydrogen atoms are counted.
      */
     BOND_COUNT_SPECIFIED,
@@ -204,9 +196,7 @@ public enum Descriptor {
     /**
      * RotatableBondsCount, counts the number of rotatable bonds in a molecule.
      * A rotatable bond is defined as any single non-ring bond, where atoms on both sides
-     * have at least two heavy-atom neighbors. Amide C-N bonds are not counted as rotatable.
-     * Excluding terminal bonds.
-     * TODO: Include terminal bonds? Exclude Amide C-N bonds?
+     * have at least two heavy-atom neighbors. Excluding terminal bonds.
      */
     ROTATABLE_BONDS_COUNT,
     /**
@@ -232,10 +222,10 @@ public enum Descriptor {
     HYBRIDIZATION_RATIO,
     /**
      * KappaShapeIndices descriptor, calculates Kier and Hall kappa molecular shape indices.
-     * These indices compare the molecular graph with minimal and maximal molecular graphs:
-     * Kier1 - First kappa shape index
-     * Kier2 - Second kappa shape index
-     * Kier3 - Third kappa shape index
+     * These indices compare the molecular graph with minimal and maximal molecular graphs. Returns 3 values:<br>
+     * 1. Kier1 - First kappa shape index<br>
+     * 2. Kier2 - Second kappa shape index<br>
+     * 3. Kier3 - Third kappa shape index<br>
      * Note: Hydrogens are ignored in the calculation.
      */
     KAPPA_SHAPE_INDICES,
@@ -246,8 +236,7 @@ public enum Descriptor {
      */
     PETITJEAN_NUMBER,
     /**
-     * Spiro atom count descriptor
-     * Returns the number of spiro atoms in a molecule.
+     * Spiro atom count descriptor, calculates the number of spiro atoms in a molecule.
      */
     SPIRO_ATOM_COUNT,
     /**
@@ -259,12 +248,12 @@ public enum Descriptor {
     V_ADJ_MAT,
     /**
      * WeightedPath descriptor, evaluates the weighted path descriptors for a molecule.
-     * Returns five values:
-     * WTPT1 - molecular ID
-     * WTPT2 - molecular ID / number of atoms
-     * WTPT3 - sum of path lengths starting from heteroatoms
-     * WTPT4 - sum of path lengths starting from oxygens
-     * WTPT5 - sum of path lengths starting from nitrogens
+     * Returns 5 values:<br>
+     * 1. WTPT1 - molecular ID<br>
+     * 2. WTPT2 - molecular ID / number of atoms<br>
+     * 3. WTPT3 - sum of path lengths starting from heteroatoms<br>
+     * 4. WTPT4 - sum of path lengths starting from oxygens<br>
+     * 5. WTPT5 - sum of path lengths starting from nitrogens<br>
      */
     WEIGHTED_PATH,
     /**
@@ -274,34 +263,33 @@ public enum Descriptor {
      */
     ZAGREB_INDEX,
     /**
-     * CarbonTypes descriptor, calculates the frequency of occurrence of 9 different types of carbon atoms:
-     * C1SP1 - triply bound carbon bound to one other carbon
-     * C2SP1 - triply bound carbon bound to two other carbons
-     * C1SP2 - doubly bound carbon bound to one other carbon
-     * C2SP2 - doubly bound carbon bound to two other carbons
-     * C3SP2 - doubly bound carbon bound to three other carbons
-     * C1SP3 - singly bound carbon bound to one other carbon
-     * C2SP3 - singly bound carbon bound to two other carbons
-     * C3SP3 - singly bound carbon bound to three other carbons
-     * C4SP3 - singly bound carbon bound to four other carbons
+     * CarbonTypes descriptor, calculates the frequency of occurrence of 9 different types of carbon atoms. Returns 9 values:<br>
+     * 1. C1SP1 - triply bound carbon bound to one other carbon<br>
+     * 2. C2SP1 - triply bound carbon bound to two other carbons<br>
+     * 3. C1SP2 - doubly bound carbon bound to one other carbon<br>
+     * 4. C2SP2 - doubly bound carbon bound to two other carbons<br>
+     * 5. C3SP2 - doubly bound carbon bound to three other carbons<br>
+     * 6. C1SP3 - singly bound carbon bound to one other carbon<br>
+     * 7. C2SP3 - singly bound carbon bound to two other carbons<br>
+     * 8. C3SP3 - singly bound carbon bound to three other carbons<br>
+     * 9. C4SP3 - singly bound carbon bound to four other carbons
      */
     CARBON_TYPES,
     /**
      * ALogP descriptor, calculates Ghose-Crippen LogP values, molar refractivity values
-     * and ALogP squared values.
-     * 1. ALogP (logP value) is the Ghose-Crippen octanol-water partition coefficient.
-     * 2. ALogP² is the squared ALogP value.
-     * 3. Molar Refractivity (MR) measures the volume occupied by an atom or group of atoms.
+     * and ALogP squared values. Returns 3 values:<br>
+     * 1. ALogP (logP value) is the Ghose-Crippen octanol-water partition coefficient.<br>
+     * 2. ALogP² is the squared ALogP value.<br>
+     * 3. Molar Refractivity (MR) measures the volume occupied by an atom or group of atoms.<br>
      */
     A_LOG_P,
     /**
-     * XLogP descriptor
-     * Prediction of logP based on the atom-type method called XLogP.
+     * XLogP descriptor, calculates logP based on the atom-type method called XLogP.
      * Requires all hydrogens to be explicit.
      */
     X_LOG_P,
     /**
-     * Calculates the JP_LOG_P descriptor (octanol-water partition coefficient based on JPlogP method)
+     * JP_LOG_P descriptor, calculates the octanol-water partition coefficien based on the JPlogP method.
      * Original publication: Junghwan Lee et al. "Estimation of partition coefficients...".
      */
     JP_LOG_P,
@@ -339,74 +327,74 @@ public enum Descriptor {
      * The complexity is defined as [Nilakantan, R. et. al.. Journal of chemical information and modeling. 2006. 46]:
      * C = abs(B^2 - A^2 + A) + H/100
      * where:
-     * C = complexity
-     * A = number of non-hydrogen atoms
-     * B = number of bonds
-     * H = number of heteroatoms
+     * (C = complexity,
+     * A = number of non-hydrogen atoms,
+     * B = number of bonds,
+     * H = number of heteroatoms,).
      * This provides a measure of structural complexity that correlates with synthetic accessibility.
      */
     FRAGMENT_COMPLEXITY,
     /**
      * ChiChain descriptor, calculates the Kier + Hall chi chain indices of orders 3 through 7.
      * These values characterize a molecular graph based on its chain subgraphs.
-     * Returns 10 values:
-     * SCH-3 - Simple chain, order 3
-     * SCH-4 - Simple chain, order 4
-     * SCH-5 - Simple chain, order 5
-     * SCH-6 - Simple chain, order 6
-     * SCH-7 - Simple chain, order 7
-     * VCH-3 - Valence chain, order 3
-     * VCH-4 - Valence chain, order 4
-     * VCH-5 - Valence chain, order 5
-     * VCH-6 - Valence chain, order 6
-     * VCH-7 - Valence chain, order 7
+     * Returns 10 values:<br>
+     * 1. SCH-3 - Simple chain, order 3<br>
+     * 2. SCH-4 - Simple chain, order 4<br>
+     * 3. SCH-5 - Simple chain, order 5<br>
+     * 4. SCH-6 - Simple chain, order 6<br>
+     * 5. SCH-7 - Simple chain, order 7<br>
+     * 6. VCH-3 - Valence chain, order 3<br>
+     * 7. VCH-4 - Valence chain, order 4<br>
+     * 8. VCH-5 - Valence chain, order 5<br>
+     * 9. VCH-6 - Valence chain, order 6<br>
+     * 10. VCH-7 - Valence chain, order 7
      */
     CHI_CHAIN,/**
      * ChiCluster descriptor, calculates Kier + Hall chi cluster indices of orders 3 through 6.
      * These values characterize a molecular graph based on its cluster subgraphs.
-     * Returns 8 values:
-     * SC-3 - Simple cluster, order 3
-     * SC-4 - Simple cluster, order 4
-     * SC-5 - Simple cluster, order 5
-     * SC-6 - Simple cluster, order 6
-     * VC-3 - Valence cluster, order 3
-     * VC-4 - Valence cluster, order 4
-     * VC-5 - Valence cluster, order 5
-     * VC-6 - Valence cluster, order 6
+     * Returns 8 values:<br>
+     * 1. SC-3 - Simple cluster, order 3<br>
+     * 2. SC-4 - Simple cluster, order 4<br>
+     * 3. SC-5 - Simple cluster, order 5<br>
+     * 4. SC-6 - Simple cluster, order 6<br>
+     * 5. VC-3 - Valence cluster, order 3<br>
+     * 6. VC-4 - Valence cluster, order 4<br>
+     * 7. VC-5 - Valence cluster, order 5<br>
+     * 8. VC-6 - Valence cluster, order 6
      */
     CHI_CLUSTER,
     /**
      * ChiPathCluster descriptor, calculates Kier + Hall chi path cluster indices of orders 4 through 6.
      * These values characterize a molecular graph based on its path cluster subgraphs.
-     * Returns 6 values:
-     * SPC-4 - Simple path cluster, order 4
-     * SPC-5 - Simple path cluster, order 5
-     * SPC-6 - Simple path cluster, order 6
-     * VPC-4 - Valence path cluster, order 4
-     * VPC-5 - Valence path cluster, order 5
-     * VPC-6 - Valence path cluster, order 6
+     * Returns 6 values:<br>
+     * 1. SPC-4 - Simple path cluster, order 4<br>
+     * 2. SPC-5 - Simple path cluster, order 5<br>
+     * 3. SPC-6 - Simple path cluster, order 6<br>
+     * 4. VPC-4 - Valence path cluster, order 4<br>
+     * 5. VPC-5 - Valence path cluster, order 5<br>
+     * 6. VPC-6 - Valence path cluster, order 6
      */
     CHI_PATH_CLUSTER,
     /**
      * ChiPath descriptor, calculates Kier + Hall chi path indices of orders 0 through 7.
      * These values characterize a molecular graph based on its path subgraphs.
-     * Returns 16 values:
-     * SP-0 - Simple path, order 0
-     * SP-1 - Simple path, order 1
-     * SP-2 - Simple path, order 2
-     * SP-3 - Simple path, order 3
-     * SP-4 - Simple path, order 4
-     * SP-5 - Simple path, order 5
-     * SP-6 - Simple path, order 6
-     * SP-7 - Simple path, order 7
-     * VP-0 - Valence path, order 0
-     * VP-1 - Valence path, order 1
-     * VP-2 - Valence path, order 2
-     * VP-3 - Valence path, order 3
-     * VP-4 - Valence path, order 4
-     * VP-5 - Valence path, order 5
-     * VP-6 - Valence path, order 6
-     * VP-7 - Valence path, order 7
+     * Returns 16 values:<br>
+     * 1.  SP-0 - Simple path, order 0<br>
+     * 2.  SP-1 - Simple path, order 1<br>
+     * 3.  SP-2 - Simple path, order 2<br>
+     * 4.  SP-3 - Simple path, order 3<br>
+     * 5.  SP-4 - Simple path, order 4<br>
+     * 6.  SP-5 - Simple path, order 5<br>
+     * 7.  SP-6 - Simple path, order 6<br>
+     * 8.  SP-7 - Simple path, order 7<br>
+     * 9.  VP-0 - Valence path, order 0<br>
+     * 10. VP-1 - Valence path, order 1<br>
+     * 11. VP-2 - Valence path, order 2<br>
+     * 12. VP-3 - Valence path, order 3<br>
+     * 13. VP-4 - Valence path, order 4<br>
+     * 14. VP-5 - Valence path, order 5<br>
+     * 15. VP-6 - Valence path, order 6<br>
+     * 16. VP-7 - Valence path, order 7<br>
      */
     CHI_PATH,
     /**
@@ -423,10 +411,11 @@ public enum Descriptor {
     LARGEST_PI_SYSTEM,
     /**
      * Descriptor that calculates small ring information.
-     * 1. nSmallRings - total number of small rings (of size 3 through 9)
-     * 2. nAromRings - total number of small aromatic rings
-     * 3. nRingBlocks - total number of distinct ring blocks
-     * 4. nAromBlocks - total number of aromatically connected components
+     * Returns 4 values:<br>
+     * 1. nSmallRings - total number of small rings (of size 3 through 9)<br>
+     * 2. nAromRings - total number of small aromatic rings<br>
+     * 3. nRingBlocks - total number of distinct ring blocks<br>
+     * 4. nAromBlocks - total number of aromatically connected components<br>
      * TODO: Expand to specific ring sizes?
      */
     SMALL_RING;
@@ -449,7 +438,7 @@ public enum Descriptor {
     private static final EnumMap<Descriptor, IMolecularDescriptor> descriptorToCdkObjectMap = new EnumMap<>(Descriptor.class);
     static {
         try {
-            // MOLECULER_WEIGHT has 1 component
+            // MOLECULAR_WEIGHT has 1 component
             descriptorToComponentNumberMap.put(MOLECULAR_WEIGHT, 1);
             descriptorToCdkObjectMap.put(MOLECULAR_WEIGHT, new WeightDescriptor());
 
@@ -608,7 +597,6 @@ public enum Descriptor {
             // FRACTIONAL_PSA has 1 component
             descriptorToComponentNumberMap.put(FRACTIONAL_PSA, 1);
             descriptorToCdkObjectMap.put(FRACTIONAL_PSA, new FractionalPSADescriptor());
-
 
             // LARGEST_PI_SYSTEM has 1 component
             descriptorToComponentNumberMap.put(LARGEST_PI_SYSTEM, 1);
@@ -1516,17 +1504,16 @@ public enum Descriptor {
                     aVector[aStartIndex] = (float) ((IntegerResult) (new BondCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case BOND_COUNT_SPECIFIED:
-                    BondCountDescriptor singleBondDesc = new BondCountDescriptor();
-                    singleBondDesc.setParameters(new Object[]{"s"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) singleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+                    BondCountDescriptor bondCountDesc = new BondCountDescriptor();
 
-                    BondCountDescriptor doubleBondDesc = new BondCountDescriptor();
-                    doubleBondDesc.setParameters(new Object[]{"d"});
-                    aVector[aStartIndex + 1] = (float) ((IntegerResult) doubleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+                    bondCountDesc.setParameters(new Object[]{"s"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
 
-                    BondCountDescriptor tripleBondDesc = new BondCountDescriptor();
-                    tripleBondDesc.setParameters(new Object[]{"t"});
-                    aVector[aStartIndex + 2] = (float) ((IntegerResult) tripleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+                    bondCountDesc.setParameters(new Object[]{"d"});
+                    aVector[aStartIndex + 1] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
+
+                    bondCountDesc.setParameters(new Object[]{"t"});
+                    aVector[aStartIndex + 2] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case B_POL:
                     aVector[aStartIndex] = (float) ((DoubleResult) (new BPolDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
@@ -1731,19 +1718,17 @@ public enum Descriptor {
                     break;
                 case BOND_COUNT_SPECIFIED:
                     // Single bonds (s)
-                    BondCountDescriptor singleBondDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED).getClass().getDeclaredConstructor().newInstance();
-                    singleBondDesc.setParameters(new Object[]{"s"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) singleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+                    BondCountDescriptor bondCountDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED).getClass().getDeclaredConstructor().newInstance();
+                    bondCountDesc.setParameters(new Object[]{"s"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
 
                     // Double bonds (d)
-                    BondCountDescriptor doubleBondDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED).getClass().getDeclaredConstructor().newInstance();
-                    doubleBondDesc.setParameters(new Object[]{"d"});
-                    aVector[aStartIndex + 1] = (float) ((IntegerResult) doubleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+                    bondCountDesc.setParameters(new Object[]{"d"});
+                    aVector[aStartIndex + 1] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
 
                     // Triple bonds (t)
-                    BondCountDescriptor tripleBondDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED).getClass().getDeclaredConstructor().newInstance();
-                    tripleBondDesc.setParameters(new Object[]{"t"});
-                    aVector[aStartIndex + 2] = (float) ((IntegerResult) tripleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+                    bondCountDesc.setParameters(new Object[]{"t"});
+                    aVector[aStartIndex + 2] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case B_POL:
                     aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(B_POL).calculate(anAtomContainer).getValue()).doubleValue();
@@ -1889,7 +1874,7 @@ public enum Descriptor {
     //</editor-fold>
     //<editor-fold desc="Private static synchronized descriptor calculation methods">
     /**
-     * Sets molecular weight
+     * Sets molecular weight.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -1906,7 +1891,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets Wiener number(s)
+     * Sets Wiener number(s).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -1925,7 +1910,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets atom count
+     * Sets atom count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -1942,7 +1927,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets hydrogen bond acceptor count
+     * Sets hydrogen bond acceptor count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -1959,7 +1944,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets hydrogen bond donor count
+     * Sets hydrogen bond donor count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -1976,7 +1961,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets the topological polar surface area (TPSA)
+     * Sets the topological polar surface area (TPSA).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -1993,7 +1978,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets largest chain size
+     * Sets largest chain size.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2010,7 +1995,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets longest aliphatic chain size
+     * Sets longest aliphatic chain size.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2027,7 +2012,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets the Mannhold LogP value (octanol-water partition coefficient)
+     * Sets the Mannhold LogP value (octanol-water partition coefficient).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods.
      * Note: Method must be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2044,7 +2029,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets BCUT descriptor values
+     * Sets BCUT descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2064,7 +2049,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets bond count
+     * Sets bond count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2081,7 +2066,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets specific bond counts (single, double, triple)
+     * Sets specific bond counts (single, double, triple).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2095,19 +2080,16 @@ public enum Descriptor {
             int aStartIndex
     ) {
         try {
-            BondCountDescriptor singleBondDesc = BondCountDescriptor.class.getDeclaredConstructor().newInstance();
-            singleBondDesc.setParameters(new Object[]{"s"});
-            aVector[aStartIndex] = (float) ((IntegerResult) singleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+            BondCountDescriptor bondCountDesc = new BondCountDescriptor();
 
-            // Double bonds (d)
-            BondCountDescriptor doubleBondDesc = BondCountDescriptor.class.getDeclaredConstructor().newInstance();
-            doubleBondDesc.setParameters(new Object[]{"d"});
-            aVector[aStartIndex + 1] = (float) ((IntegerResult) doubleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+            bondCountDesc.setParameters(new Object[]{"s"});
+            aVector[aStartIndex] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
 
-            // Triple bonds (t)
-            BondCountDescriptor tripleBondDesc = BondCountDescriptor.class.getDeclaredConstructor().newInstance();
-            tripleBondDesc.setParameters(new Object[]{"t"});
-            aVector[aStartIndex + 2] = (float) ((IntegerResult) tripleBondDesc.calculate(anAtomContainer).getValue()).intValue();
+            bondCountDesc.setParameters(new Object[]{"d"});
+            aVector[aStartIndex + 1] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
+
+            bondCountDesc.setParameters(new Object[]{"t"});
+            aVector[aStartIndex + 2] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
         } catch (Exception e) {
             for (int i = 0; i < 3; i++) {
                 aVector[aStartIndex + i] = Float.NaN;
@@ -2116,7 +2098,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets bond polarizability value
+     * Sets bond polarizability value.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2151,7 +2133,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets the number of aromatic atoms
+     * Sets the number of aromatic atoms.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2168,7 +2150,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets the number of aromatic bonds
+     * Sets the number of aromatic bonds.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2185,7 +2167,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets rotatable bonds count
+     * Sets rotatable bonds count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2202,7 +2184,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets the FMF (Framework Match Fraction) value
+     * Sets the FMF (Framework Match Fraction) value.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2219,7 +2201,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets the FractionalCSP3 value (fraction of sp3 hybridized carbon atoms)
+     * Sets the FractionalCSP3 value (fraction of sp3 hybridized carbon atoms).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2236,7 +2218,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets hybridization ratio (sp3 carbons to sp2 carbons)
+     * Sets hybridization ratio (sp3 carbons to sp2 carbons).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2253,7 +2235,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets Kappa shape indices
+     * Sets Kappa shape indices.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2273,7 +2255,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets Petitjean number value
+     * Sets Petitjean number value.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2290,7 +2272,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets spiro atom count
+     * Sets spiro atom count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2307,7 +2289,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets the vertex adjacency information (magnitude)
+     * Sets the vertex adjacency information (magnitude).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2324,7 +2306,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets weighted path descriptor values
+     * Sets weighted path descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2344,7 +2326,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets Zagreb index value
+     * Sets Zagreb index value.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2361,7 +2343,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets carbon types descriptor values
+     * Sets carbon types descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2381,7 +2363,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets ALogP values (Ghose-Crippen LogP,ALogP squared and molar refractivity)
+     * Sets ALogP values (Ghose-Crippen LogP, ALogP squared and molar refractivity).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2417,7 +2399,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets XLogP value (prediction of logP based on the atom-type method)
+     * Sets XLogP value (prediction of logP based on the atom-type method).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      * Note: XLogP requires explicit hydrogens for correct calculation
@@ -2447,7 +2429,7 @@ public enum Descriptor {
         }
     }
     /**
-     * Sets JP LogP value (octanol-water partition coefficient based on JPlogP method)
+     * Sets JP LogP value (octanol-water partition coefficient based on JPlogP method).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2464,7 +2446,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets APol value (sum of the atomic polarizabilities)
+     * Sets APol value (sum of the atomic polarizabilities).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2481,7 +2463,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets AutocorrelationDescriptorCharge values
+     * Sets AutocorrelationDescriptorCharge values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2501,7 +2483,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets AutocorrelationDescriptorMass values
+     * Sets AutocorrelationDescriptorMass values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2521,7 +2503,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets AutocorrelationDescriptorPolarizability values
+     * Sets AutocorrelationDescriptorPolarizability values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2541,7 +2523,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets fragment complexity value
+     * Sets fragment complexity value.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2558,7 +2540,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets ChiChain descriptor values
+     * Sets ChiChain descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2578,7 +2560,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets ChiCluster descriptor values
+     * Sets ChiCluster descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2598,7 +2580,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets ChiPathCluster descriptor values
+     * Sets ChiPathCluster descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2618,7 +2600,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets ChiPath descriptor values
+     * Sets ChiPath descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2638,7 +2620,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets FractionalPSA descriptor values
+     * Sets FractionalPSA descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2655,7 +2637,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets LargestPiSystem descriptor value
+     * Sets LargestPiSystem descriptor value.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2672,7 +2654,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets SmallRing descriptor values
+     * Sets SmallRing descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2695,29 +2677,28 @@ public enum Descriptor {
     //</editor-fold>
     //<editor-fold desc="Public static molecule preparation methods">
     /**
-     * Creates a new molecule with explicit hydrogens from a molecule that has implicit hydrogens.
-     * Note: This method requires that the implicit hydrogen counts on atoms are properly set
-     *  before calling this method. If implicit hydrogen counts are not set or are all zero,
-     *  no explicit hydrogens will be added to the resulting molecule. Checks are NOT performed here.
-     *  All necessary checks have already been made in public methods above.
+     * Creates a deep copy of the input molecule.
+     * Note: This method is used to create a new molecule object
+     * without affecting implicit hydrogen atoms.
      *
-     *
-     * @param aMolecule Molecule with implicit hydrogens (IS NOT CHANGED)
-     * @return New molecule with explicit hydrogens (Not allowed to be null or empty)
-     * @throws Exception Thrown if the molecular structure is invalid or hydrogens cannot be added
+     * @param aMolecule Source molecule to be copied (NOT MODIFIED)
+     * @return New instance of the molecule
+     * @throws NullPointerException If the input molecule is null
+     * @throws IllegalArgumentException If the input molecule is empty
+     * @throws CloneNotSupportedException If the molecule cannot be properly copied
      */
-    public static IAtomContainer createMoleculeWithExplicitHydrogens(
+    public static IAtomContainer copyMolecule(
             IAtomContainer aMolecule
-    ) throws Exception {
-
+    ) throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
+        if (aMolecule == null) {
+            throw new NullPointerException("Input molecule must not be null");
+        }
+        if (aMolecule.isEmpty()) {
+            throw new IllegalArgumentException("Input molecule must not be empty");
+        }
         try {
             // Create a new empty atom container with the same properties
-            IAtomContainer tmpMoleculeWithExplicitH = aMolecule.getBuilder().newInstance(IAtomContainer.class);
-
-            // Copy properties
-            for (Object key : aMolecule.getProperties().keySet()) {
-                tmpMoleculeWithExplicitH.setProperty(key, aMolecule.getProperty(key));
-            }
+            IAtomContainer tmpMoleculeCopy = aMolecule.getBuilder().newInstance(IAtomContainer.class);
 
             // Copy atoms
             for (IAtom tmpAtom : aMolecule.atoms()) {
@@ -2739,13 +2720,8 @@ public enum Descriptor {
                     tmpNewAtom.setIsInRing(true);
                 }
 
-                // Copy atom properties
-                for (Object key : tmpAtom.getProperties().keySet()) {
-                    tmpNewAtom.setProperty(key, tmpAtom.getProperty(key));
-                }
-
                 // Add atom to new container
-                tmpMoleculeWithExplicitH.addAtom(tmpNewAtom);
+                tmpMoleculeCopy.addAtom(tmpNewAtom);
             }
 
             // Copy bonds
@@ -2753,8 +2729,8 @@ public enum Descriptor {
                 IBond tmpNewBond = tmpBond.getBuilder().newInstance(IBond.class);
 
                 // Get atoms for this bond in the new molecule
-                IAtom tmpAtom1 = tmpMoleculeWithExplicitH.getAtom(aMolecule.indexOf(tmpBond.getBegin()));
-                IAtom tmpAtom2 = tmpMoleculeWithExplicitH.getAtom(aMolecule.indexOf(tmpBond.getEnd()));
+                IAtom tmpAtom1 = tmpMoleculeCopy.getAtom(aMolecule.indexOf(tmpBond.getBegin()));
+                IAtom tmpAtom2 = tmpMoleculeCopy.getAtom(aMolecule.indexOf(tmpBond.getEnd()));
 
                 // Set bond properties
                 tmpNewBond.setOrder(tmpBond.getOrder());
@@ -2768,79 +2744,82 @@ public enum Descriptor {
                     tmpNewBond.setIsInRing(true);
                 }
 
-                // Copy bond properties
-                for (Object key : tmpBond.getProperties().keySet()) {
-                    tmpNewBond.setProperty(key, tmpBond.getProperty(key));
-                }
-
                 // Add bond to new container
-                tmpMoleculeWithExplicitH.addBond(tmpNewBond);
+                tmpMoleculeCopy.addBond(tmpNewBond);
             }
 
-            // Now that we have a copy of the original molecule, add explicit hydrogens
-            try {
-                AtomContainerManipulator.convertImplicitToExplicitHydrogens(tmpMoleculeWithExplicitH);
-            } catch (Exception anException) {
-                Descriptor.LOGGER.log(
-                        Level.SEVERE,
-                        "Descriptor.createMoleculeWithExplicitHydrogens: Error converting implicit to explicit hydrogens: " + anException.getMessage(),
-                        anException
-                );
-                throw new Exception("Failed to convert implicit to explicit hydrogens: " + anException.getMessage());
-            }
-
-            return tmpMoleculeWithExplicitH;
+            return tmpMoleculeCopy;
 
         } catch (Exception anException) {
-            if (!(anException instanceof IllegalArgumentException)) {
-                Descriptor.LOGGER.log(
-                        Level.SEVERE,
-                        "Descriptor.createMoleculeWithExplicitHydrogens: Error creating molecule with explicit hydrogens: " + anException.getMessage(),
-                        anException
-                );
-            }
-            throw anException;
+            throw new CloneNotSupportedException("Could not clone molecule: " + anException.getMessage());
+        }
+
+    }
+
+    /**
+     * Creates a new molecule with all implicit hydrogen atoms made explicit.
+     *
+     * @param aMolecule Source molecule with implicit hydrogens (NOT MODIFIED)
+     * @return New molecule with all hydrogens made explicit
+     * @throws NullPointerException If the input molecule is null
+     * @throws IllegalArgumentException If the input molecule is empty
+     * @throws CloneNotSupportedException If the molecule cannot be properly processed
+     */
+    public static IAtomContainer createMoleculeWithExplicitHydrogens(
+            IAtomContainer aMolecule
+    ) throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
+        if (aMolecule == null) {
+            throw new NullPointerException("Input molecule must not be null");
+        }
+        if (aMolecule.isEmpty()) {
+            throw new IllegalArgumentException("Input molecule must not be empty");
+        }
+        try {
+            // Create a deep copy of the molecule first
+            IAtomContainer tmpMoleculeCopy = copyMolecule(aMolecule);
+
+            // Add explicit hydrogen atoms
+            AtomContainerManipulator.convertImplicitToExplicitHydrogens(tmpMoleculeCopy);
+
+            return tmpMoleculeCopy;
+        } catch (Exception anException) {
+            throw new CloneNotSupportedException("Could not create molecule with explicit hydrogens: " + anException.getMessage());
         }
     }
 
     /**
      * Uses a specified aromaticity model to modify aMolecule.
      * Note: This method changes the input molecule by applying the specified aromaticity model.
-     * Note: No checks are performed, all necessary checks have already been made in public methods above.
      *
      * @param aMolecule Molecule that will be modified (IS CHANGED)
      * @param anAromaticityModel The aromaticity model that will be used for aromaticity detection
-     * @throws Exception Thrown if the aromaticity detection fails or if the aromaticity model is null
+     * @throws NullPointerException If the input molecule or aromaticity model is null
+     * @throws IllegalArgumentException If the input molecule is empty
+     * @throws Exception If the aromaticity detection fails
      */
-    public static void setAromaticity(IAtomContainer aMolecule, ElectronDonation anAromaticityModel) throws Exception {
+    public static void setAromaticity(
+            IAtomContainer aMolecule,
+            ElectronDonation anAromaticityModel
+    ) throws NullPointerException, IllegalArgumentException, Exception {
+        if (aMolecule == null) {
+            throw new NullPointerException("Input molecule must not be null");
+        }
+        if (aMolecule.isEmpty()) {
+            throw new IllegalArgumentException("Input molecule must not be empty");
+        }
+        if (anAromaticityModel == null) {
+            throw new NullPointerException("Aromaticity model must not be null");
+        }
         try {
-            // Check if anAromaticityModel is null
-            if (anAromaticityModel == null) {
-                Descriptor.LOGGER.log(
-                        Level.SEVERE,
-                        "Descriptor.setAromaticity: Aromaticity model cannot be null."
-                );
-                throw new IllegalArgumentException("Aromaticity model cannot be null.");
-            }
             AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(aMolecule);
 
-            for (IAtom atom : aMolecule.atoms()) {
-                atom.setIsAromatic(false);
-            }
-            for (IBond bond : aMolecule.bonds()) {
-                bond.setIsAromatic(false);
-            }
+            // Clears all aromatic flags before applying the aromaticity model.
+            Aromaticity.clear(aMolecule);
 
             Cycles.markRingAtomsAndBonds(aMolecule);
             Aromaticity.apply(anAromaticityModel, aMolecule);
-
         } catch (Exception anException) {
-            Descriptor.LOGGER.log(
-                    Level.SEVERE,
-                    "Descriptor.setAromaticity: Error applying aromaticity model: " + anException.getMessage(),
-                    anException
-            );
-            throw new Exception("Failed to apply aromaticity model: " + anException.getMessage(), anException);
+            throw new Exception("Failed to detect aromaticity: " + anException.getMessage(), anException);
         }
     }
 
