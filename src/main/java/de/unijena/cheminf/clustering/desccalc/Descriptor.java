@@ -34,6 +34,7 @@ import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.ALOGPDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.APolDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.AcidicGroupCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AromaticAtomsCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AromaticBondsCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AtomCountDescriptor;
@@ -42,6 +43,7 @@ import org.openscience.cdk.qsar.descriptors.molecular.AutocorrelationDescriptorM
 import org.openscience.cdk.qsar.descriptors.molecular.AutocorrelationDescriptorPolarizability;
 import org.openscience.cdk.qsar.descriptors.molecular.BCUTDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.BPolDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.BasicGroupCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.BondCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.CarbonTypesDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.ChiChainDescriptor;
@@ -77,6 +79,7 @@ import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.IntegerArrayResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
+import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import java.util.EnumMap;
@@ -418,7 +421,15 @@ public enum Descriptor {
      * 4. nAromBlocks - total number of aromatically connected components<br>
      * TODO: Expand to specific ring sizes?
      */
-    SMALL_RING;
+    SMALL_RING,
+    /**
+     * Basic Group Count: Returns the number of basic groups in a molecule.
+     */
+    BASIC_GROUP_COUNT,
+    /**
+     * Acidic Group Count: Returns the number of acidic groups in a molecule.
+     */
+    ACIDIC_GROUP_COUNT;
 
     // Add new descriptor information here!
 
@@ -605,6 +616,18 @@ public enum Descriptor {
             // SMALL_RING has 4 components
             descriptorToComponentNumberMap.put(SMALL_RING, 4);
             descriptorToCdkObjectMap.put(SMALL_RING, new SmallRingDescriptor());
+
+            // Basic Group Count has 1 component
+            BasicGroupCountDescriptor basicGroupCountDescriptor = new BasicGroupCountDescriptor();
+            basicGroupCountDescriptor.initialise(SilentChemObjectBuilder.getInstance());
+            descriptorToCdkObjectMap.put(BASIC_GROUP_COUNT, basicGroupCountDescriptor);
+            descriptorToComponentNumberMap.put(BASIC_GROUP_COUNT, 1);
+
+            // Acidic Group Count has 1 component
+            AcidicGroupCountDescriptor acidicGroupCountDescriptor = new AcidicGroupCountDescriptor();
+            acidicGroupCountDescriptor.initialise(SilentChemObjectBuilder.getInstance());
+            descriptorToCdkObjectMap.put(ACIDIC_GROUP_COUNT, acidicGroupCountDescriptor);
+            descriptorToComponentNumberMap.put(ACIDIC_GROUP_COUNT, 1);
 
             // Add new descriptor information here!
 
@@ -1430,6 +1453,12 @@ public enum Descriptor {
                 case SMALL_RING:
                     setSmallRing(anAtomContainer, aVector, aStartIndex);
                     break;
+                case BASIC_GROUP_COUNT:
+                    setBasicGroupCount(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ACIDIC_GROUP_COUNT:
+                    setAcidicGroupCount(anAtomContainer, aVector, aStartIndex);
+                    break;
 
                 // Add new descriptor information here!
                 default:
@@ -1643,6 +1672,16 @@ public enum Descriptor {
                         aVector[aStartIndex + i] = smallRingResult.get(i);
                     }
                     break;
+                case BASIC_GROUP_COUNT:
+                    BasicGroupCountDescriptor basicGroupCountDesc = new BasicGroupCountDescriptor();
+                    basicGroupCountDesc.initialise(SilentChemObjectBuilder.getInstance());
+                    aVector[aStartIndex] = (float) ((IntegerResult) basicGroupCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ACIDIC_GROUP_COUNT:
+                    AcidicGroupCountDescriptor acidicGroupCountDesc = new AcidicGroupCountDescriptor();
+                    acidicGroupCountDesc.initialise(SilentChemObjectBuilder.getInstance());
+                    aVector[aStartIndex] = (float) ((IntegerResult) acidicGroupCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
 
                 // Add new descriptor information here!
                 default:
@@ -1718,7 +1757,7 @@ public enum Descriptor {
                     break;
                 case BOND_COUNT_SPECIFIED:
                     // Single bonds (s)
-                    BondCountDescriptor bondCountDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED).getClass().getDeclaredConstructor().newInstance();
+                    BondCountDescriptor bondCountDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED);
                     bondCountDesc.setParameters(new Object[]{"s"});
                     aVector[aStartIndex] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
 
@@ -1857,6 +1896,12 @@ public enum Descriptor {
                     for (int i = 0; i < 4; i++) {
                         aVector[aStartIndex + i] = smallRingResult.get(i);
                     }
+                    break;
+                case BASIC_GROUP_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BASIC_GROUP_COUNT).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ACIDIC_GROUP_COUNT:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ACIDIC_GROUP_COUNT).calculate(anAtomContainer).getValue()).intValue();
                     break;
 
                 // Add new descriptor information here!
@@ -2080,14 +2125,15 @@ public enum Descriptor {
             int aStartIndex
     ) {
         try {
-            BondCountDescriptor bondCountDesc = new BondCountDescriptor();
-
+            BondCountDescriptor bondCountDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED);
             bondCountDesc.setParameters(new Object[]{"s"});
             aVector[aStartIndex] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
 
+            // Double bonds (d)
             bondCountDesc.setParameters(new Object[]{"d"});
             aVector[aStartIndex + 1] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
 
+            // Triple bonds (t)
             bondCountDesc.setParameters(new Object[]{"t"});
             aVector[aStartIndex + 2] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
         } catch (Exception e) {
@@ -2671,6 +2717,40 @@ public enum Descriptor {
         for (int i = 0; i < 4; i++) {
             aVector[aStartIndex + i] = result.get(i);
         }
+    }
+
+    /**
+     * Sets basic group count
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setBasicGroupCount(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BASIC_GROUP_COUNT).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets acidic group count
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAcidicGroupCount(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ACIDIC_GROUP_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
     // Add new descriptor information here!
