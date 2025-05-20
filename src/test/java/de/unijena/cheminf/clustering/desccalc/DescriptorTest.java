@@ -3406,6 +3406,70 @@ class DescriptorTest {
         }
     }
 
+    /**
+     * Tests method for descriptor AMINO_ACID_COUNT
+     */
+    @Test
+    public void test_AMINO_ACID_COUNT() throws Exception {
+        String tmpSmiles = "N[C@@]([H])([C@]([H])(O)C)C(=O)N[C@@]([H])([C@]([H])(O)C)C(=O)O"; // protein TT
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AMINO_ACID_COUNT};
+        boolean tmpIsParallelCalculation = false;
+
+        try {
+            Assertions.assertEquals(20, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+
+            float[][] tmpMatrix = new float[1][];
+            tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+
+            Assertions.assertEquals(2, tmpMatrix[0][8]);
+            Assertions.assertEquals(2, tmpMatrix[0][16]);
+
+            tmpMatrix = new float[1][];
+            tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(2, tmpMatrix[0][8]);
+            Assertions.assertEquals(2, tmpMatrix[0][16]);
+
+            tmpMatrix = new float[1][];
+            tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation
+                    )
+            );
+            Assertions.assertEquals(2, tmpMatrix[0][8]);
+            Assertions.assertEquals(2, tmpMatrix[0][16]);
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
     // Add new descriptor tests here!
 
     //</editor-fold>
@@ -3512,7 +3576,7 @@ class DescriptorTest {
         // Aromaticity detection and marking
         Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
 
-        int tmpNumberOfMolecules = 1;
+        int tmpNumberOfMolecules = 1000;
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
         Arrays.fill(tmpMoleculesArray, tmpMolecule);
         int tmpStartIndex = 0;

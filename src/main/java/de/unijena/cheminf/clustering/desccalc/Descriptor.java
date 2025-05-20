@@ -35,6 +35,7 @@ import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.ALOGPDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.APolDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AcidicGroupCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.AminoAcidCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AromaticAtomsCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AromaticBondsCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AtomCountDescriptor;
@@ -429,7 +430,16 @@ public enum Descriptor {
     /**
      * Acidic Group Count: Returns the number of acidic groups in a molecule.
      */
-    ACIDIC_GROUP_COUNT;
+    ACIDIC_GROUP_COUNT,
+    /**
+     * AminoAcidCount descriptor, calculates the number of each amino acid in a molecule.
+     * Returns 20 values, one for each of the 20 standard amino acids:
+     * Alanine, Arginine, Asparagine, Aspartic acid, Cysteine, Glutamic acid, Glutamine,
+     * Glycine, Histidine, Isoleucine, Leucine, Lysine, Methionine, Phenylalanine,
+     * Proline, Serine, Threonine, Tryptophan, Tyrosine, and Valine.
+     * This descriptor helps identify and quantify amino acid composition in peptides and proteins.
+     */
+    AMINO_ACID_COUNT;
 
     // Add new descriptor information here!
 
@@ -628,6 +638,10 @@ public enum Descriptor {
             acidicGroupCountDescriptor.initialise(SilentChemObjectBuilder.getInstance());
             descriptorToCdkObjectMap.put(ACIDIC_GROUP_COUNT, acidicGroupCountDescriptor);
             descriptorToComponentNumberMap.put(ACIDIC_GROUP_COUNT, 1);
+
+            // AminoAcidCount has 20 components
+            descriptorToComponentNumberMap.put(AMINO_ACID_COUNT, 20);
+            descriptorToCdkObjectMap.put(AMINO_ACID_COUNT, new AminoAcidCountDescriptor());
 
             // Add new descriptor information here!
 
@@ -1459,6 +1473,9 @@ public enum Descriptor {
                 case ACIDIC_GROUP_COUNT:
                     setAcidicGroupCount(anAtomContainer, aVector, aStartIndex);
                     break;
+                case AMINO_ACID_COUNT:
+                    setAminoAcidCount(anAtomContainer, aVector, aStartIndex);
+                    return true;
 
                 // Add new descriptor information here!
                 default:
@@ -1622,7 +1639,7 @@ public enum Descriptor {
                     }
                     break;
                 case AUTOCORRELATION_MASS:
-                    DoubleArrayResult tmpAutocorrelationMassResult = (DoubleArrayResult) new AutocorrelationDescriptorMass().calculate(anAtomContainer).getValue();
+                    DoubleArrayResult tmpAutocorrelationMassResult = (DoubleArrayResult) (new AutocorrelationDescriptorMass()).calculate(anAtomContainer).getValue();
                     for (int i = 0; i < 5; i++) {
                         aVector[aStartIndex + i] = (float) tmpAutocorrelationMassResult.get(i);
                     }
@@ -1664,12 +1681,14 @@ public enum Descriptor {
                     aVector[aStartIndex] = (float) ((DoubleResult) (new FractionalPSADescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case LARGEST_PI_SYSTEM:
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new LargestPiSystemDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    // The largest pi system descriptor is not thread-safe, so we need to copy the molecule otherwise calculation can fail.
+                    IAtomContainer tmpMolecule = copyMolecule(anAtomContainer);
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new LargestPiSystemDescriptor()).calculate(tmpMolecule).getValue()).intValue();
                     break;
                 case SMALL_RING:
                     IntegerArrayResult smallRingResult = (IntegerArrayResult) (new SmallRingDescriptor()).calculate(anAtomContainer).getValue();
                     for (int i = 0; i < 4; i++) {
-                        aVector[aStartIndex + i] = smallRingResult.get(i);
+                        aVector[aStartIndex + i] = (float) smallRingResult.get(i);
                     }
                     break;
                 case BASIC_GROUP_COUNT:
@@ -1682,6 +1701,12 @@ public enum Descriptor {
                     acidicGroupCountDesc.initialise(SilentChemObjectBuilder.getInstance());
                     aVector[aStartIndex] = (float) ((IntegerResult) acidicGroupCountDesc.calculate(anAtomContainer).getValue()).intValue();
                     break;
+                case AMINO_ACID_COUNT:
+                    IntegerArrayResult aminoAcidCountResult = (IntegerArrayResult) (new AminoAcidCountDescriptor()).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < aminoAcidCountResult.length(); i++) {
+                        aVector[aStartIndex + i] = (float) aminoAcidCountResult.get(i);
+                    }
+                    return true;
 
                 // Add new descriptor information here!
                 default:
@@ -1894,7 +1919,7 @@ public enum Descriptor {
                 case SMALL_RING:
                     IntegerArrayResult smallRingResult = (IntegerArrayResult) descriptorToCdkObjectMap.get(SMALL_RING).calculate(anAtomContainer).getValue();
                     for (int i = 0; i < 4; i++) {
-                        aVector[aStartIndex + i] = smallRingResult.get(i);
+                        aVector[aStartIndex + i] = (float) smallRingResult.get(i);
                     }
                     break;
                 case BASIC_GROUP_COUNT:
@@ -1903,6 +1928,12 @@ public enum Descriptor {
                 case ACIDIC_GROUP_COUNT:
                     aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ACIDIC_GROUP_COUNT).calculate(anAtomContainer).getValue()).intValue();
                     break;
+                case AMINO_ACID_COUNT:
+                    IntegerArrayResult aminoAcidCountResult = (IntegerArrayResult) descriptorToCdkObjectMap.get(AMINO_ACID_COUNT).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < aminoAcidCountResult.length(); i++) {
+                        aVector[aStartIndex + i] = (float) aminoAcidCountResult.get(i);
+                    }
+                    return true;
 
                 // Add new descriptor information here!
                 default:
@@ -2715,7 +2746,7 @@ public enum Descriptor {
     ) {
         IntegerArrayResult result = (IntegerArrayResult) descriptorToCdkObjectMap.get(SMALL_RING).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 4; i++) {
-            aVector[aStartIndex + i] = result.get(i);
+            aVector[aStartIndex + i] = (float) result.get(i);
         }
     }
 
@@ -2753,6 +2784,26 @@ public enum Descriptor {
         aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ACIDIC_GROUP_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
+    /**
+     * Sets amino acid count values.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAminoAcidCount(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        IntegerArrayResult aminoAcidCountResult = (IntegerArrayResult) descriptorToCdkObjectMap.get(AMINO_ACID_COUNT).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < aminoAcidCountResult.length(); i++) {
+            aVector[aStartIndex + i] = (float) aminoAcidCountResult.get(i);
+        }
+    }
+
     // Add new descriptor information here!
     //</editor-fold>
     //<editor-fold desc="Public static molecule preparation methods">
@@ -2767,9 +2818,8 @@ public enum Descriptor {
      * @throws IllegalArgumentException If the input molecule is empty
      * @throws CloneNotSupportedException If the molecule cannot be properly copied
      */
-    public static IAtomContainer copyMolecule(
-            IAtomContainer aMolecule
-    ) throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
+    public static IAtomContainer copyMolecule(IAtomContainer aMolecule)
+            throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
         if (aMolecule == null) {
             throw new NullPointerException("Input molecule must not be null");
         }
