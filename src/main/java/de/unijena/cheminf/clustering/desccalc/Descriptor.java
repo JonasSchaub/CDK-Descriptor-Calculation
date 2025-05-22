@@ -1583,7 +1583,8 @@ public enum Descriptor {
                     aVector[aStartIndex] = (float) ((DoubleResult) (new FractionalCSP3Descriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case HYBRIDIZATION_RATIO:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new HybridizationRatioDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    IAtomContainer hybridizationRatioMoleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new HybridizationRatioDescriptor()).calculate(hybridizationRatioMoleculeWithExplicitH).getValue()).doubleValue();
                     break;
                 case KAPPA_SHAPE_INDICES:
                     DoubleArrayResult kappaResult = (DoubleArrayResult) (new KappaShapeIndicesDescriptor()).calculate(anAtomContainer).getValue();
@@ -1816,7 +1817,8 @@ public enum Descriptor {
                     aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FRACTIONAL_CSP3).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case HYBRIDIZATION_RATIO:
-                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(HYBRIDIZATION_RATIO).calculate(anAtomContainer).getValue()).doubleValue();
+                    IAtomContainer hybridizationRatioMoleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(HYBRIDIZATION_RATIO).calculate(hybridizationRatioMoleculeWithExplicitH).getValue()).doubleValue();
                     break;
                 case KAPPA_SHAPE_INDICES:
                     DoubleArrayResult kappaResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(KAPPA_SHAPE_INDICES).calculate(anAtomContainer).getValue();
@@ -2195,7 +2197,6 @@ public enum Descriptor {
      * Sets Lipinski's Rule of Five violations count
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
-     * TODO: Test works check if we need to addExplicitHydrogens to the molecule
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -2308,7 +2309,20 @@ public enum Descriptor {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(HYBRIDIZATION_RATIO).calculate(anAtomContainer).getValue()).doubleValue();
+        try {
+            // Create a copy of the molecule with explicit hydrogen atoms
+            IAtomContainer moleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
+
+            // Calculate XLogP using the molecule copy containing explicit hydrogen atoms
+            aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(HYBRIDIZATION_RATIO).calculate(moleculeWithExplicitH).getValue()).doubleValue();
+        } catch (Exception anException) {
+            aVector[aStartIndex] = Float.NaN;
+            Descriptor.LOGGER.log(
+                    Level.WARNING,
+                    "Descriptor.setHybridizationRatio: An exception occurred: " + anException.getMessage(),
+                    anException
+            );
+        }
     }
 
     /**

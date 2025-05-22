@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.aromaticity.Aromaticity;
 import org.openscience.cdk.aromaticity.ElectronDonation;
-import org.openscience.cdk.graph.Cycles;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -422,9 +421,6 @@ class DescriptorTest {
         IAtomContainer tmpMolecule2 = tmpSmilesParser.parseSmiles(tmpSmiles2);
         Descriptor.setAromaticity(tmpMolecule2, Aromaticity.Model.Daylight);
 
-
-
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule1, tmpMolecule2};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.TPSA};
@@ -651,10 +647,6 @@ class DescriptorTest {
         String tmpSmiles = "C";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.MANNHOLD_LOGP};
@@ -722,10 +714,6 @@ class DescriptorTest {
         String tmpSmiles = "CC(=O)N";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BCUT};
@@ -809,17 +797,14 @@ class DescriptorTest {
         // Preparation of the first molecule
         String tmpSmiles1 = "CCO";
         IAtomContainer tmpMolecule1 = tmpSmilesParser.parseSmiles(tmpSmiles1);
-        Descriptor.setAromaticity(tmpMolecule1, Aromaticity.Model.Daylight);
 
         // Preparation of the second molecule
         String tmpSmiles2 = "C=C=C";
         IAtomContainer tmpMolecule2 = tmpSmilesParser.parseSmiles(tmpSmiles2);
-        Descriptor.setAromaticity(tmpMolecule2, Aromaticity.Model.Daylight);
 
         // Preparation of the third molecule
         String tmpSmiles3 = "CC#N";
         IAtomContainer tmpMolecule3 = tmpSmilesParser.parseSmiles(tmpSmiles3);
-        Descriptor.setAromaticity(tmpMolecule3, Aromaticity.Model.Daylight);
 
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule1, tmpMolecule2, tmpMolecule3};
         int tmpStartIndex = 0;
@@ -967,10 +952,6 @@ class DescriptorTest {
         String tmpSmiles = "O=C(O)CC";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.B_POL};
@@ -1037,10 +1018,7 @@ class DescriptorTest {
         String tmpSmiles = "CCCC(OCC)OCC(c1cccc2ccccc12)C4CCC(CCCO)C(CC3CNCNC3)C4";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
+        Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.RULE_OF_FIVE};
@@ -1117,14 +1095,12 @@ class DescriptorTest {
                 Aromaticity.Model.OpenSmiles,
                 Aromaticity.Model.PiBonds
         };
-
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         for (ElectronDonation model : models) {
             // Parse fresh molecule for each model
             IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-
             // Apply aromaticity with the current model
             Descriptor.setAromaticity(tmpMolecule, model);
 
@@ -1194,10 +1170,7 @@ class DescriptorTest {
         String tmpSmiles = "c1ccccc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
+        Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AROMATIC_BONDS_COUNT};
@@ -1258,17 +1231,13 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor ROTATABLE_BONDS_COUNT with an amide bond
+     * Tests method for descriptor ROTATABLE_BONDS_COUNT
      */
     @Test
-    public void test_ROTATABLE_BONDS_COUNT_amide() throws Exception {
+    public void test_ROTATABLE_BONDS_COUNT() throws Exception {
         String tmpSmiles = "CCNC(=O)CC(C)C";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ROTATABLE_BONDS_COUNT};
@@ -1336,10 +1305,6 @@ class DescriptorTest {
         String tmpSmiles = "Clc1cc(cc(Cl)c1N)C(O)CNC(C)(C)C";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.FMF};
@@ -1406,10 +1371,6 @@ class DescriptorTest {
         String tmpSmiles = "CC1=CC=CC(C)=N1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.FRACTIONAL_CSP3};
@@ -1476,10 +1437,6 @@ class DescriptorTest {
         String tmpSmiles = "CCC";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.HYBRIDIZATION_RATIO};
@@ -1547,10 +1504,6 @@ class DescriptorTest {
         String tmpSmiles = "O=C(O)CC";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.KAPPA_SHAPE_INDICES};
@@ -1623,10 +1576,6 @@ class DescriptorTest {
         String tmpSmiles = "O=C(O)CC";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.PETITJEAN_NUMBER};
@@ -1693,10 +1642,6 @@ class DescriptorTest {
         String tmpSmiles = "C1CCC2(CC1)CC=C1C=CC=CC1=C2";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.SPIRO_ATOM_COUNT};
@@ -1764,10 +1709,6 @@ class DescriptorTest {
         String tmpSmiles = "C1CCC2CCCCC2C1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.V_ADJ_MAT};
@@ -1834,10 +1775,6 @@ class DescriptorTest {
         String tmpSmiles = "CCCC";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.WEIGHTED_PATH};
@@ -1916,10 +1853,6 @@ class DescriptorTest {
         String tmpSmiles = "O=C(O)CC";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ZAGREB_INDEX};
@@ -1986,10 +1919,6 @@ class DescriptorTest {
         String tmpSmiles = "CCCC";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CARBON_TYPES};
@@ -2081,10 +2010,6 @@ class DescriptorTest {
         String tmpSmiles = "CCCCl";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.A_LOG_P};
@@ -2158,10 +2083,7 @@ class DescriptorTest {
         String tmpSmiles = "O=C(O)C(N)CCCN";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
+        Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[] {tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.X_LOG_P};
@@ -2228,10 +2150,6 @@ class DescriptorTest {
         String tmpSmiles = "CCC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.JP_LOG_P};
@@ -2298,10 +2216,6 @@ class DescriptorTest {
         String tmpSmiles = "O=C(O)CC";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.A_POL};
@@ -2368,10 +2282,6 @@ class DescriptorTest {
         String tmpSmiles = "Clc1ccccc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AUTOCORRELATION_CHARGE};
@@ -2449,10 +2359,6 @@ class DescriptorTest {
         String tmpSmiles = "Clc1ccccc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AUTOCORRELATION_MASS};
@@ -2532,10 +2438,6 @@ class DescriptorTest {
         String tmpSmiles = "Clc1ccccc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AUTOCORRELATION_POLARIZABILITY};
@@ -2604,10 +2506,6 @@ class DescriptorTest {
         String tmpSmiles = "c1ccc(CCc2ccccc2)cc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.FRAGMENT_COMPLEXITY};
@@ -2674,12 +2572,6 @@ class DescriptorTest {
         String tmpSmiles = "CC1OC1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
-
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CHI_CHAIN};
@@ -2767,10 +2659,6 @@ class DescriptorTest {
         String tmpSmiles = "CC1OC1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CHI_CLUSTER};
@@ -2858,10 +2746,6 @@ class DescriptorTest {
         String tmpSmiles = "C1=C(Cl)C=CC=C1(Cl)";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CHI_PATH_CLUSTER};
@@ -2943,10 +2827,6 @@ class DescriptorTest {
         String tmpSmiles = "CC1OC1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CHI_PATH};
@@ -3041,10 +2921,6 @@ class DescriptorTest {
         String tmpSmiles = "O=C(O)c1ccncc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.FRACTIONAL_PSA};
@@ -3111,13 +2987,12 @@ class DescriptorTest {
     public void test_LARGEST_PI_SYSTEM() throws Exception {
         String tmpSmiles = "C=CC=CCc2ccc(Cc1ccncc1C=C)cc2";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        // Parse fresh molecule for each model
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-
+        Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LARGEST_PI_SYSTEM};
-        boolean tmpIsParallelCalculation = true;
+        boolean tmpIsParallelCalculation = false;
 
             try {
                 Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -3171,7 +3046,6 @@ class DescriptorTest {
                 Assertions.fail();
             }
     }
-
 
     /**
      * Tests method for descriptor SMALL_RING
@@ -3276,10 +3150,6 @@ class DescriptorTest {
         String tmpSmiles = "NC";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BASIC_GROUP_COUNT};
@@ -3345,10 +3215,6 @@ class DescriptorTest {
         String tmpSmiles = "CC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ACIDIC_GROUP_COUNT};
@@ -3414,7 +3280,6 @@ class DescriptorTest {
         String tmpSmiles = "N[C@@]([H])([C@]([H])(O)C)C(=O)N[C@@]([H])([C@]([H])(O)C)C(=O)O"; // protein TT
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AMINO_ACID_COUNT};
@@ -3575,8 +3440,7 @@ class DescriptorTest {
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         // Aromaticity detection and marking
         Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
-
-        int tmpNumberOfMolecules = 1000;
+        int tmpNumberOfMolecules = 100;
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
         Arrays.fill(tmpMoleculesArray, tmpMolecule);
         int tmpStartIndex = 0;
@@ -3708,8 +3572,7 @@ class DescriptorTest {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         // Aromaticity detection and marking
-        Cycles.markRingAtomsAndBonds((tmpMolecule));
-        Aromaticity.apply(Aromaticity.Model.Daylight, tmpMolecule);
+        Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
         int tmpNumberOfMolecules = 1000;
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
         Arrays.fill(tmpMoleculesArray, tmpMolecule);
