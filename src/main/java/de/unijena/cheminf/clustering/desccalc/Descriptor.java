@@ -497,7 +497,9 @@ public enum Descriptor {
 
             // BCUT has 6 components
             descriptorToComponentNumberMap.put(BCUT, 6);
-            descriptorToCdkObjectMap.put(BCUT, new BCUTDescriptor());
+            BCUTDescriptor bcutDescriptor = new BCUTDescriptor();
+            bcutDescriptor.setParameters(new Object[] {1, 1, false}); // nhigh = 1, nlow = 1, checkAromaticity = false
+            descriptorToCdkObjectMap.put(BCUT, bcutDescriptor);
 
             // BOND_COUNT has 1 component
             descriptorToComponentNumberMap.put(BOND_COUNT_ALL, 1);
@@ -621,6 +623,8 @@ public enum Descriptor {
 
             // LARGEST_PI_SYSTEM has 1 component
             descriptorToComponentNumberMap.put(LARGEST_PI_SYSTEM, 1);
+            LargestPiSystemDescriptor largestPiSystemDescriptor = new LargestPiSystemDescriptor();
+            largestPiSystemDescriptor.setParameters(new Object[] {false});
             descriptorToCdkObjectMap.put(LARGEST_PI_SYSTEM, new LargestPiSystemDescriptor());
 
             // SMALL_RING has 4 components
@@ -1541,7 +1545,10 @@ public enum Descriptor {
                     aVector[aStartIndex] = (float) ((DoubleResult) (new MannholdLogPDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case BCUT:
-                    DoubleArrayResult bcutResult = (DoubleArrayResult) (new BCUTDescriptor()).calculate(anAtomContainer).getValue();
+                    BCUTDescriptor bcutDescriptor = new BCUTDescriptor();
+                    // Change parameters so that we can use our own setAromaticity method default: checkAromaticity = true
+                    bcutDescriptor.setParameters(new Object[] {1, 1, false}); // nhigh = 1, nlow = 1, checkAromaticity = false
+                    DoubleArrayResult bcutResult = (DoubleArrayResult) bcutDescriptor.calculate(anAtomContainer).getValue();
                     for (int i = 0; i < 6; i++) {
                         aVector[aStartIndex + i] = (float) bcutResult.get(i);
                     }
@@ -1684,7 +1691,10 @@ public enum Descriptor {
                 case LARGEST_PI_SYSTEM:
                     // The largest pi system descriptor is not thread-safe, so we need to copy the molecule otherwise calculation can fail.
                     IAtomContainer tmpMolecule = copyMolecule(anAtomContainer);
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new LargestPiSystemDescriptor()).calculate(tmpMolecule).getValue()).intValue();
+                    LargestPiSystemDescriptor largestPiSystemDescriptor = new LargestPiSystemDescriptor();
+                    // Change parameters so that we can use our own setAromaticity method
+                    largestPiSystemDescriptor.setParameters(new Object[] {false}); // checkAromaticity = false
+                    aVector[aStartIndex] = (float) ((IntegerResult) largestPiSystemDescriptor.calculate(tmpMolecule).getValue()).intValue();
                     break;
                 case SMALL_RING:
                     IntegerArrayResult smallRingResult = (IntegerArrayResult) (new SmallRingDescriptor()).calculate(anAtomContainer).getValue();
