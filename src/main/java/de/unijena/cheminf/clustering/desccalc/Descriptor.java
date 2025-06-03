@@ -60,6 +60,7 @@ import org.openscience.cdk.qsar.descriptors.molecular.HBondDonorCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.HybridizationRatioDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.JPlogPDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.KappaShapeIndicesDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.KierHallSmartsDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.LargestChainDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.LargestPiSystemDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.LongestAliphaticChainDescriptor;
@@ -420,7 +421,13 @@ public enum Descriptor {
      * 2. nAromRings - total number of small aromatic rings<br>
      * 3. nRingBlocks - total number of distinct ring blocks<br>
      * 4. nAromBlocks - total number of aromatically connected components<br>
-     * TODO: Expand to specific ring sizes?
+     * 5. nRings3 - total number of 3-membered rings<br>
+     * 6. nRings4 - total number of 4-membered rings<br>
+     * 7. nRings5 - total number of 5-membered rings<br>
+     * 8. nRings6 - total number of 6-membered rings<br>
+     * 9. nRings7 - total number of 7-membered rings<br>
+     * 10. nRings8 - total number of 8-membered rings<br>
+     * 11. nRings9 - total number of 9-membered rings<br>
      */
     SMALL_RING,
     /**
@@ -439,7 +446,13 @@ public enum Descriptor {
      * Proline, Serine, Threonine, Tryptophan, Tyrosine, and Valine.
      * This descriptor helps identify and quantify amino acid composition in peptides and proteins.
      */
-    AMINO_ACID_COUNT;
+    AMINO_ACID_COUNT,
+    /**
+     * Kier-Hall SMARTS descriptor that calculates counts of functional groups and substructures
+     * based on the Kier and Hall SMARTS patterns, used for QSAR modeling and molecular characterization.
+     * Note: This descriptor provides 79 values representing different molecular fragments.
+     */
+    KIER_HALL_SMARTS;
 
     // Add new descriptor information here!
 
@@ -628,7 +641,7 @@ public enum Descriptor {
             descriptorToCdkObjectMap.put(LARGEST_PI_SYSTEM, new LargestPiSystemDescriptor());
 
             // SMALL_RING has 4 components
-            descriptorToComponentNumberMap.put(SMALL_RING, 4);
+            descriptorToComponentNumberMap.put(SMALL_RING, 11);
             descriptorToCdkObjectMap.put(SMALL_RING, new SmallRingDescriptor());
 
             // Basic Group Count has 1 component
@@ -646,6 +659,10 @@ public enum Descriptor {
             // AminoAcidCount has 20 components
             descriptorToComponentNumberMap.put(AMINO_ACID_COUNT, 20);
             descriptorToCdkObjectMap.put(AMINO_ACID_COUNT, new AminoAcidCountDescriptor());
+
+            // Kier-Hall SMARTS has 79 components
+            descriptorToComponentNumberMap.put(KIER_HALL_SMARTS, 79);
+            descriptorToCdkObjectMap.put(KIER_HALL_SMARTS, new KierHallSmartsDescriptor());
 
             // Add new descriptor information here!
 
@@ -914,7 +931,7 @@ public enum Descriptor {
      * @throws IllegalArgumentException Thrown if an argument is illegal
      * @throws Exception Thrown if fatal error occurs (this should never happen)
      */
-    public static boolean setDescriptorsForMoleculesByMoleculeParallelizationNew(
+        public static boolean setDescriptorsForMoleculesByMoleculeParallelizationNew(
             Descriptor[] aDescriptors,
             IAtomContainer[] anAtomContainerArray,
             float[][] aMatrix,
@@ -1440,7 +1457,7 @@ public enum Descriptor {
                     break;
                 case AUTOCORRELATION_CHARGE:
                     setAutocorrelationCharge(anAtomContainer, aVector, aStartIndex);
-                    return true;
+                    break;
                 case AUTOCORRELATION_MASS:
                     setAutocorrelationMass(anAtomContainer, aVector, aStartIndex);
                     break;
@@ -1479,7 +1496,10 @@ public enum Descriptor {
                     break;
                 case AMINO_ACID_COUNT:
                     setAminoAcidCount(anAtomContainer, aVector, aStartIndex);
-                    return true;
+                    break;
+                case KIER_HALL_SMARTS:
+                    setKierHallSmarts(anAtomContainer, aVector, aStartIndex);
+                    break;
 
                 // Add new descriptor information here!
                 default:
@@ -1698,7 +1718,7 @@ public enum Descriptor {
                     break;
                 case SMALL_RING:
                     IntegerArrayResult smallRingResult = (IntegerArrayResult) (new SmallRingDescriptor()).calculate(anAtomContainer).getValue();
-                    for (int i = 0; i < 4; i++) {
+                    for (int i = 0; i < 11; i++) {
                         aVector[aStartIndex + i] = (float) smallRingResult.get(i);
                     }
                     break;
@@ -1717,7 +1737,13 @@ public enum Descriptor {
                     for (int i = 0; i < aminoAcidCountResult.length(); i++) {
                         aVector[aStartIndex + i] = (float) aminoAcidCountResult.get(i);
                     }
-                    return true;
+                    break;
+                case KIER_HALL_SMARTS:
+                    IntegerArrayResult kierHallSmartsResult = (IntegerArrayResult) (new KierHallSmartsDescriptor()).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < kierHallSmartsResult.length(); i++) {
+                        aVector[aStartIndex + i] = (float) kierHallSmartsResult.get(i);
+                    }
+                    break;
 
                 // Add new descriptor information here!
                 default:
@@ -1930,7 +1956,7 @@ public enum Descriptor {
                     break;
                 case SMALL_RING:
                     IntegerArrayResult smallRingResult = (IntegerArrayResult) descriptorToCdkObjectMap.get(SMALL_RING).calculate(anAtomContainer).getValue();
-                    for (int i = 0; i < 4; i++) {
+                    for (int i = 0; i < 11; i++) {
                         aVector[aStartIndex + i] = (float) smallRingResult.get(i);
                     }
                     break;
@@ -1945,7 +1971,13 @@ public enum Descriptor {
                     for (int i = 0; i < aminoAcidCountResult.length(); i++) {
                         aVector[aStartIndex + i] = (float) aminoAcidCountResult.get(i);
                     }
-                    return true;
+                    break;
+                case KIER_HALL_SMARTS:
+                    IntegerArrayResult kierHallSmartsResult = (IntegerArrayResult) descriptorToCdkObjectMap.get(KIER_HALL_SMARTS).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < kierHallSmartsResult.length(); i++) {
+                        aVector[aStartIndex + i] = (float) kierHallSmartsResult.get(i);
+                    }
+                    break;
 
                 // Add new descriptor information here!
                 default:
@@ -2769,7 +2801,7 @@ public enum Descriptor {
             int aStartIndex
     ) {
         IntegerArrayResult result = (IntegerArrayResult) descriptorToCdkObjectMap.get(SMALL_RING).calculate(anAtomContainer).getValue();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 11; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
     }
@@ -2825,6 +2857,25 @@ public enum Descriptor {
         IntegerArrayResult aminoAcidCountResult = (IntegerArrayResult) descriptorToCdkObjectMap.get(AMINO_ACID_COUNT).calculate(anAtomContainer).getValue();
         for (int i = 0; i < aminoAcidCountResult.length(); i++) {
             aVector[aStartIndex + i] = (float) aminoAcidCountResult.get(i);
+        }
+    }
+    /**
+     * Sets Kier-Hall SMARTS descriptor values (79 functional group counts).
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setKierHallSmarts(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        IntegerArrayResult result = (IntegerArrayResult) descriptorToCdkObjectMap.get(KIER_HALL_SMARTS).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < result.length(); i++) {
+            aVector[aStartIndex + i] = (float) result.get(i);
         }
     }
 
