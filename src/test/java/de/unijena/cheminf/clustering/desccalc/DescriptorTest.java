@@ -80,7 +80,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
@@ -95,7 +96,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
@@ -110,7 +112,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
@@ -148,7 +151,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
@@ -164,7 +168,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
@@ -180,7 +185,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
@@ -220,7 +226,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
 
@@ -236,7 +243,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("8", tmpFormat.format(tmpMatrix[0][0])); // Acetic acid has 8 atoms
@@ -251,7 +259,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("8", tmpFormat.format(tmpMatrix[0][0])); // Acetic acid has 8 atoms
@@ -312,7 +321,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
@@ -328,7 +338,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
@@ -343,7 +354,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
@@ -402,7 +414,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Acetic acid has 1 hydrogen bond donor
@@ -418,7 +431,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Acetic acid has 1 hydrogen bond donor
@@ -434,7 +448,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Acetic acid has 1 hydrogen bond donor
@@ -497,7 +512,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("39.39", tmpFormat.format(tmpMatrix[0][0]));
@@ -513,7 +529,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("39.39", tmpFormat.format(tmpMatrix[0][0]));
@@ -529,7 +546,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("39.39", tmpFormat.format(tmpMatrix[0][0]));
@@ -591,7 +609,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
@@ -607,7 +626,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
@@ -623,7 +643,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
@@ -685,7 +706,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
@@ -701,7 +723,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
@@ -717,7 +740,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
@@ -756,7 +780,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1.57", tmpFormat.format(tmpMatrix[0][0]));
@@ -771,7 +796,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1.57", tmpFormat.format(tmpMatrix[0][0]));
@@ -786,7 +812,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1.57", tmpFormat.format(tmpMatrix[0][0]));
@@ -822,7 +849,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(11.881587, tmpMatrix[0][0], epsilon);
@@ -842,7 +870,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(11.881587, tmpMatrix[0][0], epsilon);
@@ -862,7 +891,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(11.881587, tmpMatrix[0][0], epsilon);
@@ -915,7 +945,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
@@ -932,7 +963,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
@@ -949,7 +981,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
@@ -988,7 +1021,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Single bonds
@@ -1005,7 +1039,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Single bonds
@@ -1022,7 +1057,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Single bonds
@@ -1060,7 +1096,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(7.517242, tmpMatrix[0][0], epsilon);
@@ -1075,7 +1112,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(7.517242, tmpMatrix[0][0], epsilon);
@@ -1090,7 +1128,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(7.517242, tmpMatrix[0][0], epsilon);
@@ -1142,7 +1181,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("3", tmpFormat.format(tmpMatrix[0][0]));
@@ -1157,7 +1197,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("3", tmpFormat.format(tmpMatrix[0][0]));
@@ -1172,7 +1213,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("3", tmpFormat.format(tmpMatrix[0][0]));
@@ -1226,7 +1268,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
@@ -1241,7 +1284,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
@@ -1256,7 +1300,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
@@ -1309,7 +1354,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
@@ -1324,7 +1370,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
@@ -1339,7 +1386,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
@@ -1377,7 +1425,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
@@ -1392,7 +1441,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
@@ -1407,7 +1457,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
@@ -1443,7 +1494,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.353, tmpMatrix[0][0], epsilon);
@@ -1458,7 +1510,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.353, tmpMatrix[0][0], epsilon);
@@ -1473,7 +1526,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.353, tmpMatrix[0][0], epsilon);
@@ -1509,7 +1563,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.29, tmpMatrix[0][0], epsilon);
@@ -1524,7 +1579,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.29, tmpMatrix[0][0], epsilon);
@@ -1539,7 +1595,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.29, tmpMatrix[0][0], epsilon);
@@ -1576,7 +1633,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1.00", tmpFormat.format(tmpMatrix[0][0]));
@@ -1591,7 +1649,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1.00", tmpFormat.format(tmpMatrix[0][0]));
@@ -1606,7 +1665,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1.00", tmpFormat.format(tmpMatrix[0][0]));
@@ -1642,7 +1702,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(5.0, tmpMatrix[0][0], epsilon);
@@ -1659,7 +1720,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(5.0, tmpMatrix[0][0], epsilon);
@@ -1676,7 +1738,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(5.0, tmpMatrix[0][0], epsilon);
@@ -1714,7 +1777,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.33333334, tmpMatrix[0][0], epsilon);
@@ -1729,7 +1793,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.33333334, tmpMatrix[0][0], epsilon);
@@ -1744,7 +1809,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.33333334, tmpMatrix[0][0], epsilon);
@@ -1781,7 +1847,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0]));
@@ -1796,7 +1863,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0]));
@@ -1811,7 +1879,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0]));
@@ -1847,7 +1916,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(4.459, tmpMatrix[0][0], epsilon);
@@ -1862,7 +1932,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(4.459, tmpMatrix[0][0], epsilon);
@@ -1877,7 +1948,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(4.459, tmpMatrix[0][0], epsilon);
@@ -1913,7 +1985,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(6.87132, tmpMatrix[0][0], epsilon);
@@ -1932,7 +2005,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(6.87132, tmpMatrix[0][0], epsilon);
@@ -1951,7 +2025,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(6.87132, tmpMatrix[0][0], epsilon);
@@ -1991,7 +2066,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(16, tmpMatrix[0][0], epsilon);
@@ -2006,7 +2082,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(16, tmpMatrix[0][0], epsilon);
@@ -2021,7 +2098,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(16, tmpMatrix[0][0], epsilon);
@@ -2058,7 +2136,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][0]));
@@ -2081,7 +2160,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][0]));
@@ -2104,7 +2184,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][0]));
@@ -2149,7 +2230,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1.719", tmpFormat.format(tmpMatrix[0][0]));
@@ -2166,7 +2248,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1.719", tmpFormat.format(tmpMatrix[0][0]));
@@ -2183,7 +2266,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals("1.719", tmpFormat.format(tmpMatrix[0][0]));
@@ -2236,7 +2320,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals(-3.30, tmpMatrix[0][0], epsilon);
@@ -2251,7 +2336,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals(-3.30, tmpMatrix[0][0], epsilon);
@@ -2266,7 +2352,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals(-3.30, tmpMatrix[0][0], epsilon);
@@ -2303,7 +2390,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.3, tmpMatrix[0][0], epsilon);
@@ -2318,7 +2406,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.3, tmpMatrix[0][0], epsilon);
@@ -2333,7 +2422,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.3, tmpMatrix[0][0], epsilon);
@@ -2369,7 +2459,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(10.88, tmpMatrix[0][0], epsilon);
@@ -2384,7 +2475,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(10.88, tmpMatrix[0][0], epsilon);
@@ -2399,7 +2491,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(10.88, tmpMatrix[0][0], epsilon);
@@ -2434,7 +2527,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertNotEquals(0f, tmpMatrix[0][0]);
@@ -2453,7 +2547,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertNotEquals(0f, tmpMatrix[0][0]);
@@ -2472,7 +2567,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertNotEquals(0f, tmpMatrix[0][0]);
@@ -2511,7 +2607,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertNotEquals(0f, tmpMatrix[0][0]);
@@ -2530,7 +2627,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertNotEquals(0f, tmpMatrix[0][0]);
@@ -2549,7 +2647,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertNotEquals(0f, tmpMatrix[0][0]);
@@ -2590,7 +2689,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             //System.out.println("Synchronized calculation results:");
@@ -2606,7 +2706,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             //System.out.println("New calculation results:");
@@ -2622,7 +2723,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             //System.out.println("Descriptor parallelization results:");
@@ -2659,7 +2761,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(659.00, tmpMatrix[0][0], epsilon);
@@ -2674,7 +2777,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(659.00, tmpMatrix[0][0], epsilon);
@@ -2689,7 +2793,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(659.00, tmpMatrix[0][0], epsilon);
@@ -2725,7 +2830,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
@@ -2747,7 +2853,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
@@ -2769,7 +2876,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
@@ -2812,7 +2920,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
@@ -2834,7 +2943,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
@@ -2856,7 +2966,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
@@ -2899,7 +3010,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.7416, tmpMatrix[0][0], epsilon);
@@ -2919,7 +3031,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.7416, tmpMatrix[0][0], epsilon);
@@ -2939,7 +3052,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.7416, tmpMatrix[0][0], epsilon);
@@ -2980,7 +3094,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(2.9916, tmpMatrix[0][0], epsilon);
@@ -3004,7 +3119,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(2.9916, tmpMatrix[0][0], epsilon);
@@ -3028,7 +3144,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(2.9916, tmpMatrix[0][0], epsilon);
@@ -3074,7 +3191,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.4077, tmpMatrix[0][0], epsilon);
@@ -3090,7 +3208,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.4077, tmpMatrix[0][0], epsilon);
@@ -3105,7 +3224,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(0.4077, tmpMatrix[0][0], epsilon);
@@ -3140,7 +3260,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+null
                         )
                 );
                 Assertions.assertEquals(8, tmpMatrix[0][0]);
@@ -3155,7 +3276,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals(8, tmpMatrix[0][0]);
@@ -3170,7 +3292,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals(8, tmpMatrix[0][0]);
@@ -3226,7 +3349,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][0]));
@@ -3244,7 +3368,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][0]));
@@ -3262,7 +3387,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][0]));
@@ -3301,7 +3427,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(1, tmpMatrix[0][0]);
@@ -3316,7 +3443,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(1, tmpMatrix[0][0]);
@@ -3331,7 +3459,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(1, tmpMatrix[0][0]);
@@ -3366,7 +3495,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(1, tmpMatrix[0][0]);
@@ -3381,7 +3511,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(1, tmpMatrix[0][0]);
@@ -3396,7 +3527,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(1, tmpMatrix[0][0]);
@@ -3430,7 +3562,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
 
@@ -3445,7 +3578,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(2, tmpMatrix[0][8]);
@@ -3459,7 +3593,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(2, tmpMatrix[0][8]);
@@ -3495,7 +3630,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(2, tmpMatrix[0][33]);
@@ -3514,7 +3650,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(2, tmpMatrix[0][33]);
@@ -3533,7 +3670,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
             Assertions.assertEquals(2, tmpMatrix[0][33]);
@@ -3603,7 +3741,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+null
                         )
                 );
                 Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
@@ -3621,7 +3760,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
@@ -3639,7 +3779,8 @@ class DescriptorTest {
                                 tmpMoleculesArray,
                                 tmpMatrix,
                                 tmpStartIndex,
-                                tmpIsParallelCalculation
+                                tmpIsParallelCalculation,
+                                null
                         )
                 );
                 Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
@@ -3661,8 +3802,7 @@ class DescriptorTest {
      */
     @Test
     public void test_Parallelization() throws Exception {
-        // Acetic acid
-        String tmpSmiles = "CC(=O)O";
+        String tmpSmiles = "CCC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         // Aromaticity detection and marking
@@ -3687,7 +3827,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrixSequential,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
 
@@ -3702,7 +3843,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrixParallel,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
 
@@ -3723,7 +3865,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrixSequential,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
 
@@ -3738,7 +3881,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrixParallel,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
 
@@ -3759,7 +3903,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrixSequential,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
 
@@ -3774,7 +3919,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrixParallel,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
 
@@ -3794,8 +3940,7 @@ class DescriptorTest {
      */
     @Test
     public void test_Integrity() throws Exception {
-        // Acetic acid
-        String tmpSmiles = "CC(=O)O";
+        String tmpSmiles = "CCC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         // Aromaticity detection and marking
@@ -3820,7 +3965,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix1,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
 
@@ -3834,7 +3980,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix2,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
 
@@ -3848,7 +3995,8 @@ class DescriptorTest {
                             tmpMoleculesArray,
                             tmpMatrix3,
                             tmpStartIndex,
-                            tmpIsParallelCalculation
+                            tmpIsParallelCalculation,
+                            null
                     )
             );
 
