@@ -85,7 +85,7 @@ import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import java.util.EnumMap;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -770,8 +770,10 @@ public enum Descriptor {
      *               anAtomContainerArray[i]. (MAY BE CHANGED)
      * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors
      * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
-     * @param aNanPositions LinkedList to track NaN positions as [moleculeIndex, componentIndex] pairs, can be null if
-     *                      NaN positions should not be tracked (MAY BE CHANGED)
+     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
+     *                      Use Collections.synchronizedList() to avoid race conditions.
+     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a descriptor
      * calculation is NaN
      * @throws IllegalArgumentException Thrown if an argument is illegal
@@ -783,7 +785,7 @@ public enum Descriptor {
         float[][] aMatrix,
         int aStartIndex,
         boolean anIsParallelCalculation,
-        LinkedList<int[]> aNanPositions
+        List<int[]> aNanPositions
     ) throws IllegalArgumentException, Exception {
         //<editor-fold desc="Checks">
         if (aDescriptors == null || aDescriptors.length == 0) {
@@ -932,8 +934,10 @@ public enum Descriptor {
      *               anAtomContainerArray[i]. (MAY BE CHANGED)
      * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors
      * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
-     * @param aNanPositions LinkedList to track NaN positions as [moleculeIndex, componentIndex] pairs, can be null if
-     *                      NaN positions should not be tracked (MAY BE CHANGED)
+     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
+     *                      Use Collections.synchronizedList() to avoid race conditions.
+     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a descriptor
      * calculation is NaN
      * @throws IllegalArgumentException Thrown if an argument is illegal
@@ -945,7 +949,7 @@ public enum Descriptor {
             float[][] aMatrix,
             int aStartIndex,
             boolean anIsParallelCalculation,
-            LinkedList<int[]> aNanPositions
+            List<int[]> aNanPositions
     ) throws IllegalArgumentException, Exception {
         //<editor-fold desc="Checks">
         if (aDescriptors == null || aDescriptors.length == 0) {
@@ -1095,8 +1099,10 @@ public enum Descriptor {
      *               anAtomContainerArray[i]. (MAY BE CHANGED)
      * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors
      * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
-     * @param aNanPositions LinkedList to track NaN positions as [moleculeIndex, componentIndex] pairs, can be null if
-     *                      NaN positions should not be tracked (MAY BE CHANGED)
+     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
+     *                      Use Collections.synchronizedList() to avoid race conditions.
+     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a descriptor
      * calculation is NaN
      * @throws IllegalArgumentException Thrown if an argument is illegal
@@ -1108,7 +1114,7 @@ public enum Descriptor {
             float[][] aMatrix,
             int aStartIndex,
             boolean anIsParallelCalculation,
-            LinkedList<int[]> aNanPositions
+            List<int[]> aNanPositions
     ) throws IllegalArgumentException, Exception {
         //<editor-fold desc="Checks">
         if (aDescriptors == null || aDescriptors.length == 0) {
@@ -1256,8 +1262,8 @@ public enum Descriptor {
      * @param aVector Component vector of molecule (MAY BE CHANGED)
      * @param aStartIndices Start indices in aVector to be filled with calculated components of descriptors
      * @param aMoleculeIndex Index of the current molecule being processed
-     * @param aNanPositions LinkedList to track NaN positions as [moleculeIndex, componentIndex] pairs, can be null if
-     *                      NaN positions should not be tracked (MAY BE CHANGED)
+     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      * @throws Exception Thrown if fatal error occurs (this should never happen)
@@ -1268,7 +1274,7 @@ public enum Descriptor {
         float[] aVector,
         int[] aStartIndices,
         int aMoleculeIndex,
-        LinkedList<int[]> aNanPositions
+        List<int[]> aNanPositions
     ) throws Exception {
         try {
             boolean tmpIsSuccessful = true;
@@ -1297,8 +1303,8 @@ public enum Descriptor {
      * @param aVector Component vector of molecule (MAY BE CHANGED)
      * @param aStartIndices Start indices in aVector to be filled with calculated components of descriptor
      * @param aMoleculeIndex Index of the current molecule being processed
-     * @param aNanPositions LinkedList to track NaN positions as [moleculeIndex, componentIndex] pairs, can be null if
-     *                      NaN positions should not be tracked (MAY BE CHANGED)
+     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      * @throws Exception Thrown if fatal error occurs (this should never happen)
@@ -1309,7 +1315,7 @@ public enum Descriptor {
         float[] aVector,
         int[] aStartIndices,
         int aMoleculeIndex,
-        LinkedList<int[]> aNanPositions
+        List<int[]> aNanPositions
     ) throws Exception {
         try {
             boolean tmpIsSuccessful = true;
@@ -1340,8 +1346,8 @@ public enum Descriptor {
      * @param aMatrix Matrix of component vectors of molecules. Note: Data vector aMatrix[i] corresponds to molecule
      *               anAtomContainerArray[i]. (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
-     * @param aNanPositions LinkedList to track NaN positions as [moleculeIndex, componentIndex] pairs, can be null if
-     *                      NaN positions should not be tracked (MAY BE CHANGED)
+     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      * @throws Exception Thrown if fatal error occurs (this should never happen)
@@ -1351,7 +1357,7 @@ public enum Descriptor {
         IAtomContainer[] anAtomContainerArray,
         float[][] aMatrix,
         int aStartIndex,
-        LinkedList<int[]> aNanPositions
+        List<int[]> aNanPositions
     ) throws Exception {
         try {
             boolean tmpIsSuccessful = true;
@@ -1380,8 +1386,8 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @param aMoleculeIndex Index of the current molecule being processed
-     * @param aNanPositions LinkedList to track NaN positions as [moleculeIndex, componentIndex] pairs, can be null if
-     *                      NaN positions should not be tracked (MAY BE CHANGED)
+     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      */
@@ -1391,7 +1397,7 @@ public enum Descriptor {
         float[] aVector,
         int aStartIndex,
         int aMoleculeIndex,
-        LinkedList<int[]> aNanPositions
+        List<int[]> aNanPositions
     ) {
         try {
             switch (aDescriptor) {
@@ -1551,9 +1557,7 @@ public enum Descriptor {
                 aVector[aStartIndex + i] = Float.NaN;
                 // Track NaN position if aNanPositions is provided
                 if (aNanPositions != null) {
-                    synchronized (aNanPositions) {
-                        aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
-                    }
+                    aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
                 }
             }
             return false;
@@ -1571,8 +1575,8 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @param aMoleculeIndex Index of the current molecule being processed
-     * @param aNanPositions LinkedList to track NaN positions as [moleculeIndex, componentIndex] pairs, can be null if
-     *                      NaN positions should not be tracked (MAY BE CHANGED)
+     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      */
@@ -1582,7 +1586,7 @@ public enum Descriptor {
             float[] aVector,
             int aStartIndex,
             int aMoleculeIndex,
-            LinkedList<int[]> aNanPositions
+            List<int[]> aNanPositions
 
     ) {
         try {
@@ -1814,9 +1818,7 @@ public enum Descriptor {
                 aVector[aStartIndex + i] = Float.NaN;
                 // Track NaN position if aNanPositions is provided
                 if (aNanPositions != null) {
-                    synchronized (aNanPositions) {
-                        aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
-                    }
+                    aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
                 }
             }
             return false;
@@ -1834,8 +1836,8 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @param aMoleculeIndex Index of the current molecule being processed
-     * @param aNanPositions LinkedList to track NaN positions as [moleculeIndex, componentIndex] pairs, can be null if
-     *                      NaN positions should not be tracked (MAY BE CHANGED)
+     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      */
@@ -1845,7 +1847,7 @@ public enum Descriptor {
             float[] aVector,
             int aStartIndex,
             int aMoleculeIndex,
-            LinkedList<int[]> aNanPositions
+            List<int[]> aNanPositions
     ) {
         try {
             switch (aDescriptor) {
@@ -2065,9 +2067,7 @@ public enum Descriptor {
             for (int i = 0; i < numComponents; i++) {
                 aVector[aStartIndex + i] = Float.NaN;
                 if (aNanPositions != null) {
-                    synchronized (aNanPositions) {
-                        aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
-                    }
+                    aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
                 }
             }
             return false;
@@ -2082,11 +2082,11 @@ public enum Descriptor {
      * @param aStartIndex The start index in the vector for this descriptor
      * @param numComponents The number of components for this descriptor
      * @param aMoleculeIndex The index of the current molecule
-     * @param aNanPositions LinkedList to track NaN positions (can be null if NaN positions should not be tracked)
+     * @param aNanPositions List to track NaN positions (can be null if NaN positions should not be tracked)
      * @return true if any NaN values were found, false otherwise
      */
     private static boolean checkAndTrackNaNValues(float[] aVector, int aStartIndex, int numComponents,
-                                                  int aMoleculeIndex, LinkedList<int[]> aNanPositions) {
+                                                  int aMoleculeIndex, List<int[]> aNanPositions) {
         boolean foundNaN = false;
         for (int i = 0; i < numComponents; i++) {
             if (Float.isNaN(aVector[aStartIndex + i])) {
@@ -2095,9 +2095,7 @@ public enum Descriptor {
                 // Note: aNanPositions must be thread-safe for parallel access
                 if (aNanPositions != null) {
                     // Synchronize the add operation to ensure thread safety
-                    synchronized (aNanPositions) {
-                        aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
-                    }
+                    aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
                 }
             }
         }
