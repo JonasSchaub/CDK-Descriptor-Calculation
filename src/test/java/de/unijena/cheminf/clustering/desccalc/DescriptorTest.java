@@ -3684,6 +3684,74 @@ null
         }
     }
 
+    /**
+     * Tests method for descriptor ECCENTRIC_CONNECTIVITY_INDEX
+     */
+    @Test
+    public void test_ECCENTRIC_CONNECTIVITY_INDEX() throws Exception {
+        String tmpSmiles = "C[C@H]1CC[C@H]2[C@@H](C)C(=O)O[C@@H]3O[C@@]4(C)CC[C@@H]1[C@]32OO4";
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ECCENTRIC_CONNECTIVITY_INDEX};
+        boolean tmpIsParallelCalculation = false;
+
+        try {
+            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            null
+                    )
+            );
+            Assertions.assertEquals(254, tmpMatrix[0][0]);
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            null
+                    )
+            );
+            Assertions.assertEquals(254, tmpMatrix[0][0]);
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            null
+                    )
+            );
+            Assertions.assertEquals(254, tmpMatrix[0][0]);
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
+
     // Add new descriptor tests here!
 
     //</editor-fold>

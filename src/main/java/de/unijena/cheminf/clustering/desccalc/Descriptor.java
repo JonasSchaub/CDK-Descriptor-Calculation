@@ -51,6 +51,7 @@ import org.openscience.cdk.qsar.descriptors.molecular.ChiChainDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.ChiClusterDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.ChiPathClusterDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.ChiPathDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.EccentricConnectivityIndexDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.FMFDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.FractionalCSP3Descriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.FractionalPSADescriptor;
@@ -453,7 +454,15 @@ public enum Descriptor {
      * based on the Kier and Hall SMARTS patterns, used for QSAR modeling and molecular characterization.
      * Note: This descriptor provides 79 values representing different molecular fragments.
      */
-    KIER_HALL_SMARTS;
+    KIER_HALL_SMARTS,
+    /**
+     * EccentricConnectivityIndex descriptor, calculates a topological descriptor that combines
+     * distance and adjacency information.
+     * It is defined as the sum of the products of eccentricity and vertex degree for each atom.
+     * This index provides information about the distribution of atoms in the molecular structure
+     * and helps characterize molecular complexity, branching, and overall shape.
+     */
+    ECCENTRIC_CONNECTIVITY_INDEX;
 
     // Add new descriptor information here!
 
@@ -664,6 +673,10 @@ public enum Descriptor {
             // Kier-Hall SMARTS has 79 components
             descriptorToComponentNumberMap.put(KIER_HALL_SMARTS, 79);
             descriptorToCdkObjectMap.put(KIER_HALL_SMARTS, new KierHallSmartsDescriptor());
+
+            // ECCENTRIC_CONNECTIVITY_INDEX has 1 component
+            descriptorToComponentNumberMap.put(ECCENTRIC_CONNECTIVITY_INDEX, 1);
+            descriptorToCdkObjectMap.put(ECCENTRIC_CONNECTIVITY_INDEX, new EccentricConnectivityIndexDescriptor());
 
             // Add new descriptor information here!
 
@@ -1539,6 +1552,9 @@ public enum Descriptor {
                 case KIER_HALL_SMARTS:
                     setKierHallSmarts(anAtomContainer, aVector, aStartIndex);
                     break;
+                case ECCENTRIC_CONNECTIVITY_INDEX:
+                    setEccentricConnectivityIndex(anAtomContainer, aVector, aStartIndex);
+                    break;
 
                 // Add new descriptor information here!
                 default:
@@ -1800,6 +1816,11 @@ public enum Descriptor {
                         aVector[aStartIndex + i] = (float) kierHallSmartsResult.get(i);
                     }
                     break;
+                case ECCENTRIC_CONNECTIVITY_INDEX:
+                {
+                    aVector[aStartIndex] = (float) ((IntegerResult) (new EccentricConnectivityIndexDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                }
+                break;
 
                 // Add new descriptor information here!
                 default:
@@ -2049,6 +2070,9 @@ public enum Descriptor {
                     for (int i = 0; i < kierHallSmartsResult.length(); i++) {
                         aVector[aStartIndex + i] = (float) kierHallSmartsResult.get(i);
                     }
+                    break;
+                case ECCENTRIC_CONNECTIVITY_INDEX:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ECCENTRIC_CONNECTIVITY_INDEX).calculate(anAtomContainer).getValue()).intValue();
                     break;
 
                 // Add new descriptor information here!
@@ -2987,6 +3011,21 @@ public enum Descriptor {
         for (int i = 0; i < result.length(); i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
+    }
+
+    /**
+     * Sets the EccentricConnectivityIndex descriptor value in aVector beginning with aStartIndex.
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector to be filled with descriptor value (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector
+     */
+    private static synchronized void setEccentricConnectivityIndex(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ECCENTRIC_CONNECTIVITY_INDEX).calculate(anAtomContainer).getValue()).intValue();
     }
 
     // Add new descriptor information here!
