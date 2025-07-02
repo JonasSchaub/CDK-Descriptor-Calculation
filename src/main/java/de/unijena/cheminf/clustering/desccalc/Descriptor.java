@@ -65,6 +65,7 @@ import org.openscience.cdk.qsar.descriptors.molecular.KierHallSmartsDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.LargestChainDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.LargestPiSystemDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.LongestAliphaticChainDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.MDEDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.MannholdLogPDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.PetitjeanNumberDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.RotatableBondsCountDescriptor;
@@ -72,6 +73,7 @@ import org.openscience.cdk.qsar.descriptors.molecular.RuleOfFiveDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.SmallRingDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.SpiroAtomCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.TPSADescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.VABCDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.VAdjMaDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.WeightedPathDescriptor;
@@ -356,7 +358,8 @@ public enum Descriptor {
      * 9. VCH-6 - Valence chain, order 6<br>
      * 10. VCH-7 - Valence chain, order 7
      */
-    CHI_CHAIN,/**
+    CHI_CHAIN,
+    /**
      * ChiCluster descriptor, calculates Kier + Hall chi cluster indices of orders 3 through 6.
      * These values characterize a molecular graph based on its cluster subgraphs.
      * Returns 8 values:<br>
@@ -462,7 +465,39 @@ public enum Descriptor {
      * This index provides information about the distribution of atoms in the molecular structure
      * and helps characterize molecular complexity, branching, and overall shape.
      */
-    ECCENTRIC_CONNECTIVITY_INDEX;
+    ECCENTRIC_CONNECTIVITY_INDEX,
+    /**
+     * MDE descriptor, calculates molecular distance edge descriptors for carbon, oxygen and nitrogen atoms.
+     * These descriptors encode information about the connectivity and distance of atoms of specific types
+     * and hybridization states in the molecular graph. Returns 19 values representing various molecular
+     * distance edge counts between different types of carbon, oxygen, and nitrogen atoms:<br>
+     * MDEC-11<br>
+     * MDEC-12<br>
+     * MDEC-13<br>
+     * MDEC-14<br>
+     * MDEC-22<br>
+     * MDEC-23<br>
+     * MDEC-24<br>
+     * MDEC-33<br>
+     * MDEC-34<br>
+     * MDEC-44<br>
+     * MDEO-11<br>
+     * MDEO-12<br>
+     * MDEO-22<br>
+     * MDEN-11<br>
+     * MDEN-12<br>
+     * MDEN-13<br>
+     * MDEN-22<br>
+     * MDEN-23<br>
+     * MDEN-33<br>
+     */
+    MDE,
+    /**
+     * VABC descriptor, calculates the volume descriptor using the van der Waals volume calculation approach.
+     * This descriptor estimates molecular volume based on atom contributions, considering bond types
+     * and atomic properties, providing insights into molecular size and steric properties.
+     */
+    VABC;
 
     // Add new descriptor information here!
 
@@ -677,6 +712,14 @@ public enum Descriptor {
             // ECCENTRIC_CONNECTIVITY_INDEX has 1 component
             descriptorToComponentNumberMap.put(ECCENTRIC_CONNECTIVITY_INDEX, 1);
             descriptorToCdkObjectMap.put(ECCENTRIC_CONNECTIVITY_INDEX, new EccentricConnectivityIndexDescriptor());
+
+            // MDE has 19 components
+            descriptorToComponentNumberMap.put(MDE, 19);
+            descriptorToCdkObjectMap.put(MDE, new MDEDescriptor());
+
+            // VABC has 1 component
+            descriptorToComponentNumberMap.put(VABC, 1);
+            descriptorToCdkObjectMap.put(VABC, new VABCDescriptor());
 
             // Add new descriptor information here!
 
@@ -1555,6 +1598,12 @@ public enum Descriptor {
                 case ECCENTRIC_CONNECTIVITY_INDEX:
                     setEccentricConnectivityIndex(anAtomContainer, aVector, aStartIndex);
                     break;
+                case MDE:
+                    setMDE(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case VABC:
+                    setVABC(anAtomContainer, aVector, aStartIndex);
+                    break;
 
                 // Add new descriptor information here!
                 default:
@@ -1806,21 +1855,28 @@ public enum Descriptor {
                     break;
                 case AMINO_ACID_COUNT:
                     IntegerArrayResult aminoAcidCountResult = (IntegerArrayResult) (new AminoAcidCountDescriptor()).calculate(anAtomContainer).getValue();
-                    for (int i = 0; i < aminoAcidCountResult.length(); i++) {
+                    for (int i = 0; i < 20; i++) {
                         aVector[aStartIndex + i] = (float) aminoAcidCountResult.get(i);
                     }
                     break;
                 case KIER_HALL_SMARTS:
                     IntegerArrayResult kierHallSmartsResult = (IntegerArrayResult) (new KierHallSmartsDescriptor()).calculate(anAtomContainer).getValue();
-                    for (int i = 0; i < kierHallSmartsResult.length(); i++) {
+                    for (int i = 0; i < 79; i++) {
                         aVector[aStartIndex + i] = (float) kierHallSmartsResult.get(i);
                     }
                     break;
                 case ECCENTRIC_CONNECTIVITY_INDEX:
-                {
                     aVector[aStartIndex] = (float) ((IntegerResult) (new EccentricConnectivityIndexDescriptor()).calculate(anAtomContainer).getValue()).intValue();
-                }
-                break;
+                    break;
+                case MDE:
+                    DoubleArrayResult aDoubleArrayResult = (DoubleArrayResult) (new MDEDescriptor()).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 19; i++) {
+                        aVector[aStartIndex + i] = (float) aDoubleArrayResult.get(i);
+                    }
+                    break;
+                case VABC:
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new VABCDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    break;
 
                 // Add new descriptor information here!
                 default:
@@ -2061,18 +2117,27 @@ public enum Descriptor {
                     break;
                 case AMINO_ACID_COUNT:
                     IntegerArrayResult aminoAcidCountResult = (IntegerArrayResult) descriptorToCdkObjectMap.get(AMINO_ACID_COUNT).calculate(anAtomContainer).getValue();
-                    for (int i = 0; i < aminoAcidCountResult.length(); i++) {
+                    for (int i = 0; i < 20; i++) {
                         aVector[aStartIndex + i] = (float) aminoAcidCountResult.get(i);
                     }
                     break;
                 case KIER_HALL_SMARTS:
                     IntegerArrayResult kierHallSmartsResult = (IntegerArrayResult) descriptorToCdkObjectMap.get(KIER_HALL_SMARTS).calculate(anAtomContainer).getValue();
-                    for (int i = 0; i < kierHallSmartsResult.length(); i++) {
+                    for (int i = 0; i < 79; i++) {
                         aVector[aStartIndex + i] = (float) kierHallSmartsResult.get(i);
                     }
                     break;
                 case ECCENTRIC_CONNECTIVITY_INDEX:
                     aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ECCENTRIC_CONNECTIVITY_INDEX).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case MDE:
+                    DoubleArrayResult aDoubleArrayResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(aDescriptor).calculate(anAtomContainer).getValue();
+                    for (int i = 0; i < 19; i++) {
+                        aVector[aStartIndex + i] = (float) aDoubleArrayResult.get(i);
+                    }
+                    break;
+                case VABC:
+                    aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(VABC).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
 
                 // Add new descriptor information here!
@@ -2989,7 +3054,7 @@ public enum Descriptor {
             int aStartIndex
     ) {
         IntegerArrayResult aminoAcidCountResult = (IntegerArrayResult) descriptorToCdkObjectMap.get(AMINO_ACID_COUNT).calculate(anAtomContainer).getValue();
-        for (int i = 0; i < aminoAcidCountResult.length(); i++) {
+        for (int i = 0; i < 20; i++) {
             aVector[aStartIndex + i] = (float) aminoAcidCountResult.get(i);
         }
     }
@@ -3008,7 +3073,7 @@ public enum Descriptor {
             int aStartIndex
     ) {
         IntegerArrayResult result = (IntegerArrayResult) descriptorToCdkObjectMap.get(KIER_HALL_SMARTS).calculate(anAtomContainer).getValue();
-        for (int i = 0; i < result.length(); i++) {
+        for (int i = 0; i < 79; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
     }
@@ -3026,6 +3091,42 @@ public enum Descriptor {
             int aStartIndex
     ) {
         aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ECCENTRIC_CONNECTIVITY_INDEX).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets MDE descriptor values (molecular distance edge between atoms of specific types).
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setMDE(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex) {
+        DoubleArrayResult tmpResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(MDE).calculate(anAtomContainer).getValue();
+        for (int i = 0; i < 19; i++) {
+            aVector[aStartIndex + i] = (float) tmpResult.get(i);
+        }
+    }
+
+    /**
+     * Sets VABC value (volume descriptor based on atom contributions).
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setVABC(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(VABC).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     // Add new descriptor information here!
