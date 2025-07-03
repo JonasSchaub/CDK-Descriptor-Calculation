@@ -118,10 +118,23 @@ public enum Descriptor {
      * Note: the CDK implementation counts all distances, not just those of carbon atoms or only carbon-carbon bonds.
      */
     WIENER_NUMBER,
+    //<editor-fold desc="Basic Bond and Count descriptors">
     /**
      * Atom count, counts the number of all atoms in the given molecule.
      */
     ATOM_COUNT,
+    /**
+     * BondCount, counts the number of bonds in a molecule with a specific bond order.
+     * Default: counts all bonds (total bond count), no bonds to hydrogen atoms are counted.
+     */
+    BOND_COUNT_ALL,
+    /**
+     * BondCount Specified, counts the number of bonds in a molecule with specified bond orders.
+     * Returns an array with counts for single, double and triple bonds.
+     * For aromatic bonds counts use AROMATIC_BONDS_COUNT.
+     * No bonds to hydrogen atoms are counted.
+     */
+    BOND_COUNT_SPECIFIED,
     /**
      * HBondAcceptorCount, counts hydrogen bond acceptors based on a simplified PHACIR scheme.
      * It includes: Oxygen atoms with formal charge ≤ 0 (excluding: Aromatic ether oxygens and oxygens adjacent to nitrogen).
@@ -133,6 +146,31 @@ public enum Descriptor {
      * It includes: OH groups where the oxygen has a formal charge ≥ 0 and NH groups where the nitrogen has a formal charge ≥ 0
      */
     H_BOND_DONOR_COUNT,
+    /**
+     * AromaticAtomsCount, counts the number of aromatic atoms in a molecule.
+     * Note: Requires that aromatic atoms in the molecule have already been detected and marked.
+     */
+    AROMATIC_ATOMS_COUNT,
+    /**
+     * AromaticBondsCount, counts the number of aromatic bonds in a molecule.
+     * Note: Requires that aromatic bonds in the molecule have already been detected and marked.
+     */
+    AROMATIC_BONDS_COUNT,
+    /**
+     * RotatableBondsCount, counts the number of rotatable bonds in a molecule.
+     * A rotatable bond is defined as any single non-ring bond, where atoms on both sides
+     * have at least two heavy-atom neighbors. Excluding terminal bonds.
+     */
+    ROTATABLE_BONDS_COUNT,
+    /**
+     * Basic Group Count: Returns the number of basic groups in a molecule.
+     */
+    BASIC_GROUP_COUNT,
+    /**
+     * Acidic Group Count: Returns the number of acidic groups in a molecule.
+     */
+    ACIDIC_GROUP_COUNT,
+    //</editor-fold>
     /**
      * TPSADescriptor, calculates the topological polar surface area (TPSA) of a molecule.
      * TPSA is the sum of the surface areas of polar atoms (typically oxygen and nitrogen)
@@ -168,18 +206,6 @@ public enum Descriptor {
      */
     BCUT,
     /**
-     * BondCount, counts the number of bonds in a molecule with a specific bond order.
-     * Default: counts all bonds (total bond count), no bonds to hydrogen atoms are counted.
-     */
-    BOND_COUNT_ALL,
-    /**
-     * BondCount Specified, counts the number of bonds in a molecule with specified bond orders.
-     * Returns an array with counts for single, double and triple bonds.
-     * For aromatic bonds counts use AROMATIC_BONDS_COUNT.
-     * No bonds to hydrogen atoms are counted.
-     */
-    BOND_COUNT_SPECIFIED,
-    /**
      * Bond polarizability descriptor.
      * The BPolDescriptor calculates the bond polarizability of a molecule.
      * Bond polarizability is a simple sum of polarizability contributions from all bonds, based on bond types and involved atoms.
@@ -192,22 +218,6 @@ public enum Descriptor {
      * The descriptor returns the number of violations (0-4).
      */
     RULE_OF_FIVE,
-    /**
-     * AromaticAtomsCount, counts the number of aromatic atoms in a molecule.
-     * Note: Requires that aromatic atoms in the molecule have already been detected and marked.
-     */
-    AROMATIC_ATOMS_COUNT,
-    /**
-     * AromaticBondsCount, counts the number of aromatic bonds in a molecule.
-     * Note: Requires that aromatic bonds in the molecule have already been detected and marked.
-     */
-    AROMATIC_BONDS_COUNT,
-    /**
-     * RotatableBondsCount, counts the number of rotatable bonds in a molecule.
-     * A rotatable bond is defined as any single non-ring bond, where atoms on both sides
-     * have at least two heavy-atom neighbors. Excluding terminal bonds.
-     */
-    ROTATABLE_BONDS_COUNT,
     /**
      * FMF (Framework Match Fraction) descriptor, calculates the ratio of heavy atoms in
      * the framework to the total number of heavy atoms in the molecule.
@@ -284,6 +294,7 @@ public enum Descriptor {
      * 9. C4SP3 - singly bound carbon bound to four other carbons
      */
     CARBON_TYPES,
+    //<editor-fold desc="LogP descriptors">
     /**
      * ALogP descriptor, calculates Ghose-Crippen LogP values, molar refractivity values
      * and ALogP squared values. Returns 3 values:<br>
@@ -302,10 +313,12 @@ public enum Descriptor {
      * Original publication: Junghwan Lee et al. "Estimation of partition coefficients...".
      */
     JP_LOG_P,
+    //</editor-fold>
     /**
      * APol descriptor, calculates the sum of the atomic polarizabilities (including implicit hydrogens).
      */
     A_POL,
+    //<editor-fold desc="Autocorrelation descriptors">
     /**
      * AutocorrelationDescriptorCharge, calculates topological autocorrelation vectors
      * that capture patterns related to charge distribution across the molecular structure.
@@ -331,6 +344,7 @@ public enum Descriptor {
      * NOTE: Method is not validated in the CDK so not validated in this implementation as well
      */
     AUTOCORRELATION_POLARIZABILITY,
+    //</editor-fold>
     /**
      * FragmentComplexity descriptor, calculates the complexity of a molecular system.
      * The complexity is defined as [Nilakantan, R. et. al.. Journal of chemical information and modeling. 2006. 46]:
@@ -343,6 +357,7 @@ public enum Descriptor {
      * This provides a measure of structural complexity that correlates with synthetic accessibility.
      */
     FRAGMENT_COMPLEXITY,
+    //<editor-fold desc="CHI descriptors">
     /**
      * ChiChain descriptor, calculates the Kier + Hall chi chain indices of orders 3 through 7.
      * These values characterize a molecular graph based on its chain subgraphs.
@@ -407,6 +422,7 @@ public enum Descriptor {
      * 16. VP-7 - Valence path, order 7<br>
      */
     CHI_PATH,
+    //</editor-fold>
     /**
      * FractionalPSA descriptor, calculates the ratio of polar surface are to molecular weight.
      * This descriptor provides the polar surface area efficiency, which is the TPSADescriptor value divided by the
@@ -435,14 +451,6 @@ public enum Descriptor {
      * 11. nRings9 - total number of 9-membered rings<br>
      */
     SMALL_RING,
-    /**
-     * Basic Group Count: Returns the number of basic groups in a molecule.
-     */
-    BASIC_GROUP_COUNT,
-    /**
-     * Acidic Group Count: Returns the number of acidic groups in a molecule.
-     */
-    ACIDIC_GROUP_COUNT,
     /**
      * AminoAcidCount descriptor, calculates the number of each amino acid in a molecule.
      * Returns 20 values, one for each of the 20 standard amino acids:
@@ -847,79 +855,86 @@ public enum Descriptor {
         if (aDescriptors == null || aDescriptors.length == 0) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aDescriptors is null or has length 0."
+                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aDescriptors is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aDescriptor is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aDescriptor is null or has length 0.");
         }
         for (Descriptor tmpDescriptor : aDescriptors) {
             if (tmpDescriptor == null) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A descriptor in aDescriptors is null."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: A descriptor in aDescriptors is null."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A descriptor in aDescriptors is null.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: A descriptor in aDescriptors is null.");
             }
         }
         if (anAtomContainerArray == null || anAtomContainerArray.length == 0) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: anAtomContainerArray is null or has length 0."
+                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: anAtomContainerArray is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: anAtomContainerArray is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: anAtomContainerArray is null or has length 0.");
         }
         for (IAtomContainer tmpMolecule : anAtomContainerArray) {
             if (tmpMolecule == null || tmpMolecule.isEmpty()) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A molecule in anAtomContainerArray is null or empty."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: A molecule in anAtomContainerArray is null or empty."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A molecule in anAtomContainerArray is null or empty.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: A molecule in anAtomContainerArray is null or empty.");
             }
         }
         if (aMatrix == null || aMatrix.length == 0) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix is null or has length 0."
+                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aMatrix is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aMatrix is null or has length 0.");
         }
         if (aMatrix.length != anAtomContainerArray.length) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix and anAtomContainerArray must have the same length."
+                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aMatrix and anAtomContainerArray must have the same length."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix and anAtomContainerArray must have the same length.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aMatrix and anAtomContainerArray must have the same length.");
         }
         for (float[] tmpVector : aMatrix) {
             if (tmpVector == null || tmpVector.length == 0) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A vector is null or has length 0."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: A vector is null or has length 0."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A vector is null or has length 0.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: A vector is null or has length 0.");
             }
             if (aStartIndex >= tmpVector.length) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal.");
             }
             try {
                 if (aStartIndex + Descriptor.getNumberOfComponents(aDescriptors) > tmpVector.length) {
                     Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal."
+                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal."
                     );
-                    throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal.");
+                    throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal.");
                 }
             } catch (Exception anException) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal.");
             }
+        }
+        if (aNanPositions == null) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aNaNPositions is null."
+            );
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aNaNPositions is null.");
         }
         //</editor-fold>
 
@@ -1011,79 +1026,86 @@ public enum Descriptor {
         if (aDescriptors == null || aDescriptors.length == 0) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aDescriptors is null or has length 0."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aDescriptors is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aDescriptor is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aDescriptor is null or has length 0.");
         }
         for (Descriptor tmpDescriptor : aDescriptors) {
             if (tmpDescriptor == null) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A descriptor in aDescriptors is null."
+                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: A descriptor in aDescriptors is null."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A descriptor in aDescriptors is null.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: A descriptor in aDescriptors is null.");
             }
         }
         if (anAtomContainerArray == null || anAtomContainerArray.length == 0) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: anAtomContainerArray is null or has length 0."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: anAtomContainerArray is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: anAtomContainerArray is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: anAtomContainerArray is null or has length 0.");
         }
         for (IAtomContainer tmpMolecule : anAtomContainerArray) {
             if (tmpMolecule == null || tmpMolecule.isEmpty()) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A molecule in anAtomContainerArray is null or empty."
+                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: A molecule in anAtomContainerArray is null or empty."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A molecule in anAtomContainerArray is null or empty.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: A molecule in anAtomContainerArray is null or empty.");
             }
         }
         if (aMatrix == null || aMatrix.length == 0) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix is null or has length 0."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aMatrix is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aMatrix is null or has length 0.");
         }
         if (aMatrix.length != anAtomContainerArray.length) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix and anAtomContainerArray must have the same length."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aMatrix and anAtomContainerArray must have the same length."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix and anAtomContainerArray must have the same length.");
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aMatrix and anAtomContainerArray must have the same length.");
         }
         for (float[] tmpVector : aMatrix) {
             if (tmpVector == null || tmpVector.length == 0) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A vector is null or has length 0."
+                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: A vector is null or has length 0."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A vector is null or has length 0.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: A vector is null or has length 0.");
             }
             if (aStartIndex >= tmpVector.length) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal."
+                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal.");
             }
             try {
                 if (aStartIndex + Descriptor.getNumberOfComponents(aDescriptors) > tmpVector.length) {
                     Descriptor.LOGGER.log(
                             Level.SEVERE,
-                            "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal."
+                            "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal."
                     );
-                    throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal.");
+                    throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal.");
                 }
             } catch (Exception anException) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal."
+                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal.");
             }
+        }
+        if (aNanPositions == null) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aNaNPositions is null."
+            );
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aNaNPositions is null.");
         }
         //</editor-fold>
 
@@ -1249,6 +1271,13 @@ public enum Descriptor {
                 );
                 throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aStartIndex is illegal.");
             }
+        }
+        if (aNanPositions == null) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aNaNPositions is null."
+            );
+            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aNaNPositions is null.");
         }
         //</editor-fold>
 
@@ -2558,11 +2587,6 @@ public enum Descriptor {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(HYBRIDIZATION_RATIO).calculate(moleculeWithExplicitH).getValue()).doubleValue();
         } catch (Exception anException) {
             aVector[aStartIndex] = Float.NaN;
-            Descriptor.LOGGER.log(
-                    Level.WARNING,
-                    "Descriptor.setHybridizationRatio: An exception occurred: " + anException.getMessage(),
-                    anException
-            );
         }
     }
 
@@ -2722,11 +2746,6 @@ public enum Descriptor {
             aVector[aStartIndex] = Float.NaN;
             aVector[aStartIndex + 1] = Float.NaN;
             aVector[aStartIndex + 2] = Float.NaN;
-            Descriptor.LOGGER.log(
-                    Level.WARNING,
-                    "Descriptor.setALogP: An exception occurred: " + anException.getMessage(),
-                    anException
-            );
         }
     }
 
@@ -2753,11 +2772,6 @@ public enum Descriptor {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(X_LOG_P).calculate(moleculeWithExplicitH).getValue()).doubleValue();
         } catch (Exception anException) {
             aVector[aStartIndex] = Float.NaN;
-            Descriptor.LOGGER.log(
-                    Level.WARNING,
-                    "Descriptor.setXLogP: An exception occurred: " + anException.getMessage(),
-                    anException
-            );
         }
     }
     /**
@@ -3105,7 +3119,8 @@ public enum Descriptor {
     private static synchronized void setMDE(
             IAtomContainer anAtomContainer,
             float[] aVector,
-            int aStartIndex) {
+            int aStartIndex
+    ) {
         DoubleArrayResult tmpResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(MDE).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 19; i++) {
             aVector[aStartIndex + i] = (float) tmpResult.get(i);
