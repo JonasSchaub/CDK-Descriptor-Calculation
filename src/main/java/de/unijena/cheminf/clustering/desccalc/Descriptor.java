@@ -99,6 +99,9 @@ import java.util.stream.IntStream;
  * (parallelized) calculation since individual CDK descriptor calculation classes are unfortunately NOT thread-safe.
  * Note: For adding a new descriptor, go to "Add new descriptor information here!"
  *
+ * TODO: add example code here for how to use this class. Especially mention that aromaticity perception needs to be
+ * performed beforehand!
+ *
  * @author Achim Zielesny
  * @author Jonas Schaub
  * @author Manuel Schauer
@@ -1484,7 +1487,8 @@ public enum Descriptor {
 
     //<editor-fold desc="Private static methods">
     /**
-     * Sets calculated descriptor components in aVector (that corresponds to anAtomContainer) at aStartIndices
+     * Sets calculated descriptor components in aVector (that corresponds to anAtomContainer, a row in the data matrix)
+     * at aStartIndices.
      * Note: Uses synchronized descriptor calculation methods.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
@@ -1495,7 +1499,7 @@ public enum Descriptor {
      * @param aMoleculeIndex Index of the current molecule being processed
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      Can be null if no NaN values should be tracked.
-     * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
+     * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      * @throws Exception Thrown if fatal error occurs (this should never happen)
      */
@@ -1518,14 +1522,15 @@ public enum Descriptor {
         } catch (Exception anException) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponents: An exception occurred: This should never happen."
+                "Descriptor.setCalculatedDescriptorComponents: An exception occurred: This should never happen.", anException
             );
-            throw new Exception("Descriptor.setCalculatedDescriptorComponents: An exception occurred: This should never happen.");
+            throw new Exception("Descriptor.setCalculatedDescriptorComponents: An exception occurred: This should never happen.", anException);
         }
     }
 
     /**
-     * Sets calculated descriptor components in aVector (that corresponds to anAtomContainer) at aStartIndices
+     * Sets calculated descriptor components in aVector (that corresponds to anAtomContainer, a row in the data matrix)
+     * at aStartIndices.
      * Note: Uses a new descriptor instance for EVERY descriptor calculation.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
@@ -1536,7 +1541,7 @@ public enum Descriptor {
      * @param aMoleculeIndex Index of the current molecule being processed
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      Can be null if no NaN values should be tracked.
-     * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
+     * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      * @throws Exception Thrown if fatal error occurs (this should never happen)
      */
@@ -1559,16 +1564,17 @@ public enum Descriptor {
         } catch (Exception anException) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setDescriptorsForSingleMoleculeNew: An exception occurred: This should never happen."
+                    "Descriptor.setDescriptorsForSingleMoleculeNew: An exception occurred: This should never happen.", anException
             );
-            throw new Exception("Descriptor.setDescriptorsForSingleMoleculeNew: An exception occurred: This should never happen.");
+            throw new Exception("Descriptor.setDescriptorsForSingleMoleculeNew: An exception occurred: This should never happen.", anException);
         }
     }
 
     /**
-     * Sets calculated descriptor components in aMatrix (that corresponds to anAtomContainerArray) beginning with
-     * aStartIndex.
-     * Note: Fast implementation without any new descriptor instances or locks/synchronization.
+     * Sets calculated descriptor components in aMatrix (that corresponds to anAtomContainerArray, a row in the data matrix)
+     * beginning with aStartIndex.
+     * Note: Fast implementation without any new descriptor instances or locks/synchronization; used in parallelization
+     * over descriptors (one thread per descriptor).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param aDescriptor Descriptor to be calculated (IS NOT CHANGED)
@@ -1579,7 +1585,7 @@ public enum Descriptor {
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      Can be null if no NaN values should be tracked.
-     * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
+     * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      * @throws Exception Thrown if fatal error occurs (this should never happen)
      */
@@ -1601,9 +1607,9 @@ public enum Descriptor {
         } catch (Exception anException) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setSingleDescriptorForMolecules: An exception occurred: This should never happen."
+                    "Descriptor.setSingleDescriptorForMolecules: An exception occurred: This should never happen.", anException
             );
-            throw new Exception("Descriptor.setSingleDescriptorForMolecules: An exception occurred: This should never happen.");
+            throw new Exception("Descriptor.setSingleDescriptorForMolecules: An exception occurred: This should never happen.", anException);
         }
     }
 
@@ -1614,12 +1620,12 @@ public enum Descriptor {
      *
      * @param aDescriptor Descriptor to be calculated (IS NOT CHANGED)
      * @param anAtomContainer Molecule (IS NOT CHANGED)
-     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aVector Vector of molecule (row of data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
-     * @param aMoleculeIndex Index of the current molecule being processed
+     * @param aMoleculeIndex Index of the current molecule being processed (row index in data matrix)
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      Can be null if no NaN values should be tracked.
-     * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
+     * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      */
     private static boolean setDescriptorSynchronized(
@@ -1782,15 +1788,11 @@ public enum Descriptor {
 
                 // Add new descriptor information here!
                 default:
-                    throw new UnsupportedOperationException("This descriptor does not have a routine yet!");
+                    throw new UnsupportedOperationException(aDescriptor + ": This descriptor does not have a routine yet!");
             }
             // Check for NaN values in the calculated result and track them
             int numComponents = descriptorToComponentNumberMap.get(aDescriptor);
-            if (checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositions)) {
-                return false;
-            }
-
-            return true;
+            return !checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositions);
         } catch (Exception anException) {
             int numComponents = descriptorToComponentNumberMap.get(aDescriptor);
             for (int i = 0; i < numComponents; i++) {
@@ -1800,6 +1802,15 @@ public enum Descriptor {
                     aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
                 }
             }
+            Descriptor.LOGGER.log(
+                    Level.WARNING,
+                    "Descriptor.setDescriptorSynchronized: An exception occurred while calculating descriptor "
+                            + aDescriptor
+                            + " for molecule index "
+                            + aMoleculeIndex
+                            + ".",
+                    anException
+            );
             return false;
         }
     }
@@ -1812,12 +1823,12 @@ public enum Descriptor {
      *
      * @param aDescriptor Descriptor to be calculated (IS NOT CHANGED)
      * @param anAtomContainer Molecule (IS NOT CHANGED)
-     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aVector Vector of molecule (row in data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @param aMoleculeIndex Index of the current molecule being processed
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      Can be null if no NaN values should be tracked.
-     * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
+     * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      */
     private static boolean setDescriptorNew(
@@ -1874,13 +1885,13 @@ public enum Descriptor {
                     break;
                 case BOND_COUNT_SPECIFIED:
                     BondCountDescriptor bondCountDesc = new BondCountDescriptor();
-
+                    //set parameter to count single bonds
                     bondCountDesc.setParameters(new Object[]{"s"});
                     aVector[aStartIndex] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
-
+                    //set parameter to count double bonds
                     bondCountDesc.setParameters(new Object[]{"d"});
                     aVector[aStartIndex + 1] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
-
+                    //set parameter to count triple bonds
                     bondCountDesc.setParameters(new Object[]{"t"});
                     aVector[aStartIndex + 2] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
                     break;
@@ -2055,15 +2066,11 @@ public enum Descriptor {
 
                 // Add new descriptor information here!
                 default:
-                    throw new UnsupportedOperationException("This descriptor does not have a routine yet!");
+                    throw new UnsupportedOperationException(aDescriptor + ": This descriptor does not have a routine yet!");
             }
             // Check for NaN values in the calculated result and track them
             int numComponents = descriptorToComponentNumberMap.get(aDescriptor);
-            if (checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositions)) {
-                return false;
-            }
-
-            return true;
+            return !checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositions);
         } catch (Exception anException) {
             int numComponents = descriptorToComponentNumberMap.get(aDescriptor);
             for (int i = 0; i < numComponents; i++) {
@@ -2073,6 +2080,15 @@ public enum Descriptor {
                     aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
                 }
             }
+            Descriptor.LOGGER.log(
+                    Level.WARNING,
+                    "Descriptor.setDescriptorNew: An exception occurred while calculating descriptor "
+                            + aDescriptor
+                            + " for molecule index "
+                            + aMoleculeIndex
+                            + ".",
+                    anException
+            );
             return false;
         }
     }
@@ -2080,17 +2096,17 @@ public enum Descriptor {
     /**
      * Sets component values of aDescriptor for anAtomContainer in aVector beginning with aStartIndex.
      * Note: This method is NOT thread-safe in concurrent computing and is NOT made for parallelized access of the
-     * SAME non-thread-safe descriptor, only parallelized access of DIFFERENT non-thread-safe descriptors is advised.
+     * SAME non-thread-safe descriptor instances, only parallelized access of DIFFERENT non-thread-safe descriptors is advised.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param aDescriptor Descriptor to be calculated (IS NOT CHANGED)
      * @param anAtomContainer Molecule (IS NOT CHANGED)
-     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aVector Vector of molecule (row in data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @param aMoleculeIndex Index of the current molecule being processed
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      Can be null if no NaN values should be tracked.
-     * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a
+     * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      */
     private static boolean setDescriptor(
@@ -2146,11 +2162,9 @@ public enum Descriptor {
                     BondCountDescriptor bondCountDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED);
                     bondCountDesc.setParameters(new Object[]{"s"});
                     aVector[aStartIndex] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
-
                     // Double bonds (d)
                     bondCountDesc.setParameters(new Object[]{"d"});
                     aVector[aStartIndex + 1] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
-
                     // Triple bonds (t)
                     bondCountDesc.setParameters(new Object[]{"t"});
                     aVector[aStartIndex + 2] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
@@ -2317,15 +2331,11 @@ public enum Descriptor {
 
                 // Add new descriptor information here!
                 default:
-                    throw new UnsupportedOperationException("This descriptor does not have a routine yet!");
+                    throw new UnsupportedOperationException(aDescriptor + ": This descriptor does not have a routine yet!");
             }
             // Check for NaN values in the calculated result and track them
             int numComponents = descriptorToComponentNumberMap.get(aDescriptor);
-            if (checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositions)) {
-                return false;
-            }
-
-            return true;
+            return !checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositions);
         } catch (Exception anException) {
             int numComponents = descriptorToComponentNumberMap.get(aDescriptor);
             for (int i = 0; i < numComponents; i++) {
@@ -2334,6 +2344,15 @@ public enum Descriptor {
                     aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
                 }
             }
+            Descriptor.LOGGER.log(
+                    Level.WARNING,
+                    "Descriptor.setDescriptor: An exception occurred while calculating descriptor "
+                            + aDescriptor
+                            + " for molecule index "
+                            + aMoleculeIndex
+                            + ".",
+                    anException
+            );
             return false;
         }
     }
@@ -2346,7 +2365,9 @@ public enum Descriptor {
      * @param aStartIndex The start index in the vector for this descriptor
      * @param numComponents The number of components for this descriptor
      * @param aMoleculeIndex The index of the current molecule
-     * @param aNanPositions List to track NaN positions (can be null if NaN positions should not be tracked)
+     * @param aNanPositions List to track NaN positions (can be null if NaN positions should not be tracked);
+     *                      must be thread-safe for parallel access; will be filled with int[] {[moleculeIndex, componentIndex]}
+     *                      pairs of NaN values
      * @return true if any NaN values were found, false otherwise
      */
     private static boolean checkAndTrackNaNValues(float[] aVector, int aStartIndex, int numComponents,
@@ -2574,14 +2595,13 @@ public enum Descriptor {
             int aStartIndex
     ) {
         try {
+            // Single bonds (s)
             BondCountDescriptor bondCountDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED);
             bondCountDesc.setParameters(new Object[]{"s"});
             aVector[aStartIndex] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
-
             // Double bonds (d)
             bondCountDesc.setParameters(new Object[]{"d"});
             aVector[aStartIndex + 1] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
-
             // Triple bonds (t)
             bondCountDesc.setParameters(new Object[]{"t"});
             aVector[aStartIndex + 2] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
@@ -2589,6 +2609,13 @@ public enum Descriptor {
             for (int i = 0; i < 3; i++) {
                 aVector[aStartIndex + i] = Float.NaN;
             }
+            Descriptor.LOGGER.log(
+                    Level.WARNING,
+                    "Descriptor.setBondCountSpecified: An exception occurred while calculating bond counts for molecule index "
+                            + aStartIndex
+                            + ".",
+                    e
+            );
         }
     }
 
@@ -2610,7 +2637,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets Lipinski's Rule of Five violations count
+     * Sets Lipinski's Rule of Five violations count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2728,11 +2755,16 @@ public enum Descriptor {
         try {
             // Create a copy of the molecule with explicit hydrogen atoms
             IAtomContainer moleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
-
             // Calculate XLogP using the molecule copy containing explicit hydrogen atoms
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(HYBRIDIZATION_RATIO).calculate(moleculeWithExplicitH).getValue()).doubleValue();
         } catch (Exception anException) {
             aVector[aStartIndex] = Float.NaN;
+            Descriptor.LOGGER.log(
+                    Level.WARNING,
+                    "Descriptor.setHybridizationRatio: An exception occurred while calculating hybridization ratio for molecule index "
+                            + aStartIndex + ".",
+                    anException
+            );
         }
     }
 
@@ -2881,10 +2913,8 @@ public enum Descriptor {
         try {
             // Create a copy of the molecule with explicit hydrogen atoms
             IAtomContainer moleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
-
             // Calculate ALogP using the molecule copy containing explicit hydrogen atoms
             DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(A_LOG_P).calculate(moleculeWithExplicitH).getValue();
-
             aVector[aStartIndex] = (float) result.get(0);      // ALogP
             aVector[aStartIndex + 1] = (float) result.get(1);  // ALogP squared
             aVector[aStartIndex + 2] = (float) result.get(2);  // Molar Refractivity
@@ -2892,6 +2922,13 @@ public enum Descriptor {
             aVector[aStartIndex] = Float.NaN;
             aVector[aStartIndex + 1] = Float.NaN;
             aVector[aStartIndex + 2] = Float.NaN;
+            Descriptor.LOGGER.log(
+                    Level.WARNING,
+                    "Descriptor.setALogP: An exception occurred while calculating ALogP for molecule index "
+                            + aStartIndex
+                            + ".",
+                    anException
+            );
         }
     }
 
@@ -2913,11 +2950,17 @@ public enum Descriptor {
         try {
             // Create a copy of the molecule with explicit hydrogen atoms
             IAtomContainer moleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
-
             // Calculate XLogP using the molecule copy containing explicit hydrogen atoms
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(X_LOG_P).calculate(moleculeWithExplicitH).getValue()).doubleValue();
         } catch (Exception anException) {
             aVector[aStartIndex] = Float.NaN;
+            Descriptor.LOGGER.log(
+                    Level.WARNING,
+                    "Descriptor.setXLogP: An exception occurred while calculating XLogP for molecule index "
+                            + aStartIndex
+                            + ".",
+                    anException
+            );
         }
     }
     /**
@@ -3166,7 +3209,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets basic group count
+     * Sets basic group count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -3183,7 +3226,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets acidic group count
+     * Sets acidic group count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -3240,6 +3283,8 @@ public enum Descriptor {
 
     /**
      * Sets the EccentricConnectivityIndex descriptor value in aVector beginning with aStartIndex.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector to be filled with descriptor value (MAY BE CHANGED)
@@ -3315,11 +3360,9 @@ public enum Descriptor {
         try {
             // Create a new empty atom container with the same properties
             IAtomContainer tmpMoleculeCopy = aMolecule.getBuilder().newInstance(IAtomContainer.class);
-
             // Copy atoms
             for (IAtom tmpAtom : aMolecule.atoms()) {
                 IAtom tmpNewAtom = tmpAtom.getBuilder().newInstance(IAtom.class);
-
                 // Copy atom properties
                 tmpNewAtom.setSymbol(tmpAtom.getSymbol());
                 tmpNewAtom.setAtomicNumber(tmpAtom.getAtomicNumber());
@@ -3327,7 +3370,6 @@ public enum Descriptor {
                 tmpNewAtom.setFormalCharge(tmpAtom.getFormalCharge());
                 tmpNewAtom.setImplicitHydrogenCount(tmpAtom.getImplicitHydrogenCount());
                 tmpNewAtom.setCharge(tmpAtom.getCharge());
-
                 // Copy atom flags
                 if (tmpAtom.isAromatic()) {
                     tmpNewAtom.setIsAromatic(true);
@@ -3335,23 +3377,18 @@ public enum Descriptor {
                 if (tmpAtom.isInRing()) {
                     tmpNewAtom.setIsInRing(true);
                 }
-
                 // Add atom to new container
                 tmpMoleculeCopy.addAtom(tmpNewAtom);
             }
-
             // Copy bonds
             for (IBond tmpBond : aMolecule.bonds()) {
                 IBond tmpNewBond = tmpBond.getBuilder().newInstance(IBond.class);
-
                 // Get atoms for this bond in the new molecule
                 IAtom tmpAtom1 = tmpMoleculeCopy.getAtom(aMolecule.indexOf(tmpBond.getBegin()));
                 IAtom tmpAtom2 = tmpMoleculeCopy.getAtom(aMolecule.indexOf(tmpBond.getEnd()));
-
                 // Set bond properties
                 tmpNewBond.setOrder(tmpBond.getOrder());
                 tmpNewBond.setAtoms(new IAtom[]{tmpAtom1, tmpAtom2});
-
                 // Copy bond flags
                 if (tmpBond.isAromatic()) {
                     tmpNewBond.setIsAromatic(true);
@@ -3359,24 +3396,20 @@ public enum Descriptor {
                 if (tmpBond.isInRing()) {
                     tmpNewBond.setIsInRing(true);
                 }
-
                 // Add bond to new container
                 tmpMoleculeCopy.addBond(tmpNewBond);
             }
-
             return tmpMoleculeCopy;
-
         } catch (Exception anException) {
             throw new CloneNotSupportedException("Could not clone molecule: " + anException.getMessage());
         }
-
     }
 
     /**
      * Creates a new molecule with all implicit hydrogen atoms made explicit.
      *
      * @param aMolecule Source molecule with implicit hydrogens (NOT MODIFIED)
-     * @return New molecule with all hydrogens made explicit
+     * @return New molecule (copy of the parameter) with all hydrogens made explicit
      * @throws NullPointerException If the input molecule is null
      * @throws IllegalArgumentException If the input molecule is empty
      * @throws CloneNotSupportedException If the molecule cannot be properly processed
@@ -3393,10 +3426,8 @@ public enum Descriptor {
         try {
             // Create a deep copy of the molecule first
             IAtomContainer tmpMoleculeCopy = copyMolecule(aMolecule);
-
             // Add explicit hydrogen atoms
             AtomContainerManipulator.convertImplicitToExplicitHydrogens(tmpMoleculeCopy);
-
             return tmpMoleculeCopy;
         } catch (Exception anException) {
             throw new CloneNotSupportedException("Could not create molecule with explicit hydrogens: " + anException.getMessage());
@@ -3428,17 +3459,13 @@ public enum Descriptor {
         }
         try {
             AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(aMolecule);
-
             // Clears all aromatic flags before applying the aromaticity model.
             Aromaticity.clear(aMolecule);
-
             Cycles.markRingAtomsAndBonds(aMolecule);
             Aromaticity.apply(anAromaticityModel, aMolecule);
         } catch (Exception anException) {
             throw new Exception("Failed to detect aromaticity: " + anException.getMessage(), anException);
         }
     }
-
     //</editor-fold>
-
 }

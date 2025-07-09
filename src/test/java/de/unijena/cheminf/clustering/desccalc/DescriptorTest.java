@@ -50,6 +50,7 @@ import java.util.Locale;
  *
  * @author Achim Zielesny
  * @author Jonas Schaub
+ * @author Manuel Schauer
  */
 class DescriptorTest {
 
