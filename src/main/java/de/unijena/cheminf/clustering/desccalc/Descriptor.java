@@ -1098,22 +1098,25 @@ public enum Descriptor {
     }
 
     /**
-     * Sets calculated descriptor components in vectors of a aMatrix (that corresponds to anAtomContainerArray)
-     * beginning with aStartIndex by (optional) parallelization of molecules.
+     * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
+     * beginning with aStartIndex by (optional) parallelization of molecules. If parallel computation is used, the atom
+     * containers (molecules) are distributed onto parallel thread, one for each molecule, and they all access shared
+     * descriptor instances.
      * Note: Uses a new descriptor instance for EVERY descriptor calculation which slows down the calculation.
      *
      * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
      * @param anAtomContainerArray Array of molecules. Note: anAtomContainerArray[i] corresponds to aMatrix[i] data
      *                              vector. (IS NOT CHANGED)
      * @param aMatrix Matrix of component vectors of molecules. Note: Data vector aMatrix[i] corresponds to molecule
-     *               anAtomContainerArray[i]. (MAY BE CHANGED)
-     * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors
+     *               anAtomContainerArray[i], i.e. the molecules define the rows of the matrix. (MAY BE CHANGED)
+     * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
+     *      *             column to start filling with descriptors
      * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
      *                      Can be null if no NaN values should be tracked.
-     * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a descriptor
+     * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      * calculation is NaN
      * @throws IllegalArgumentException Thrown if an argument is illegal
      * @throws Exception Thrown if fatal error occurs (this should never happen)
@@ -1199,9 +1202,9 @@ public enum Descriptor {
             } catch (Exception anException) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal."
+                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal.", anException
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal.", anException);
             }
         }
         if (aNanPositions == null) {
@@ -1269,23 +1272,26 @@ public enum Descriptor {
     }
 
     /**
-     * Sets calculated descriptor components in vectors of a aMatrix (that corresponds to anAtomContainerArray)
-     * beginning with aStartIndex by (optional) parallelization of descriptor calculations.
-     * Note: Parallelization of descriptor calculation is fastest since new descriptor instances for every calculation
+     * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
+     * beginning with aStartIndex by (optional) parallelization of descriptor calculations. If parallel computation is
+     * used, the descriptor instances are distributed onto parallel thread, one for each descriptor, and they all access shared
+     * atom container (molecule) instances.
+     * Note: Parallelization of descriptor calculation is fastest (under memory constraints) since new descriptor instances for every calculation
      * or synchronized descriptor calculation are avoided.
      *
      * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
      * @param anAtomContainerArray Array of molecules. Note: anAtomContainerArray[i] corresponds to aMatrix[i] data
      *                              vector. (IS NOT CHANGED)
      * @param aMatrix Matrix of component vectors of molecules. Note: Data vector aMatrix[i] corresponds to molecule
-     *               anAtomContainerArray[i]. (MAY BE CHANGED)
-     * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors
+     *               anAtomContainerArray[i], i.e. the molecules define the rows of the matrix. (MAY BE CHANGED)
+     * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
+     *                    column to start filling with descriptors
      * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
      *                      Can be null if no NaN values should be tracked.
-     * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a descriptor
+     * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      * calculation is NaN
      * @throws IllegalArgumentException Thrown if an argument is illegal
      * @throws Exception Thrown if fatal error occurs (this should never happen)
