@@ -95,20 +95,22 @@ import java.util.stream.IntStream;
 
 /**
  * Descriptor related calculations based on the CDK for the enrichment of data vectors.
- * Note. There are 3 "public static boolean setDescriptorsForMolecules...()" methods with different forms of
+ * Note: There are 3 "public static boolean setDescriptorsForMolecules...()" methods with different forms of
  * (parallelized) calculation since individual CDK descriptor calculation classes are unfortunately NOT thread-safe.
- * Note: For adding a new descriptor goto "Add new descriptor information here!"
+ * Note: For adding a new descriptor, go to "Add new descriptor information here!"
  *
  * @author Achim Zielesny
  * @author Jonas Schaub
+ * @author Manuel Schauer
  */
 public enum Descriptor {
-
     //<editor-fold desc="Descriptor enumeration and initialization">
     /**
      * Molecular weight, adds up the natural masses (weighted average of all known
      * isotopes of the particular element based on their natural abundances) of every atom
      * in the given molecule, it is NOT the exact mass.
+     *
+     * @see WeightDescriptor
      */
     MOLECULAR_WEIGHT,
     /**
@@ -116,82 +118,113 @@ public enum Descriptor {
      * Path number: sum of the distances between any two atoms in the molecule.<br>
      * Polarity number: number of pairs of atoms which are separated by exactly three bonds.<br>
      * Note: the CDK implementation counts all distances, not just those of carbon atoms or only carbon-carbon bonds.
+     *
+     * @see WienerNumbersDescriptor
      */
     WIENER_NUMBER,
     //<editor-fold desc="Basic Bond and Count descriptors">
     /**
      * Atom count, counts the number of all atoms in the given molecule.
+     *
+     * @see AtomCountDescriptor
      */
     ATOM_COUNT,
     /**
-     * BondCount, counts the number of bonds in a molecule with a specific bond order.
-     * Default: counts all bonds (total bond count), no bonds to hydrogen atoms are counted.
+     * Total bond count, counts the number of all bonds in a molecule, neglecting the order.
+     * Double and triple bonds are counted as one bond.
+     * Bonds to hydrogen atoms are not counted.
+     *
+     * @see BondCountDescriptor
      */
     BOND_COUNT_ALL,
     /**
-     * BondCount Specified, counts the number of bonds in a molecule with specified bond orders.
+     * Bond count specified, counts the number of bonds in a molecule with specified bond orders.
      * Returns an array with counts for single, double and triple bonds.
-     * For aromatic bonds counts use AROMATIC_BONDS_COUNT.
+     * For aromatic bond counts use AROMATIC_BONDS_COUNT.
      * No bonds to hydrogen atoms are counted.
+     *
+     * @see BondCountDescriptor
      */
     BOND_COUNT_SPECIFIED,
     /**
-     * HBondAcceptorCount, counts hydrogen bond acceptors based on a simplified PHACIR scheme.
-     * It includes: Oxygen atoms with formal charge ≤ 0 (excluding: Aromatic ether oxygens and oxygens adjacent to nitrogen).
-     * Nitrogen atoms with formal charge ≤ 0 (excluding: Nitrogens adjacent to oxygen).
+     * H bond acceptor count, counts hydrogen bond acceptors based on a simplified PHACIR scheme.
+     * It includes: Oxygen atoms with formal charge ≤ 0 (excluding: Aromatic ether oxygens and oxygens adjacent to nitrogen)
+     * and nitrogen atoms with formal charge ≤ 0 (excluding: nitrogens adjacent to oxygen).
+     *
+     * @see HBondAcceptorCountDescriptor
      */
     H_BOND_ACCEPTOR_COUNT,
     /**
-     * HBondDonorCount, counts hydrogen bond donors based on a simplified PHACIR classification.
-     * It includes: OH groups where the oxygen has a formal charge ≥ 0 and NH groups where the nitrogen has a formal charge ≥ 0
+     * H bond donor count, counts hydrogen bond donors based on a simplified PHACIR classification.
+     * It includes: OH groups where the oxygen has a formal charge ≥ 0 and NH groups where the nitrogen has a formal charge ≥ 0.
+     *
+     * @see HBondDonorCountDescriptor
      */
     H_BOND_DONOR_COUNT,
     /**
-     * AromaticAtomsCount, counts the number of aromatic atoms in a molecule.
+     * Aromatic atoms count, counts the number of aromatic atoms in a molecule.
      * Note: Requires that aromatic atoms in the molecule have already been detected and marked.
+     *
+     * @see AromaticAtomsCountDescriptor
      */
     AROMATIC_ATOMS_COUNT,
     /**
-     * AromaticBondsCount, counts the number of aromatic bonds in a molecule.
+     * Aromatic bonds count, counts the number of aromatic bonds in a molecule.
      * Note: Requires that aromatic bonds in the molecule have already been detected and marked.
+     *
+     * @see AromaticBondsCountDescriptor
      */
     AROMATIC_BONDS_COUNT,
     /**
-     * RotatableBondsCount, counts the number of rotatable bonds in a molecule.
+     * Rotatable bonds count, counts the number of rotatable bonds in a molecule.
      * A rotatable bond is defined as any single non-ring bond, where atoms on both sides
      * have at least two heavy-atom neighbors. Excluding terminal bonds.
+     *
+     * @see RotatableBondsCountDescriptor
      */
     ROTATABLE_BONDS_COUNT,
     /**
-     * Basic Group Count: Returns the number of basic groups in a molecule.
+     * Basic group count, returns the number of basic groups in a molecule.
+     *
+     * @see BasicGroupCountDescriptor
      */
     BASIC_GROUP_COUNT,
     /**
-     * Acidic Group Count: Returns the number of acidic groups in a molecule.
+     * Acidic group count, returns the number of acidic groups in a molecule.
+     *
+     * @see AcidicGroupCountDescriptor
      */
     ACIDIC_GROUP_COUNT,
     //</editor-fold>
     /**
-     * TPSADescriptor, calculates the topological polar surface area (TPSA) of a molecule.
+     * TPSA descriptor, calculates the topological polar surface area (TPSA) of a molecule.
      * TPSA is the sum of the surface areas of polar atoms (typically oxygen and nitrogen)
      * and their attached hydrogens, based on a topological approximation (2D structure only).
+     *
+     * @see TPSADescriptor
      */
     TPSA,
     /**
-     * LargestChain descriptor, calculates the number of atoms in the longest chain in the molecule.
+     * Largest chain descriptor, calculates the number of atoms in the longest chain in the molecule.
      * This is a simple topological descriptor that provides a measure of molecular linearity.
+     *
+     * @see LargestChainDescriptor
      */
     LARGEST_CHAIN,
     /**
-     * LongestAliphaticChain descriptor, calculates the number of atoms in the longest aliphatic chain.
+     * Longest aliphatic chain descriptor, calculates the number of atoms in the longest aliphatic chain.
      * This descriptor provides information about the maximum linear extent of non-aromatic
      * portions of the molecular structure, which relates to molecular shape properties.
+     *
+     * @see LongestAliphaticChainDescriptor
      */
     LONGEST_ALIPHATIC_CHAIN,
     /**
-     * MannholdLogPDescriptor, calculates the octanol-water partition coefficient (logP) using the Mannhold method.
+     * Mannhold LogP descriptor, calculates the octanol-water partition coefficient (logP) using the Mannhold method.
      * LogP describes the hydrophilicity or lipophilicity of a compound and is crucial for
      * predicting solubility, permeability, and bioavailability.
+     *
+     * @see MannholdLogPDescriptor
      */
     MANNHOLD_LOGP,
     /**
@@ -203,6 +236,8 @@ public enum Descriptor {
      * 5. BCUTp-1l, BCUTp-2l ... - nhigh lowest polarizability weighted BCUTS<br>
      * 6. BCUTp-1h, BCUTp-2h ... - nlow highest polarizability weighted BCUTS<br>
      * Note: No array for one parameter is returned, just the highest and lowest numbers. (Default Parameters: nhigh = 1 and nlow = 1)
+     *
+     * @see BCUTDescriptor
      */
     BCUT,
     /**
@@ -211,11 +246,15 @@ public enum Descriptor {
      * Bond polarizability is a simple sum of polarizability contributions from all bonds, based on bond types and involved atoms.
      * It provides a rough estimate of how easily the electron cloud in a molecule can be distorted,
      * which relates to intermolecular interactions, polarizability and refractive behavior.
+     *
+     * @see BPolDescriptor
      */
     B_POL,
     /**
-     * RuleOfFive descriptor, calculates the number of failures of Lipinski's Rule of Five.
+     * Rule of five descriptor, calculates the number of failures of Lipinski's Rule of Five.
      * The descriptor returns the number of violations (0-4).
+     *
+     * @see RuleOfFiveDescriptor
      */
     RULE_OF_FIVE,
     /**
@@ -223,39 +262,51 @@ public enum Descriptor {
      * the framework to the total number of heavy atoms in the molecule.
      * This provides an indication of the proportion of the molecule that is part of the
      * scaffold or core structure, versus the proportion that is in side chains.
+     *
+     * @see FMFDescriptor
      */
     FMF,
     /**
-     * FractionalCSP3 descriptor, characterizes the non-flatness of a molecule by calculating
+     * Fractional C SP3 descriptor, characterizes the non-flatness of a molecule by calculating
      * the fraction of sp3 hybridized carbon atoms over the total carbon count.
      * This provides information about the three-dimensionality and complexity
      * of a molecule, which relates to drug-likeness properties.
+     *
+     * @see FractionalCSP3Descriptor
      */
     FRACTIONAL_CSP3,
     /**
-     * HybridizationRatio descriptor, calculates the ratio of sp3 carbons to sp2 carbons.
+     * Hybridization ratio descriptor, calculates the ratio of sp3 carbons to sp2 carbons.
      * This provides valuable information about the three-dimensionality and flatness
      * of a molecule, which can be useful for predicting drug-like properties and
      * comparing structural characteristics.
+     *
+     * @see HybridizationRatioDescriptor
      */
     HYBRIDIZATION_RATIO,
     /**
-     * KappaShapeIndices descriptor, calculates Kier and Hall kappa molecular shape indices.
+     * Kappa shape indices descriptor, calculates Kier and Hall kappa molecular shape indices.
      * These indices compare the molecular graph with minimal and maximal molecular graphs. Returns 3 values:<br>
      * 1. Kier1 - First kappa shape index<br>
      * 2. Kier2 - Second kappa shape index<br>
      * 3. Kier3 - Third kappa shape index<br>
      * Note: Hydrogens are ignored in the calculation.
+     *
+     * @see KappaShapeIndicesDescriptor
      */
     KAPPA_SHAPE_INDICES,
     /**
-     * PetitjeanNumber descriptor, calculates an index characterizing molecular graph topology.
+     * Petitjean number descriptor, calculates an index characterizing molecular graph topology.
      * This topological descriptor is based on the calculation of the graph eccentricity
      * and provides information about the molecular shape and branching pattern.
+     *
+     * @see PetitjeanNumberDescriptor
      */
     PETITJEAN_NUMBER,
     /**
      * Spiro atom count descriptor, calculates the number of spiro atoms in a molecule.
+     *
+     * @see SpiroAtomCountDescriptor
      */
     SPIRO_ATOM_COUNT,
     /**
@@ -263,22 +314,28 @@ public enum Descriptor {
      * This is calculated as 1 + log2 m, where m is the number of heavy-heavy bonds.
      * If m is zero, then zero is returned.
      * This descriptor characterizes molecular complexity in terms of edge connectivity.
+     *
+     * @see VAdjMaDescriptor
      */
     V_ADJ_MAT,
     /**
-     * WeightedPath descriptor, evaluates the weighted path descriptors for a molecule.
+     * Weighted path descriptor, evaluates the weighted path descriptors for a molecule.
      * Returns 5 values:<br>
      * 1. WTPT1 - molecular ID<br>
      * 2. WTPT2 - molecular ID / number of atoms<br>
      * 3. WTPT3 - sum of path lengths starting from heteroatoms<br>
      * 4. WTPT4 - sum of path lengths starting from oxygens<br>
      * 5. WTPT5 - sum of path lengths starting from nitrogens<br>
+     *
+     * @see WeightedPathDescriptor
      */
     WEIGHTED_PATH,
     /**
-     * ZagrebIndex descriptor, calculates the Zagreb index of a molecule.
+     * Zagreb index descriptor, calculates the Zagreb index of a molecule.
      * The Zagreb index is the sum of the squares of atom degrees over all heavy atoms,
      * which provides information about the molecular complexity and topological structure.
+     *
+     * @see ZagrebIndexDescriptor
      */
     ZAGREB_INDEX,
     /**
@@ -292,6 +349,8 @@ public enum Descriptor {
      * 7. C2SP3 - singly bound carbon bound to two other carbons<br>
      * 8. C3SP3 - singly bound carbon bound to three other carbons<br>
      * 9. C4SP3 - singly bound carbon bound to four other carbons
+     *
+     * @see CarbonTypesDescriptor
      */
     CARBON_TYPES,
     //<editor-fold desc="LogP descriptors">
@@ -301,53 +360,66 @@ public enum Descriptor {
      * 1. ALogP (logP value) is the Ghose-Crippen octanol-water partition coefficient.<br>
      * 2. ALogP² is the squared ALogP value.<br>
      * 3. Molar Refractivity (MR) measures the volume occupied by an atom or group of atoms.<br>
+     *
+     * @see ALOGPDescriptor
      */
     A_LOG_P,
     /**
      * XLogP descriptor, calculates logP based on the atom-type method called XLogP.
      * Requires all hydrogens to be explicit.
+     *
+     * @see XLogPDescriptor
      */
     X_LOG_P,
     /**
-     * JP_LOG_P descriptor, calculates the octanol-water partition coefficien based on the JPlogP method.
-     * Original publication: Junghwan Lee et al. "Estimation of partition coefficients...".
+     * JPlogP descriptor, calculates the octanol-water partition coefficient based on an atom contribution model.
+     *
+     * @see JPlogPDescriptor
      */
     JP_LOG_P,
     //</editor-fold>
     /**
      * APol descriptor, calculates the sum of the atomic polarizabilities (including implicit hydrogens).
+     *
+     * @see APolDescriptor
      */
     A_POL,
     //<editor-fold desc="Autocorrelation descriptors">
     /**
-     * AutocorrelationDescriptorCharge, calculates topological autocorrelation vectors
+     * Autocorrelation charge descriptor, calculates topological autocorrelation vectors
      * that capture patterns related to charge distribution across the molecular structure.
      * This descriptor correlates atomic partial charges along the molecular topology
      * to characterize charge-related structural patterns in the molecule.
      * Returns 5 values representing charge autocorrelation at different topological distances.
+     *
+     * @see AutocorrelationDescriptorCharge
      */
     AUTOCORRELATION_CHARGE,
     /**
-     * AutocorrelationDescriptorMass, calculates topological autocorrelation vectors
+     * Autocorrelation mass descriptor, calculates topological autocorrelation vectors
      * that capture patterns related to atomic mass distribution across the molecular structure.
      * This descriptor correlates atomic masses along the molecular topology
      * to characterize mass-related structural patterns in the molecule.
      * Returns 5 values representing mass autocorrelation at different topological distances.
+     *
+     * @see AutocorrelationDescriptorMass
      */
     AUTOCORRELATION_MASS,
     /**
-     * AutocorrelationDescriptorPolarizability, calculates topological autocorrelation vectors
+     * Autocorrelation polarizability descriptor, calculates topological autocorrelation vectors
      * that capture patterns related to polarizability distribution across the molecular structure.
      * This descriptor correlates atomic polarizabilities along the molecular topology
      * to characterize polarizability-related structural patterns in the molecule.
      * Returns 5 values representing polarizability autocorrelation at different topological distances.
      * NOTE: Method is not validated in the CDK so not validated in this implementation as well
+     *
+     * @see AutocorrelationDescriptorPolarizability
      */
     AUTOCORRELATION_POLARIZABILITY,
     //</editor-fold>
     /**
-     * FragmentComplexity descriptor, calculates the complexity of a molecular system.
-     * The complexity is defined as [Nilakantan, R. et. al.. Journal of chemical information and modeling. 2006. 46]:
+     * Fragment complexity descriptor, calculates the complexity of a molecular system.
+     * The complexity is defined as [Nilakantan, R. et al. Journal of chemical information and modeling. 2006. 46]:
      * C = abs(B^2 - A^2 + A) + H/100
      * where:
      * (C = complexity,
@@ -355,11 +427,13 @@ public enum Descriptor {
      * B = number of bonds,
      * H = number of heteroatoms,).
      * This provides a measure of structural complexity that correlates with synthetic accessibility.
+     *
+     * @see FragmentComplexityDescriptor
      */
     FRAGMENT_COMPLEXITY,
     //<editor-fold desc="CHI descriptors">
     /**
-     * ChiChain descriptor, calculates the Kier + Hall chi chain indices of orders 3 through 7.
+     * Chi chain descriptor, calculates the Kier + Hall chi chain indices of orders 3 through 7.
      * These values characterize a molecular graph based on its chain subgraphs.
      * Returns 10 values:<br>
      * 1. SCH-3 - Simple chain, order 3<br>
@@ -372,10 +446,12 @@ public enum Descriptor {
      * 8. VCH-5 - Valence chain, order 5<br>
      * 9. VCH-6 - Valence chain, order 6<br>
      * 10. VCH-7 - Valence chain, order 7
+     *
+     * @see ChiChainDescriptor
      */
     CHI_CHAIN,
     /**
-     * ChiCluster descriptor, calculates Kier + Hall chi cluster indices of orders 3 through 6.
+     * Chi cluster descriptor, calculates Kier + Hall chi cluster indices of orders 3 through 6.
      * These values characterize a molecular graph based on its cluster subgraphs.
      * Returns 8 values:<br>
      * 1. SC-3 - Simple cluster, order 3<br>
@@ -386,10 +462,12 @@ public enum Descriptor {
      * 6. VC-4 - Valence cluster, order 4<br>
      * 7. VC-5 - Valence cluster, order 5<br>
      * 8. VC-6 - Valence cluster, order 6
+     *
+     * @see ChiClusterDescriptor
      */
     CHI_CLUSTER,
     /**
-     * ChiPathCluster descriptor, calculates Kier + Hall chi path cluster indices of orders 4 through 6.
+     * Chi path cluster descriptor, calculates Kier + Hall chi path cluster indices of orders 4 through 6.
      * These values characterize a molecular graph based on its path cluster subgraphs.
      * Returns 6 values:<br>
      * 1. SPC-4 - Simple path cluster, order 4<br>
@@ -398,10 +476,12 @@ public enum Descriptor {
      * 4. VPC-4 - Valence path cluster, order 4<br>
      * 5. VPC-5 - Valence path cluster, order 5<br>
      * 6. VPC-6 - Valence path cluster, order 6
+     *
+     * @see ChiPathClusterDescriptor
      */
     CHI_PATH_CLUSTER,
     /**
-     * ChiPath descriptor, calculates Kier + Hall chi path indices of orders 0 through 7.
+     * Chi path descriptor, calculates Kier + Hall chi path indices of orders 0 through 7.
      * These values characterize a molecular graph based on its path subgraphs.
      * Returns 16 values:<br>
      * 1.  SP-0 - Simple path, order 0<br>
@@ -420,24 +500,30 @@ public enum Descriptor {
      * 14. VP-5 - Valence path, order 5<br>
      * 15. VP-6 - Valence path, order 6<br>
      * 16. VP-7 - Valence path, order 7<br>
+     *
+     * @see ChiPathDescriptor
      */
     CHI_PATH,
     //</editor-fold>
     /**
-     * FractionalPSA descriptor, calculates the ratio of polar surface are to molecular weight.
+     * Fractional PSA descriptor, calculates the ratio of polar surface area to molecular weight.
      * This descriptor provides the polar surface area efficiency, which is the TPSADescriptor value divided by the
-     * molecular weight, measure in square Angstroms per Dalton.
+     * molecular weight, measured in square Angstroms per Dalton.
+     *
+     * @see FractionalPSADescriptor
      */
     FRACTIONAL_PSA,
     /**
-     * LargestPiSystem descriptor, calculates the number of atoms in the largest pi system.
+     * Largest pi system descriptor, calculates the number of atoms in the largest pi system.
      * This descriptor identifies the largest conjugated pi system within a molecule and
      * returns the count of atoms participating in it.
+     *
+     * @see LargestPiSystemDescriptor
      */
     LARGEST_PI_SYSTEM,
     /**
      * Descriptor that calculates small ring information.
-     * Returns 4 values:<br>
+     * Returns 11 values:<br>
      * 1. nSmallRings - total number of small rings (of size 3 through 9)<br>
      * 2. nAromRings - total number of small aromatic rings<br>
      * 3. nRingBlocks - total number of distinct ring blocks<br>
@@ -449,29 +535,37 @@ public enum Descriptor {
      * 9. nRings7 - total number of 7-membered rings<br>
      * 10. nRings8 - total number of 8-membered rings<br>
      * 11. nRings9 - total number of 9-membered rings<br>
+     *
+     * @see SmallRingDescriptor
      */
     SMALL_RING,
     /**
-     * AminoAcidCount descriptor, calculates the number of each amino acid in a molecule.
+     * Amino acid count descriptor, calculates the number of each amino acid in a molecule.
      * Returns 20 values, one for each of the 20 standard amino acids:
      * Alanine, Arginine, Asparagine, Aspartic acid, Cysteine, Glutamic acid, Glutamine,
      * Glycine, Histidine, Isoleucine, Leucine, Lysine, Methionine, Phenylalanine,
      * Proline, Serine, Threonine, Tryptophan, Tyrosine, and Valine.
      * This descriptor helps identify and quantify amino acid composition in peptides and proteins.
+     *
+     * @see AminoAcidCountDescriptor
      */
     AMINO_ACID_COUNT,
     /**
      * Kier-Hall SMARTS descriptor that calculates counts of functional groups and substructures
      * based on the Kier and Hall SMARTS patterns, used for QSAR modeling and molecular characterization.
      * Note: This descriptor provides 79 values representing different molecular fragments.
+     *
+     * @see KierHallSmartsDescriptor
      */
     KIER_HALL_SMARTS,
     /**
-     * EccentricConnectivityIndex descriptor, calculates a topological descriptor that combines
+     * Eccentric connectivity index descriptor, calculates a topological descriptor that combines
      * distance and adjacency information.
      * It is defined as the sum of the products of eccentricity and vertex degree for each atom.
      * This index provides information about the distribution of atoms in the molecular structure
      * and helps characterize molecular complexity, branching, and overall shape.
+     *
+     * @see EccentricConnectivityIndexDescriptor
      */
     ECCENTRIC_CONNECTIVITY_INDEX,
     /**
@@ -498,31 +592,38 @@ public enum Descriptor {
      * MDEN-22<br>
      * MDEN-23<br>
      * MDEN-33<br>
+     *
+     * @see MDEDescriptor
      */
     MDE,
     /**
      * VABC descriptor, calculates the volume descriptor using the van der Waals volume calculation approach.
      * This descriptor estimates molecular volume based on atom contributions, considering bond types
      * and atomic properties, providing insights into molecular size and steric properties.
+     *
+     * @see VABCDescriptor
      */
     VABC;
 
     // Add new descriptor information here!
 
-    /**
-     * EnumMap that maps a descriptor to its number of calculated components
-     */
-    private static final EnumMap<Descriptor, Integer> descriptorToComponentNumberMap = new EnumMap<>(Descriptor.class);
     //<editor-fold desc="Private static final LOGGER">
     /**
-     * Logger of this class
+     * Logger of this class.
      */
     private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());
     //</editor-fold>
     /**
+     * EnumMap that maps a descriptor to its number of calculated components.
+     */
+    private static final EnumMap<Descriptor, Integer> descriptorToComponentNumberMap = new EnumMap<>(Descriptor.class);
+    /**
      * EnumMap that maps a descriptor to an instance of its CDK descriptor class
      */
     private static final EnumMap<Descriptor, IMolecularDescriptor> descriptorToCdkObjectMap = new EnumMap<>(Descriptor.class);
+    /*
+     * Static initializer block to populate the descriptorToComponentNumberMap and descriptorToCdkObjectMap.
+     */
     static {
         try {
             // MOLECULAR_WEIGHT has 1 component
@@ -690,7 +791,7 @@ public enum Descriptor {
             // LARGEST_PI_SYSTEM has 1 component
             descriptorToComponentNumberMap.put(LARGEST_PI_SYSTEM, 1);
             LargestPiSystemDescriptor largestPiSystemDescriptor = new LargestPiSystemDescriptor();
-            largestPiSystemDescriptor.setParameters(new Object[] {false});
+            largestPiSystemDescriptor.setParameters(new Object[] {false}); //do not check aromaticity again
             descriptorToCdkObjectMap.put(LARGEST_PI_SYSTEM, new LargestPiSystemDescriptor());
 
             // SMALL_RING has 4 components
@@ -743,7 +844,7 @@ public enum Descriptor {
 
     //<editor-fold desc="Public static methods">
     /**
-     * Returns all available descriptors
+     * Returns all available descriptors.
      *
      * @return All available descriptors
      */
@@ -753,7 +854,7 @@ public enum Descriptor {
 
     /**
      * Returns specified available descriptors.
-     * Note: If both flags are false, then null is returned. If both flags are true, then all descriptors are returned.
+     * Note: If both flags are false, an empty array is returned. If both flags are true, then all descriptors are returned.
      *
      * @param isQuicklyCalculableDescriptorInclusion True: Quickly calculable descriptors are returned, false: Otherwise.
      * @param isSlowlyCalculableDescriptorInclusion True: Slowly calculable descriptors are returned, false: Otherwise.
@@ -766,7 +867,7 @@ public enum Descriptor {
         if (isQuicklyCalculableDescriptorInclusion && isSlowlyCalculableDescriptorInclusion) {
             return values();
         } else if (!isQuicklyCalculableDescriptorInclusion && !isSlowlyCalculableDescriptorInclusion) {
-            return null;
+            return new Descriptor[0];
         } else if (isQuicklyCalculableDescriptorInclusion) {
             // TODO: Implement after analytical data are evaluated.
             return null;
@@ -778,7 +879,7 @@ public enum Descriptor {
     }
 
     /**
-     * Returns sum of number of calculated components of an array of defined descriptors
+     * Returns sum of number of calculated components of an array of defined descriptors.
      *
      * @param aDescriptors Array of descriptors (IS NOT CHANGED)
      * @return Sum of number of calculated components of array of descriptors
@@ -816,29 +917,32 @@ public enum Descriptor {
         } catch (Exception anException) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.getNumberOfComponents: Number of components could not be evaluated: This should never happen."
+                "Descriptor.getNumberOfComponents: Number of components could not be evaluated: This should never happen.", anException
             );
-            throw new Exception("Descriptor.getNumberOfComponents: An exception occurred: This should never happen.");
+            throw new Exception("Descriptor.getNumberOfComponents: An exception occurred: This should never happen.", anException);
         }
     }
 
     /**
-     * Sets calculated descriptor components in vectors of a aMatrix (that corresponds to anAtomContainerArray)
-     * beginning with aStartIndex by (optional) parallelization of molecules.
+     * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
+     * beginning with aStartIndex by (optional) parallelization of molecules. If parallel computation is used, the atom
+     * containers (molecules) are distributed onto parallel thread, one for each molecule, and they all access shared
+     * descriptor instances.
      * Note: Uses synchronized descriptor calculation methods which slows down the calculation.
      *
      * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
      * @param anAtomContainerArray Array of molecules. Note: anAtomContainerArray[i] corresponds to aMatrix[i] data
-     *                              vector. (IS NOT CHANGED)
+     *                              vector, i.e. the molecules define the rows of the matrix (IS NOT CHANGED)
      * @param aMatrix Matrix of component vectors of molecules. Note: Data vector aMatrix[i] corresponds to molecule
      *               anAtomContainerArray[i]. (MAY BE CHANGED)
-     * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors
+     * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
+     *                    column to start filling with descriptors
      * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
      *                      Can be null if no NaN values should be tracked.
-     * @return True: Operation was successful, false: Operation failed, i.e. at least one component in a descriptor
+     * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      * calculation is NaN
      * @throws IllegalArgumentException Thrown if an argument is illegal
      * @throws Exception Thrown if fatal error occurs (this should never happen)
@@ -924,9 +1028,9 @@ public enum Descriptor {
             } catch (Exception anException) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal."
+                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal.", anException
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal.", anException);
             }
         }
         if (aNanPositions == null) {
@@ -987,7 +1091,7 @@ public enum Descriptor {
         } catch (Exception anException) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: An exception occurred: This should never happen."
+                "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: An exception occurred: This should never happen.", anException
             );
             throw anException;
         }
