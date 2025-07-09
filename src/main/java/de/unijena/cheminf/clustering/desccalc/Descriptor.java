@@ -1067,6 +1067,13 @@ public enum Descriptor {
                                     );
                             } catch (Exception anException) {
                                 tmpIsDescriptorCalculations[i] = false;
+                                Descriptor.LOGGER.log(
+                                        Level.WARNING,
+                                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: One descriptor calculation caused an exception, molecule index: "
+                                                + i
+                                                + ".",
+                                        anException
+                                );
                             }
                         }
                     );
@@ -1077,6 +1084,11 @@ public enum Descriptor {
                     }
                     return true;
                 } catch (Exception anException) {
+                    Descriptor.LOGGER.log(
+                            Level.WARNING,
+                            "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: Global exception occurred in descriptor calculation: ",
+                            anException
+                    );
                     return false;
                 }
             } else {
@@ -1241,6 +1253,13 @@ public enum Descriptor {
                                     );
                             } catch (Exception anException) {
                                 tmpIsDescriptorCalculations[i] = false;
+                                Descriptor.LOGGER.log(
+                                        Level.WARNING,
+                                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: One descriptor calculation caused an exception, molecule index: "
+                                                + i
+                                                + ".",
+                                        anException
+                                );
                             }
                         }
                     );
@@ -1251,6 +1270,11 @@ public enum Descriptor {
                     }
                     return true;
                 } catch (Exception anException) {
+                    Descriptor.LOGGER.log(
+                            Level.WARNING,
+                            "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: Global exception occurred in descriptor calculation: ",
+                            anException
+                    );
                     return false;
                 }
             } else {
@@ -1265,7 +1289,7 @@ public enum Descriptor {
         } catch (Exception anException) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: An exception occurred: This should never happen."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: An exception occurred: This should never happen.", anException
             );
             throw anException;
         }
@@ -1377,9 +1401,9 @@ public enum Descriptor {
             } catch (Exception anException) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aStartIndex is illegal."
+                        "Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aStartIndex is illegal.", anException
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aStartIndex is illegal.");
+                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByDescriptorParallelization: aStartIndex is illegal.", anException);
             }
         }
         if (aNanPositions == null) {
@@ -1415,6 +1439,13 @@ public enum Descriptor {
                                     );
                             } catch (Exception anException) {
                                 tmpIsMoleculeCalculations[i] = false;
+                                Descriptor.LOGGER.log(
+                                        Level.WARNING,
+                                        "Descriptor.setDescriptorsForMoleculesByDescriptorParallelization: One descriptor calculation caused an exception, descriptor index: "
+                                                + i
+                                                + ".",
+                                        anException
+                                );
                             }
                         }
                     );
@@ -1425,6 +1456,11 @@ public enum Descriptor {
                     }
                     return true;
                 } catch (Exception anException) {
+                    Descriptor.LOGGER.log(
+                            Level.WARNING,
+                            "Descriptor.setDescriptorsForMoleculesByDescriptorParallelization: Global exception occurred in descriptor calculation: ",
+                            anException
+                    );
                     return false;
                 }
             } else {
@@ -1439,7 +1475,7 @@ public enum Descriptor {
         } catch (Exception anException) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setDescriptorsForMoleculesByDescriptorParallelization: An exception occurred: This should never happen."
+                    "Descriptor.setDescriptorsForMoleculesByDescriptorParallelization: An exception occurred: This should never happen.", anException
             );
             throw anException;
         }
