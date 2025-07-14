@@ -50,12 +50,12 @@ import java.util.Locale;
  *
  * @author Achim Zielesny
  * @author Jonas Schaub
+ * @author Manuel Schauer
  */
 class DescriptorTest {
-
     //<editor-fold desc="Single descriptor tests">
     /**
-     * Tests method for descriptor MOLECULAR_WEIGHT
+     * Test method for descriptor MOLECULAR_WEIGHT.
      */
     @Test
     public void test_MOLECULAR_WEIGHT() throws Exception {
@@ -129,7 +129,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor WIENER_NUMBER
+     * Tests method for descriptor WIENER_NUMBER.
      */
     @Test
     public void test_WIENER_NUMBER() throws Exception {
@@ -206,7 +206,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor ATOM_COUNT
+     * Tests method for descriptor ATOM_COUNT.
      */
     @Test
     public void test_ATOM_COUNT() throws Exception {
@@ -281,7 +281,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor H_BOND_ACCEPTOR_COUNT
+     * Tests method for descriptor H_BOND_ACCEPTOR_COUNT.
      */
     @Test
     public void test_H_BOND_ACCEPTOR_COUNT() throws Exception {
@@ -381,12 +381,12 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor H_BOND_DONOR_COUNT
+     * Tests method for descriptor H_BOND_DONOR_COUNT.
      */
     @Test
     public void test_H_BOND_DONOR_COUNT() throws Exception {
-        String tmpSmiles1 = "CC(=O)O";
-        String tmpSmiles2 = "Oc1ccccc1";
+        String tmpSmiles1 = "CC(=O)O"; // Acetic acid
+        String tmpSmiles2 = "Oc1ccccc1"; // Phenol
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
@@ -478,11 +478,10 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor TPSA
+     * Tests method for descriptor TPSA.
      */
     @Test
     public void test_TPSA() throws Exception {
-
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         // Preparation of the first molecule
         String tmpSmiles1 = "C=NC(CC#N)N(C)C";
@@ -579,7 +578,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor LARGEST_CHAIN
+     * Tests method for descriptor LARGEST_CHAIN.
      */
     @Test
     public void test_LARGEST_CHAIN() throws Exception {
@@ -588,7 +587,6 @@ class DescriptorTest {
         String tmpSmiles1 = "C=CC=Cc1ccccc1";
         // Preparation of the second molecule
         String tmpSmiles2 = "C=CC=CCc2ccc(Cc1ccncc1C=C)cc2";
-
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
                 Aromaticity.Model.CDK_2x,
@@ -679,7 +677,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor LONGEST_ALIPHATIC_CHAIN
+     * Tests method for descriptor LONGEST_ALIPHATIC_CHAIN.
      */
     @Test
     public void test_LONGEST_ALIPHATIC_CHAIN() throws Exception {
@@ -688,7 +686,6 @@ class DescriptorTest {
         String tmpSmiles1 = "CCCCc1ccccc1";
         // Preparation of the second molecule
         String tmpSmiles2 = "CC(C)(C)c2ccc(OCCCC(=O)Nc1nccs1)cc2";
-
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
                 Aromaticity.Model.CDK_2x,
@@ -779,7 +776,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor MANNHOLD_LOGP
+     * Tests method for descriptor MANNHOLD_LOGP.
      */
     @Test
     public void test_MANNHOLD_LOGP() throws Exception {
@@ -852,7 +849,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor BCUT
+     * Tests method for descriptor BCUT.
      */
     @Test
     public void test_BCUT() throws Exception {
@@ -939,24 +936,20 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor BOND_COUNT_ALL
+     * Tests method for descriptor BOND_COUNT_ALL.
      */
     @Test
     public void test_BOND_COUNT_ALL() throws Exception {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-
         // Preparation of the first molecule
         String tmpSmiles1 = "CCO";
         IAtomContainer tmpMolecule1 = tmpSmilesParser.parseSmiles(tmpSmiles1);
-
         // Preparation of the second molecule
         String tmpSmiles2 = "C=C=C";
         IAtomContainer tmpMolecule2 = tmpSmilesParser.parseSmiles(tmpSmiles2);
-
         // Preparation of the third molecule
         String tmpSmiles3 = "CC#N";
         IAtomContainer tmpMolecule3 = tmpSmilesParser.parseSmiles(tmpSmiles3);
-
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule1, tmpMolecule2, tmpMolecule3};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BOND_COUNT_ALL};
@@ -1029,7 +1022,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor BOND_COUNT_SPECIFIED
+     * Tests method for descriptor BOND_COUNT_SPECIFIED.
      */
     @Test
     public void test_BOND_COUNT_SPECIFIED() throws Exception {
@@ -1108,7 +1101,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor B_POL
+     * Tests method for descriptor B_POL.
      */
     @Test
     public void test_B_POL() throws Exception {
@@ -1180,7 +1173,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor RULE_OF_FIVE
+     * Tests method for descriptor RULE_OF_FIVE.
      */
     @Test
     public void test_RULE_OF_FIVE() throws Exception {
@@ -1269,7 +1262,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor AROMATIC_ATOMS_COUNT
+     * Tests method for descriptor AROMATIC_ATOMS_COUNT.
      */
     @Test
     public void test_AROMATIC_ATOMS_COUNT() throws Exception {
@@ -1359,7 +1352,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor AROMATIC_BONDS_COUNT with benzene
+     * Tests method for descriptor AROMATIC_BONDS_COUNT with benzene.
      */
     @Test
     public void test_AROMATIC_BONDS_COUNT() throws Exception {
@@ -1448,7 +1441,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor ROTATABLE_BONDS_COUNT
+     * Tests method for descriptor ROTATABLE_BONDS_COUNT.
      */
     @Test
     public void test_ROTATABLE_BONDS_COUNT() throws Exception {
@@ -1521,7 +1514,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor FMF
+     * Tests method for descriptor FMF.
      */
     @Test
     public void test_FMF() throws Exception {
@@ -1593,7 +1586,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor FRACTIONAL_CSP3
+     * Tests method for descriptor FRACTIONAL_CSP3.
      */
     @Test
     public void test_FRACTIONAL_CSP3() throws Exception {
@@ -1665,7 +1658,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor HYBRIDIZATION_RATIO
+     * Tests method for descriptor HYBRIDIZATION_RATIO.
      */
     @Test
     public void test_HYBRIDIZATION_RATIO() throws Exception {
@@ -1738,7 +1731,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor KAPPA_SHAPE_INDICES
+     * Tests method for descriptor KAPPA_SHAPE_INDICES.
      */
     @Test
     public void test_KAPPA_SHAPE_INDICES() throws Exception {
@@ -1816,7 +1809,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor PETITJEAN_NUMBER
+     * Tests method for descriptor PETITJEAN_NUMBER.
      */
     @Test
     public void test_PETITJEAN_NUMBER() throws Exception {
@@ -1888,7 +1881,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor SPIRO_ATOM_COUNT
+     * Tests method for descriptor SPIRO_ATOM_COUNT.
      */
     @Test
     public void test_SPIRO_ATOM_COUNT() throws Exception {
@@ -1961,7 +1954,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor V_ADJ_MAT
+     * Tests method for descriptor V_ADJ_MAT.
      */
     @Test
     public void test_V_ADJ_MAT() throws Exception {
@@ -2033,7 +2026,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor WEIGHTED_PATH
+     * Tests method for descriptor WEIGHTED_PATH.
      */
     @Test
     public void test_WEIGHTED_PATH() throws Exception {
@@ -2117,7 +2110,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor ZAGREB_INDEX
+     * Tests method for descriptor ZAGREB_INDEX.
      */
     @Test
     public void test_ZAGREB_INDEX() throws Exception {
@@ -2189,7 +2182,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor CARBON_TYPES
+     * Tests method for descriptor CARBON_TYPES.
      */
     @Test
     public void test_CARBON_TYPES() throws Exception {
@@ -2286,7 +2279,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor A_LOG_P
+     * Tests method for descriptor A_LOG_P.
      */
     @Test
     public void test_A_LOG_P() throws Exception {
@@ -2365,7 +2358,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor X_LOG_P
+     * Tests method for descriptor X_LOG_P.
      */
     @Test
     public void test_X_LOG_P() throws Exception {
@@ -2453,7 +2446,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor JP_LOG_P
+     * Tests method for descriptor JP_LOG_P.
      */
     @Test
     public void test_JP_LOG_P() throws Exception {
@@ -2525,7 +2518,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor A_POL
+     * Tests method for descriptor A_POL.
      */
     @Test
     public void test_A_POL() throws Exception {
@@ -2597,7 +2590,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor AUTOCORRELATION_CHARGE
+     * Tests method for descriptor AUTOCORRELATION_CHARGE.
      */
     @Test
     public void test_AUTOCORRELATION_CHARGE() throws Exception {
@@ -2680,7 +2673,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor AUTOCORRELATION_MASS
+     * Tests method for descriptor AUTOCORRELATION_MASS.
      */
     @Test
     public void test_AUTOCORRELATION_MASS() throws Exception {
@@ -2763,9 +2756,9 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor AUTOCORRELATION_POLARIZABILITY
-     * No validated result because the descriptor itself is not validated in the CDK
-     * Result can be printed to see if descriptor calculates values
+     * Tests method for descriptor AUTOCORRELATION_POLARIZABILITY.
+     * No validated result because the descriptor itself is not validated in the CDK.
+     * Result can be printed to see if descriptor calculates values.
      */
     @Test
     public void test_AUTOCORRELATION_POLARIZABILITY() throws Exception {
@@ -2839,7 +2832,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor FRAGMENT_COMPLEXITY
+     * Tests method for descriptor FRAGMENT_COMPLEXITY.
      */
     @Test
     public void test_FRAGMENT_COMPLEXITY() throws Exception {
@@ -2911,7 +2904,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor CHI_CHAIN
+     * Tests method for descriptor CHI_CHAIN.
      */
     @Test
     public void test_CHI_CHAIN() throws Exception {
@@ -3004,7 +2997,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor CHI_CLUSTER
+     * Tests method for descriptor CHI_CLUSTER.
      */
     @Test
     public void test_CHI_CLUSTER() throws Exception {
@@ -3097,7 +3090,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor CHI_PATH_CLUSTER
+     * Tests method for descriptor CHI_PATH_CLUSTER.
      */
     @Test
     public void test_CHI_PATH_CLUSTER() throws Exception {
@@ -3184,7 +3177,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor CHI_PATH
+     * Tests method for descriptor CHI_PATH.
      */
     @Test
     public void test_CHI_PATH() throws Exception {
@@ -3283,8 +3276,8 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor FRACTIONAL_PSA
-     * Expected result is calculated by TPSADescriptor / MolecularWeightDescriptor
+     * Tests method for descriptor FRACTIONAL_PSA.
+     * Expected results were calculated by TPSADescriptor / MolecularWeightDescriptor.
      */
     @Test
     public void test_FRACTIONAL_PSA() throws Exception {
@@ -3357,7 +3350,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor LARGEST_PI_SYSTEM
+     * Tests method for descriptor LARGEST_PI_SYSTEM.
      */
     @Test
     public void test_LARGEST_PI_SYSTEM() throws Exception {
@@ -3429,7 +3422,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor SMALL_RING
+     * Tests method for descriptor SMALL_RING.
      */
     @Test
     public void test_SMALL_RING() throws Exception {
@@ -3530,7 +3523,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor BASIC_GROUP_COUNT
+     * Tests method for descriptor BASIC_GROUP_COUNT.
      */
     @Test
     public void test_BASIC_GROUP_COUNT() throws Exception {
@@ -3601,7 +3594,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor ACIDIC_GROUP_COUNT
+     * Tests method for descriptor ACIDIC_GROUP_COUNT.
      */
     @Test
     public void test_ACIDIC_GROUP_COUNT() throws Exception {
@@ -3672,7 +3665,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor AMINO_ACID_COUNT
+     * Tests method for descriptor AMINO_ACID_COUNT.
      */
     @Test
     public void test_AMINO_ACID_COUNT() throws Exception {
@@ -3747,7 +3740,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor KIER_HALL_SMARTS
+     * Tests method for descriptor KIER_HALL_SMARTS.
      */
     @Test
     public void test_KIER_HALL_SMARTS() throws Exception {
@@ -3830,7 +3823,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor ECCENTRIC_CONNECTIVITY_INDEX
+     * Tests method for descriptor ECCENTRIC_CONNECTIVITY_INDEX.
      */
     @Test
     public void test_ECCENTRIC_CONNECTIVITY_INDEX() throws Exception {
@@ -3901,7 +3894,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor MDE
+     * Tests method for descriptor MDE.
      */
     @Test
     public void test_MDE() throws Exception {
@@ -3979,7 +3972,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor MDE
+     * Tests method for descriptor VABC.
      */
     @Test
     public void test_VABC() throws Exception {
@@ -4056,10 +4049,10 @@ class DescriptorTest {
 
     //<editor-fold desc="Combined descriptor tests">
     /**
-     * Tests combined descriptors
+     * Tests combined descriptors.
      */
     @Test
-    public void test_CombinedDescriptors() throws Exception {
+    public void test_CombinedDescriptorsSequential() throws Exception {
         // Acetic acid
         String tmpSmiles = "CC(=O)O";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
@@ -4092,7 +4085,6 @@ class DescriptorTest {
                                     Descriptor.ATOM_COUNT,
                                     Descriptor.H_BOND_ACCEPTOR_COUNT,
                                     Descriptor.H_BOND_DONOR_COUNT
-
                             };
             boolean tmpIsParallelCalculation = false;
 
@@ -4112,12 +4104,12 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[0][1]));
-                Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[0][2]));
-                Assertions.assertEquals("8.00", tmpFormat.format(tmpMatrix[0][3]));
-                Assertions.assertEquals("2.00", tmpFormat.format(tmpMatrix[0][4]));
-                Assertions.assertEquals("1.00", tmpFormat.format(tmpMatrix[0][5]));
+                Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0])); //molecular weight
+                Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[0][1])); //wiener path number
+                Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[0][2])); //wiener polarity number
+                Assertions.assertEquals("8.00", tmpFormat.format(tmpMatrix[0][3])); //atom count
+                Assertions.assertEquals("2.00", tmpFormat.format(tmpMatrix[0][4])); //H-bond acceptor count
+                Assertions.assertEquals("1.00", tmpFormat.format(tmpMatrix[0][5])); //H-bond donor count
 
                 tmpMatrix = new float[1][];
                 tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
@@ -4167,7 +4159,7 @@ class DescriptorTest {
 
     //<editor-fold desc="Tests with all implemented descriptors">
     /**
-     * Tests parallelization
+     * Tests parallelization.
      */
     @Test
     public void test_Parallelization() throws Exception {
@@ -4311,7 +4303,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests integrity
+     * Tests integrity.
      */
     @Test
     public void test_Integrity() throws Exception {
@@ -4392,9 +4384,8 @@ class DescriptorTest {
     //</editor-fold>
 
     //<editor-fold desc="Tests preparation Methods">
-
     /**
-     * Tests createMoleculeWithExplicitHydrogens
+     * Tests createMoleculeWithExplicitHydrogens.
      */
     @Test
     public void testCreateMoleculeWithExplicitHydrogens() throws Exception {
@@ -4446,7 +4437,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests the copyMolecule method
+     * Tests the copyMolecule method.
      */
     @Test
     public void testCopyMolecule() throws Exception {
@@ -4481,7 +4472,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests setAromaticity
+     * Tests setAromaticity.
      */
     @Test
     public void testSetAromaticity() throws Exception {
@@ -4509,12 +4500,7 @@ class DescriptorTest {
             AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(testMolecule);
 
             // Reset aromaticity flags
-            for (IAtom atom : testMolecule.atoms()) {
-                atom.setIsAromatic(false);
-            }
-            for (IBond bond : testMolecule.bonds()) {
-                bond.setIsAromatic(false);
-            }
+            Aromaticity.clear(testMolecule);
 
             // Set aromaticity using the current model
             // Note: This test still uses the old Descriptor.setAromaticity which takes ElectronDonation
@@ -4546,7 +4532,5 @@ class DescriptorTest {
                     "Model " + modelName + " should identify aromatic bonds");
         }
     }
-
     //</editor-fold>
-
 }
