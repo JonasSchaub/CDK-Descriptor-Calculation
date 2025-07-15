@@ -133,9 +133,15 @@ public enum Descriptor {
      */
     ATOM_COUNT,
     /**
+     * Atom count organic subset, counts the number of all organic atoms separately in the given molecule.
+     *
+     * @see AtomCountDescriptor
+     */
+    ATOM_COUNT_ORGANIC_SUBSET,
+    /**
      * Total bond count, counts the number of all bonds in a molecule, neglecting the order.
      * Double and triple bonds are counted as one bond.
-     * Bonds to hydrogen atoms are not counted.
+     * Bonds to hydrogen atoms are counted.
      *
      * @see BondCountDescriptor
      */
@@ -222,14 +228,6 @@ public enum Descriptor {
      * @see LongestAliphaticChainDescriptor
      */
     LONGEST_ALIPHATIC_CHAIN,
-    /**
-     * Mannhold LogP descriptor, calculates the octanol-water partition coefficient (logP) using the Mannhold method.
-     * LogP describes the hydrophilicity or lipophilicity of a compound and is crucial for
-     * predicting solubility, permeability, and bioavailability.
-     *
-     * @see MannholdLogPDescriptor
-     */
-    MANNHOLD_LOGP,
     /**
      * BCUT descriptor, calculates Burden matrix modified eigenvalues with different weighting schemes. Returns 6 values:<br>
      * 1. BCUTw-1l, BCUTw-2l ... - nhigh lowest atom weighted BCUTS<br>
@@ -380,6 +378,14 @@ public enum Descriptor {
      * @see JPlogPDescriptor
      */
     JP_LOG_P,
+    /**
+     * Mannhold LogP descriptor, calculates the octanol-water partition coefficient (logP) using the Mannhold method.
+     * LogP describes the hydrophilicity or lipophilicity of a compound and is crucial for
+     * predicting solubility, permeability, and bioavailability.
+     *
+     * @see MannholdLogPDescriptor
+     */
+    MANNHOLD_LOGP,
     //</editor-fold>
     /**
      * APol descriptor, calculates the sum of the atomic polarizabilities (including implicit hydrogens).
@@ -640,6 +646,10 @@ public enum Descriptor {
             // ATOM_COUNT has 1 component
             descriptorToComponentNumberMap.put(ATOM_COUNT, 1);
             descriptorToCdkObjectMap.put(ATOM_COUNT, new AtomCountDescriptor());
+
+            // ATOM_COUNT_ORGANIC_SUBSET has 1 component
+            descriptorToComponentNumberMap.put(ATOM_COUNT_ORGANIC_SUBSET, 10);
+            descriptorToCdkObjectMap.put(ATOM_COUNT_ORGANIC_SUBSET, new AtomCountDescriptor());
 
             // H_BOND_ACCEPTOR_COUNT has 1 component
             descriptorToComponentNumberMap.put(H_BOND_ACCEPTOR_COUNT, 1);
@@ -1647,6 +1657,9 @@ public enum Descriptor {
                 case ATOM_COUNT:
                     setAtomCount(anAtomContainer, aVector, aStartIndex);
                     break;
+                case ATOM_COUNT_ORGANIC_SUBSET:
+                    setAtomCountOrganicSubset(anAtomContainer, aVector, aStartIndex);
+                    break;
                 case H_BOND_ACCEPTOR_COUNT:
                     setHBondAcceptorCount(anAtomContainer, aVector, aStartIndex);
                     break;
@@ -1852,6 +1865,39 @@ public enum Descriptor {
                     break;
                 case ATOM_COUNT:
                     aVector[aStartIndex] = (float) ((IntegerResult) (new AtomCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_ORGANIC_SUBSET:
+                    AtomCountDescriptor atomCountDesc = new AtomCountDescriptor();
+                    //set parameter to count carbon atoms
+                    atomCountDesc.setParameters(new Object[]{"C"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count hydrogen atoms
+                    atomCountDesc.setParameters(new Object[]{"H"});
+                    aVector[aStartIndex + 1] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count nitrogen atoms
+                    atomCountDesc.setParameters(new Object[]{"N"});
+                    aVector[aStartIndex + 2] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count oxygen atoms
+                    atomCountDesc.setParameters(new Object[]{"O"});
+                    aVector[aStartIndex + 3] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count sulfur atoms
+                    atomCountDesc.setParameters(new Object[]{"S"});
+                    aVector[aStartIndex + 4] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count phosphorus atoms
+                    atomCountDesc.setParameters(new Object[]{"P"});
+                    aVector[aStartIndex + 5] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count fluorine atoms
+                    atomCountDesc.setParameters(new Object[]{"F"});
+                    aVector[aStartIndex + 6] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count bromine atoms
+                    atomCountDesc.setParameters(new Object[]{"Br"});
+                    aVector[aStartIndex + 7] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count chlorine atoms
+                    atomCountDesc.setParameters(new Object[]{"Cl"});
+                    aVector[aStartIndex + 8] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count iodine atoms
+                    atomCountDesc.setParameters(new Object[]{"I"});
+                    aVector[aStartIndex + 9] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case H_BOND_ACCEPTOR_COUNT:
                     aVector[aStartIndex] = (float) ((IntegerResult) (new HBondAcceptorCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
@@ -2129,6 +2175,39 @@ public enum Descriptor {
                     break;
                 case ATOM_COUNT:
                     aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_ORGANIC_SUBSET:
+                    AtomCountDescriptor atomCountDesc = (AtomCountDescriptor) descriptorToCdkObjectMap.get(ATOM_COUNT_ORGANIC_SUBSET);
+                    //set parameter to count carbon atoms
+                    atomCountDesc.setParameters(new Object[]{"C"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count hydrogen atoms
+                    atomCountDesc.setParameters(new Object[]{"H"});
+                    aVector[aStartIndex + 1] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count nitrogen atoms
+                    atomCountDesc.setParameters(new Object[]{"N"});
+                    aVector[aStartIndex + 2] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count oxygen atoms
+                    atomCountDesc.setParameters(new Object[]{"O"});
+                    aVector[aStartIndex + 3] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count sulfur atoms
+                    atomCountDesc.setParameters(new Object[]{"S"});
+                    aVector[aStartIndex + 4] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count phosphorus atoms
+                    atomCountDesc.setParameters(new Object[]{"P"});
+                    aVector[aStartIndex + 5] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count fluorine atoms
+                    atomCountDesc.setParameters(new Object[]{"F"});
+                    aVector[aStartIndex + 6] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count bromine atoms
+                    atomCountDesc.setParameters(new Object[]{"Br"});
+                    aVector[aStartIndex + 7] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count chlorine atoms
+                    atomCountDesc.setParameters(new Object[]{"Cl"});
+                    aVector[aStartIndex + 8] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    //set parameter to count iodine atoms
+                    atomCountDesc.setParameters(new Object[]{"I"});
+                    aVector[aStartIndex + 9] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case H_BOND_ACCEPTOR_COUNT:
                     aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(H_BOND_ACCEPTOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
@@ -2439,6 +2518,66 @@ public enum Descriptor {
             int aStartIndex
     ) {
         aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for organic subset (C, H, N, O, S, P, F, Br, Cl, I).
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAtomCountOrganicSubset(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        try {
+            AtomCountDescriptor atomCountDesc = (AtomCountDescriptor) descriptorToCdkObjectMap.get(ATOM_COUNT_ORGANIC_SUBSET);
+            //set parameter to count carbon atoms
+            atomCountDesc.setParameters(new Object[]{"C"});
+            aVector[aStartIndex] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+            //set parameter to count hydrogen atoms
+            atomCountDesc.setParameters(new Object[]{"H"});
+            aVector[aStartIndex + 1] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+            //set parameter to count nitrogen atoms
+            atomCountDesc.setParameters(new Object[]{"N"});
+            aVector[aStartIndex + 2] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+            //set parameter to count oxygen atoms
+            atomCountDesc.setParameters(new Object[]{"O"});
+            aVector[aStartIndex + 3] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+            //set parameter to count sulfur atoms
+            atomCountDesc.setParameters(new Object[]{"S"});
+            aVector[aStartIndex + 4] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+            //set parameter to count phosphorus atoms
+            atomCountDesc.setParameters(new Object[]{"P"});
+            aVector[aStartIndex + 5] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+            //set parameter to count fluorine atoms
+            atomCountDesc.setParameters(new Object[]{"F"});
+            aVector[aStartIndex + 6] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+            //set parameter to count bromine atoms
+            atomCountDesc.setParameters(new Object[]{"Br"});
+            aVector[aStartIndex + 7] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+            //set parameter to count chlorine atoms
+            atomCountDesc.setParameters(new Object[]{"Cl"});
+            aVector[aStartIndex + 8] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+            //set parameter to count iodine atoms
+            atomCountDesc.setParameters(new Object[]{"I"});
+            aVector[aStartIndex + 9] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+        } catch (Exception e) {
+            for (int i = 0; i < 10; i++) {
+                aVector[aStartIndex + i] = Float.NaN;
+            }
+            Descriptor.LOGGER.log(
+                    Level.WARNING,
+                    "Descriptor.setAtomCountOrganicSubset: An exception occurred while calculating atom counts for molecule index "
+                            + aStartIndex
+                            + ".",
+                    e
+            );
+        }
     }
 
     /**
@@ -3417,12 +3556,14 @@ public enum Descriptor {
     public static IAtomContainer createMoleculeWithExplicitHydrogens(
             IAtomContainer aMolecule
     ) throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
+        //<editor-fold desc="Checks">
         if (aMolecule == null) {
             throw new NullPointerException("Input molecule must not be null");
         }
         if (aMolecule.isEmpty()) {
             throw new IllegalArgumentException("Input molecule must not be empty");
         }
+        //</editor-fold>
         try {
             // Create a deep copy of the molecule first
             IAtomContainer tmpMoleculeCopy = copyMolecule(aMolecule);
@@ -3448,6 +3589,7 @@ public enum Descriptor {
             IAtomContainer aMolecule,
             ElectronDonation anAromaticityModel
     ) throws NullPointerException, IllegalArgumentException, Exception {
+        //<editor-fold desc="Checks">
         if (aMolecule == null) {
             throw new NullPointerException("Input molecule must not be null");
         }
@@ -3457,6 +3599,7 @@ public enum Descriptor {
         if (anAromaticityModel == null) {
             throw new NullPointerException("Aromaticity model must not be null");
         }
+        //</editor-fold>
         try {
             AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(aMolecule);
             // Clears all aromatic flags before applying the aromaticity model.

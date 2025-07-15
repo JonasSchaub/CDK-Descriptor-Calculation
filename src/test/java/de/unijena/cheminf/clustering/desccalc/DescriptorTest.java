@@ -281,6 +281,108 @@ class DescriptorTest {
     }
 
     /**
+     * Tests method for descriptor ATOM_COUNT_ORGANIC_SUBSET.
+     */
+    @Test
+    public void test_ATOM_COUNT_ORGANIC_SUBSET() throws Exception {
+        String tmpSmiles = "CC1=CC2=C(C=C1C)N(C=N2)C3C(C(C(O3)CO)OP(=O)([O-])OC(C)CNC(=O)CCC4(C(C5C6(C(C(C(=N6)C(=C7C(C(C(=N7)C=C8C(C(C(=N8)C(=C4[N-]5)C)CCC(=O)N)(C)C)CCC(=O)N)(C)CC(=O)N)C)CCC(=O)N)(C)CC(=O)N)C)CC(=O)N)C)O.[Co+3]"; // Cobalamin
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ATOM_COUNT_ORGANIC_SUBSET};
+        boolean tmpIsParallelCalculation = false;
+
+        try {
+            Assertions.assertEquals(10, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[][]
+                    {
+                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
+                    };
+            List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+
+            // Expected values for the organic subset atoms in this complex molecule
+            Assertions.assertEquals(62, tmpMatrix[0][0]); // C count
+            Assertions.assertEquals(88, tmpMatrix[0][1]); // H count
+            Assertions.assertEquals(13, tmpMatrix[0][2]); // N count
+            Assertions.assertEquals(14, tmpMatrix[0][3]);  // O count
+            Assertions.assertEquals(0, tmpMatrix[0][4]);  // S count
+            Assertions.assertEquals(1, tmpMatrix[0][5]);  // P count
+            Assertions.assertEquals(0, tmpMatrix[0][6]);  // F count
+            Assertions.assertEquals(0, tmpMatrix[0][7]);  // Br count
+            Assertions.assertEquals(0, tmpMatrix[0][8]);  // Cl count
+            Assertions.assertEquals(0, tmpMatrix[0][9]);  // I count
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
+                    };
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+            Assertions.assertEquals(62, tmpMatrix[0][0]); // C count
+            Assertions.assertEquals(88, tmpMatrix[0][1]); // H count
+            Assertions.assertEquals(13, tmpMatrix[0][2]); // N count
+            Assertions.assertEquals(14, tmpMatrix[0][3]);  // O count
+            Assertions.assertEquals(0, tmpMatrix[0][4]);  // S count
+            Assertions.assertEquals(1, tmpMatrix[0][5]);  // P count
+            Assertions.assertEquals(0, tmpMatrix[0][6]);  // F count
+            Assertions.assertEquals(0, tmpMatrix[0][7]);  // Br count
+            Assertions.assertEquals(0, tmpMatrix[0][8]);  // Cl count
+            Assertions.assertEquals(0, tmpMatrix[0][9]);  // I count
+
+            tmpMatrix = new float[][]
+                    {
+                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f,}
+                    };
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+            Assertions.assertEquals(62, tmpMatrix[0][0]); // C count
+            Assertions.assertEquals(88, tmpMatrix[0][1]); // H count
+            Assertions.assertEquals(13, tmpMatrix[0][2]); // N count
+            Assertions.assertEquals(14, tmpMatrix[0][3]);  // O count
+            Assertions.assertEquals(0, tmpMatrix[0][4]);  // S count
+            Assertions.assertEquals(1, tmpMatrix[0][5]);  // P count
+            Assertions.assertEquals(0, tmpMatrix[0][6]);  // F count
+            Assertions.assertEquals(0, tmpMatrix[0][7]);  // Br count
+            Assertions.assertEquals(0, tmpMatrix[0][8]);  // Cl count
+            Assertions.assertEquals(0, tmpMatrix[0][9]);  // I count
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
+
+
+
+    /**
      * Tests method for descriptor H_BOND_ACCEPTOR_COUNT.
      */
     @Test
