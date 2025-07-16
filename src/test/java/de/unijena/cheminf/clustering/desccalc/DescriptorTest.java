@@ -3771,10 +3771,14 @@ class DescriptorTest {
      */
     @Test
     public void test_AMINO_ACID_COUNT() throws Exception {
-        String tmpSmiles = "N[C@@]([H])([C@]([H])(O)C)C(=O)N[C@@]([H])([C@]([H])(O)C)C(=O)O"; // protein TT
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+        // Preparation of the first molecule
+        String tmpSmiles1 = "N[C@@]([H])([C@]([H])(O)C)C(=O)N[C@@]([H])([C@]([H])(O)C)C(=O)O"; //protein TT
+        IAtomContainer tmpMolecule1 = tmpSmilesParser.parseSmiles(tmpSmiles1);
+        // Preparation of the second molecule
+        String tmpSmiles2 = "C(C(=O)NCC(=O)O)N"; // Glycylglycine
+        IAtomContainer tmpMolecule2 = tmpSmilesParser.parseSmiles(tmpSmiles2);
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule1, tmpMolecule2};
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AMINO_ACID_COUNT};
         boolean tmpIsParallelCalculation = false;
@@ -3785,6 +3789,7 @@ class DescriptorTest {
 
             float[][] tmpMatrix = new float[][]
                     {
+                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f},
                             {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
@@ -3800,9 +3805,11 @@ class DescriptorTest {
             );
             Assertions.assertEquals(2, tmpMatrix[0][8]);
             Assertions.assertEquals(2, tmpMatrix[0][16]);
+            Assertions.assertEquals(2, tmpMatrix[1][8]);
 
             tmpMatrix = new float[][]
                     {
+                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f},
                             {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
                     };
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
@@ -3818,9 +3825,11 @@ class DescriptorTest {
             );
             Assertions.assertEquals(2, tmpMatrix[0][8]);
             Assertions.assertEquals(2, tmpMatrix[0][16]);
+            Assertions.assertEquals(2, tmpMatrix[1][8]);
 
             tmpMatrix = new float[][]
                     {
+                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f},
                             {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
                     };
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
@@ -3836,6 +3845,8 @@ class DescriptorTest {
             );
             Assertions.assertEquals(2, tmpMatrix[0][8]);
             Assertions.assertEquals(2, tmpMatrix[0][16]);
+            Assertions.assertEquals(2, tmpMatrix[1][8]);
+
         } catch (Exception anException) {
             Assertions.fail();
         }

@@ -647,7 +647,7 @@ public enum Descriptor {
             descriptorToComponentNumberMap.put(ATOM_COUNT, 1);
             descriptorToCdkObjectMap.put(ATOM_COUNT, new AtomCountDescriptor());
 
-            // ATOM_COUNT_ORGANIC_SUBSET has 1 component
+            // ATOM_COUNT_ORGANIC_SUBSET has 10 components
             descriptorToComponentNumberMap.put(ATOM_COUNT_ORGANIC_SUBSET, 10);
             descriptorToCdkObjectMap.put(ATOM_COUNT_ORGANIC_SUBSET, new AtomCountDescriptor());
 
