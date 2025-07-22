@@ -115,7 +115,7 @@ public enum Descriptor {
      *
      * @see WeightDescriptor
      */
-    MOLECULAR_WEIGHT,
+    MOLECULAR_WEIGHT(true, true),
     /**
      * Wiener number, returns Wiener path number and Wiener polarity number.
      * Path number: sum of the distances between any two atoms in the molecule.<br>
@@ -124,20 +124,20 @@ public enum Descriptor {
      *
      * @see WienerNumbersDescriptor
      */
-    WIENER_NUMBER,
+    WIENER_NUMBER(true, true),
     //<editor-fold desc="Basic Bond and Count descriptors">
     /**
      * Atom count, counts the number of all atoms in the given molecule.
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT,
+    ATOM_COUNT(true, true),
     /**
      * Atom count organic subset, counts the number of all organic atoms separately in the given molecule.
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT_ORGANIC_SUBSET,
+    ATOM_COUNT_ORGANIC_SUBSET(true, true),
     /**
      * Total bond count, counts the number of all bonds in a molecule, neglecting the order.
      * Double and triple bonds are counted as one bond.
@@ -145,7 +145,7 @@ public enum Descriptor {
      *
      * @see BondCountDescriptor
      */
-    BOND_COUNT_ALL,
+    BOND_COUNT_ALL(true, true),
     /**
      * Bond count specified, counts the number of bonds in a molecule with specified bond orders.
      * Returns an array with counts for single, double and triple bonds.
@@ -154,7 +154,7 @@ public enum Descriptor {
      *
      * @see BondCountDescriptor
      */
-    BOND_COUNT_SPECIFIED,
+    BOND_COUNT_SPECIFIED(true, true),
     /**
      * H bond acceptor count, counts hydrogen bond acceptors based on a simplified PHACIR scheme.
      * It includes: Oxygen atoms with formal charge ≤ 0 (excluding: Aromatic ether oxygens and oxygens adjacent to nitrogen)
@@ -162,28 +162,28 @@ public enum Descriptor {
      *
      * @see HBondAcceptorCountDescriptor
      */
-    H_BOND_ACCEPTOR_COUNT,
+    H_BOND_ACCEPTOR_COUNT(true, true),
     /**
      * H bond donor count, counts hydrogen bond donors based on a simplified PHACIR classification.
      * It includes: OH groups where the oxygen has a formal charge ≥ 0 and NH groups where the nitrogen has a formal charge ≥ 0.
      *
      * @see HBondDonorCountDescriptor
      */
-    H_BOND_DONOR_COUNT,
+    H_BOND_DONOR_COUNT(true, true),
     /**
      * Aromatic atoms count, counts the number of aromatic atoms in a molecule.
      * Note: Requires that aromatic atoms in the molecule have already been detected and marked.
      *
      * @see AromaticAtomsCountDescriptor
      */
-    AROMATIC_ATOMS_COUNT,
+    AROMATIC_ATOMS_COUNT(true, true),
     /**
      * Aromatic bonds count, counts the number of aromatic bonds in a molecule.
      * Note: Requires that aromatic bonds in the molecule have already been detected and marked.
      *
      * @see AromaticBondsCountDescriptor
      */
-    AROMATIC_BONDS_COUNT,
+    AROMATIC_BONDS_COUNT(true, true),
     /**
      * Rotatable bonds count, counts the number of rotatable bonds in a molecule.
      * A rotatable bond is defined as any single non-ring bond, where atoms on both sides
@@ -191,19 +191,19 @@ public enum Descriptor {
      *
      * @see RotatableBondsCountDescriptor
      */
-    ROTATABLE_BONDS_COUNT,
+    ROTATABLE_BONDS_COUNT(true, true),
     /**
      * Basic group count, returns the number of basic groups in a molecule.
      *
      * @see BasicGroupCountDescriptor
      */
-    BASIC_GROUP_COUNT,
+    BASIC_GROUP_COUNT(true, true),
     /**
      * Acidic group count, returns the number of acidic groups in a molecule.
      *
      * @see AcidicGroupCountDescriptor
      */
-    ACIDIC_GROUP_COUNT,
+    ACIDIC_GROUP_COUNT(true, true),
     //</editor-fold>
     /**
      * TPSA descriptor, calculates the topological polar surface area (TPSA) of a molecule.
@@ -212,14 +212,14 @@ public enum Descriptor {
      *
      * @see TPSADescriptor
      */
-    TPSA,
+    TPSA(true, true),
     /**
      * Largest chain descriptor, calculates the number of atoms in the longest chain in the molecule.
      * This is a simple topological descriptor that provides a measure of molecular linearity.
      *
      * @see LargestChainDescriptor
      */
-    LARGEST_CHAIN,
+    LARGEST_CHAIN(true, true),
     /**
      * Longest aliphatic chain descriptor, calculates the number of atoms in the longest aliphatic chain.
      * This descriptor provides information about the maximum linear extent of non-aromatic
@@ -227,7 +227,7 @@ public enum Descriptor {
      *
      * @see LongestAliphaticChainDescriptor
      */
-    LONGEST_ALIPHATIC_CHAIN,
+    LONGEST_ALIPHATIC_CHAIN(true, true),
     /**
      * BCUT descriptor, calculates Burden matrix modified eigenvalues with different weighting schemes. Returns 6 values:<br>
      * 1. BCUTw-1l, BCUTw-2l ... - nhigh lowest atom weighted BCUTS<br>
@@ -240,7 +240,7 @@ public enum Descriptor {
      *
      * @see BCUTDescriptor
      */
-    BCUT,
+    BCUT(true, false),
     /**
      * Bond polarizability descriptor.
      * The BPolDescriptor calculates the bond polarizability of a molecule.
@@ -250,14 +250,14 @@ public enum Descriptor {
      *
      * @see BPolDescriptor
      */
-    B_POL,
+    B_POL(true, true),
     /**
      * Rule of five descriptor, calculates the number of failures of Lipinski's Rule of Five.
      * The descriptor returns the number of violations (0-4).
      *
      * @see RuleOfFiveDescriptor
      */
-    RULE_OF_FIVE,
+    RULE_OF_FIVE(true, true),
     /**
      * FMF (Framework Match Fraction) descriptor, calculates the ratio of heavy atoms in
      * the framework to the total number of heavy atoms in the molecule.
@@ -266,7 +266,7 @@ public enum Descriptor {
      *
      * @see FMFDescriptor
      */
-    FMF,
+    FMF(true, true),
     /**
      * Fractional C SP3 descriptor, characterizes the non-flatness of a molecule by calculating
      * the fraction of sp3 hybridized carbon atoms over the total carbon count.
@@ -275,7 +275,7 @@ public enum Descriptor {
      *
      * @see FractionalCSP3Descriptor
      */
-    FRACTIONAL_CSP3,
+    FRACTIONAL_CSP3(true, true),
     /**
      * Hybridization ratio descriptor, calculates the ratio of sp3 carbons to sp2 carbons.
      * This provides valuable information about the three-dimensionality and flatness
@@ -284,7 +284,7 @@ public enum Descriptor {
      *
      * @see HybridizationRatioDescriptor
      */
-    HYBRIDIZATION_RATIO,
+    HYBRIDIZATION_RATIO(true, true),
     /**
      * Kappa shape indices descriptor, calculates Kier and Hall kappa molecular shape indices.
      * These indices compare the molecular graph with minimal and maximal molecular graphs. Returns 3 values:<br>
@@ -295,7 +295,7 @@ public enum Descriptor {
      *
      * @see KappaShapeIndicesDescriptor
      */
-    KAPPA_SHAPE_INDICES,
+    KAPPA_SHAPE_INDICES(true, true),
     /**
      * Petitjean number descriptor, calculates an index characterizing molecular graph topology.
      * This topological descriptor is based on the calculation of the graph eccentricity
@@ -303,13 +303,13 @@ public enum Descriptor {
      *
      * @see PetitjeanNumberDescriptor
      */
-    PETITJEAN_NUMBER,
+    PETITJEAN_NUMBER(true, true),
     /**
      * Spiro atom count descriptor, calculates the number of spiro atoms in a molecule.
      *
      * @see SpiroAtomCountDescriptor
      */
-    SPIRO_ATOM_COUNT,
+    SPIRO_ATOM_COUNT(true, true),
     /**
      * VAdjMa descriptor, calculates the Vertex adjacency information (magnitude).
      * This is calculated as 1 + log2 m, where m is the number of heavy-heavy bonds.
@@ -318,7 +318,7 @@ public enum Descriptor {
      *
      * @see VAdjMaDescriptor
      */
-    V_ADJ_MAT,
+    V_ADJ_MAT(true, true),
     /**
      * Weighted path descriptor, evaluates the weighted path descriptors for a molecule.
      * Returns 5 values:<br>
@@ -330,7 +330,7 @@ public enum Descriptor {
      *
      * @see WeightedPathDescriptor
      */
-    WEIGHTED_PATH,
+    WEIGHTED_PATH(true, true),
     /**
      * Zagreb index descriptor, calculates the Zagreb index of a molecule.
      * The Zagreb index is the sum of the squares of atom degrees over all heavy atoms,
@@ -338,7 +338,7 @@ public enum Descriptor {
      *
      * @see ZagrebIndexDescriptor
      */
-    ZAGREB_INDEX,
+    ZAGREB_INDEX(true, true),
     /**
      * CarbonTypes descriptor, calculates the frequency of occurrence of 9 different types of carbon atoms. Returns 9 values:<br>
      * 1. C1SP1 - triply bound carbon bound to one other carbon<br>
@@ -353,7 +353,7 @@ public enum Descriptor {
      *
      * @see CarbonTypesDescriptor
      */
-    CARBON_TYPES,
+    CARBON_TYPES(true, true),
     //<editor-fold desc="LogP descriptors">
     /**
      * ALogP descriptor, calculates Ghose-Crippen LogP values, molar refractivity values
@@ -364,20 +364,20 @@ public enum Descriptor {
      *
      * @see ALOGPDescriptor
      */
-    A_LOG_P,
+    A_LOG_P(true, true),
     /**
      * XLogP descriptor, calculates logP based on the atom-type method called XLogP.
      * Requires all hydrogens to be explicit.
      *
      * @see XLogPDescriptor
      */
-    X_LOG_P,
+    X_LOG_P(true, true),
     /**
      * JPlogP descriptor, calculates the octanol-water partition coefficient based on an atom contribution model.
      *
      * @see JPlogPDescriptor
      */
-    JP_LOG_P,
+    JP_LOG_P(true, false),
     /**
      * Mannhold LogP descriptor, calculates the octanol-water partition coefficient (logP) using the Mannhold method.
      * LogP describes the hydrophilicity or lipophilicity of a compound and is crucial for
@@ -385,14 +385,14 @@ public enum Descriptor {
      *
      * @see MannholdLogPDescriptor
      */
-    MANNHOLD_LOGP,
+    MANNHOLD_LOGP(true, true),
     //</editor-fold>
     /**
      * APol descriptor, calculates the sum of the atomic polarizabilities (including implicit hydrogens).
      *
      * @see APolDescriptor
      */
-    A_POL,
+    A_POL(true, true),
     //<editor-fold desc="Autocorrelation descriptors">
     /**
      * Autocorrelation charge descriptor, calculates topological autocorrelation vectors
@@ -403,7 +403,7 @@ public enum Descriptor {
      *
      * @see AutocorrelationDescriptorCharge
      */
-    AUTOCORRELATION_CHARGE,
+    AUTOCORRELATION_CHARGE(true, false),
     /**
      * Autocorrelation mass descriptor, calculates topological autocorrelation vectors
      * that capture patterns related to atomic mass distribution across the molecular structure.
@@ -413,7 +413,7 @@ public enum Descriptor {
      *
      * @see AutocorrelationDescriptorMass
      */
-    AUTOCORRELATION_MASS,
+    AUTOCORRELATION_MASS(true, true),
     /**
      * Autocorrelation polarizability descriptor, calculates topological autocorrelation vectors
      * that capture patterns related to polarizability distribution across the molecular structure.
@@ -424,7 +424,7 @@ public enum Descriptor {
      *
      * @see AutocorrelationDescriptorPolarizability
      */
-    AUTOCORRELATION_POLARIZABILITY,
+    AUTOCORRELATION_POLARIZABILITY(true, true),
     //</editor-fold>
     /**
      * Fragment complexity descriptor, calculates the complexity of a molecular system.
@@ -439,7 +439,7 @@ public enum Descriptor {
      *
      * @see FragmentComplexityDescriptor
      */
-    FRAGMENT_COMPLEXITY,
+    FRAGMENT_COMPLEXITY(true, true),
     //<editor-fold desc="CHI descriptors">
     /**
      * Chi chain descriptor, calculates the Kier + Hall chi chain indices of orders 3 through 7.
@@ -458,7 +458,7 @@ public enum Descriptor {
      *
      * @see ChiChainDescriptor
      */
-    CHI_CHAIN,
+    CHI_CHAIN(false, true),
     /**
      * Chi cluster descriptor, calculates Kier + Hall chi cluster indices of orders 3 through 6.
      * These values characterize a molecular graph based on its cluster subgraphs.
@@ -474,7 +474,7 @@ public enum Descriptor {
      *
      * @see ChiClusterDescriptor
      */
-    CHI_CLUSTER,
+    CHI_CLUSTER(false, true),
     /**
      * Chi path cluster descriptor, calculates Kier + Hall chi path cluster indices of orders 4 through 6.
      * These values characterize a molecular graph based on its path cluster subgraphs.
@@ -488,7 +488,7 @@ public enum Descriptor {
      *
      * @see ChiPathClusterDescriptor
      */
-    CHI_PATH_CLUSTER,
+    CHI_PATH_CLUSTER(false, true),
     /**
      * Chi path descriptor, calculates Kier + Hall chi path indices of orders 0 through 7.
      * These values characterize a molecular graph based on its path subgraphs.
@@ -512,7 +512,7 @@ public enum Descriptor {
      *
      * @see ChiPathDescriptor
      */
-    CHI_PATH,
+    CHI_PATH(false, true),
     //</editor-fold>
     /**
      * Fractional PSA descriptor, calculates the ratio of polar surface area to molecular weight.
@@ -521,7 +521,7 @@ public enum Descriptor {
      *
      * @see FractionalPSADescriptor
      */
-    FRACTIONAL_PSA,
+    FRACTIONAL_PSA(true, true),
     /**
      * Largest pi system descriptor, calculates the number of atoms in the largest pi system.
      * This descriptor identifies the largest conjugated pi system within a molecule and
@@ -529,7 +529,7 @@ public enum Descriptor {
      *
      * @see LargestPiSystemDescriptor
      */
-    LARGEST_PI_SYSTEM,
+    LARGEST_PI_SYSTEM(true, true),
     /**
      * Descriptor that calculates small ring information.
      * Returns 11 values:<br>
@@ -547,7 +547,7 @@ public enum Descriptor {
      *
      * @see SmallRingDescriptor
      */
-    SMALL_RING,
+    SMALL_RING(true, true),
     /**
      * Amino acid count descriptor, calculates the number of each amino acid in a molecule.
      * Returns 20 values, one for each of the 20 standard amino acids:
@@ -558,7 +558,7 @@ public enum Descriptor {
      *
      * @see AminoAcidCountDescriptor
      */
-    AMINO_ACID_COUNT,
+    AMINO_ACID_COUNT(true, true),
     /**
      * Kier-Hall SMARTS descriptor that calculates counts of functional groups and substructures
      * based on the Kier and Hall SMARTS patterns, used for QSAR modeling and molecular characterization.
@@ -566,7 +566,7 @@ public enum Descriptor {
      *
      * @see KierHallSmartsDescriptor
      */
-    KIER_HALL_SMARTS,
+    KIER_HALL_SMARTS(true, true),
     /**
      * Eccentric connectivity index descriptor, calculates a topological descriptor that combines
      * distance and adjacency information.
@@ -576,7 +576,7 @@ public enum Descriptor {
      *
      * @see EccentricConnectivityIndexDescriptor
      */
-    ECCENTRIC_CONNECTIVITY_INDEX,
+    ECCENTRIC_CONNECTIVITY_INDEX(true, true),
     /**
      * MDE descriptor, calculates molecular distance edge descriptors for carbon, oxygen and nitrogen atoms.
      * These descriptors encode information about the connectivity and distance of atoms of specific types
@@ -604,7 +604,7 @@ public enum Descriptor {
      *
      * @see MDEDescriptor
      */
-    MDE,
+    MDE(true, true),
     /**
      * VABC descriptor, calculates the volume descriptor using the van der Waals volume calculation approach.
      * This descriptor estimates molecular volume based on atom contributions, considering bond types
@@ -612,9 +612,58 @@ public enum Descriptor {
      *
      * @see VABCDescriptor
      */
-    VABC;
+    VABC(true, true);
 
     // Add new descriptor information here!
+
+    // <editor-fold desc="Descriptor information and constructor">
+    /**
+     * Indicates whether this descriptor is quickly calculable.
+     * Fast descriptors have lower computational complexity and can be calculated efficiently,
+     * while slow descriptors require more intensive calculations (e.g., CHI descriptors).
+     */
+    private final boolean isFast;
+
+    /**
+     * Indicates whether this descriptor is safe to calculate.
+     * Safe descriptors are reliable and validated, while unsafe descriptors may produce
+     * inconsistent results or NaN values under certain conditions.
+     */
+    private final boolean isSafe;
+
+    /**
+     * Constructs a Descriptor with the specified speed and safety characteristics.
+     *
+     * @param isFast true if the descriptor is quickly calculable, false if it requires
+     *               more intensive computation
+     * @param isSafe true if the descriptor is safe and reliable, false if it may produce
+     *               inconsistent results or NaN values
+     */
+    Descriptor(boolean isFast, boolean isSafe) {
+        this.isFast = isFast;
+        this.isSafe = isSafe;
+    }
+
+    /**
+     * Returns whether this descriptor is quickly calculable.
+     *
+     * @return true if the descriptor has low computational complexity and can be
+     *         calculated efficiently, false if it requires intensive computation
+     */
+    public boolean isFast() {
+        return isFast;
+    }
+
+    /**
+     * Returns whether this descriptor is safe to calculate.
+     *
+     * @return true if the descriptor is reliable and validated, false if it may
+     *         produce inconsistent results or NaN values under certain conditions
+     */
+    public boolean isSafe() {
+        return isSafe;
+    }
+    //</editor-fold>
 
     //<editor-fold desc="Private static final LOGGER">
     /**
@@ -871,24 +920,43 @@ public enum Descriptor {
      *
      * @param isQuicklyCalculableDescriptorInclusion True: Quickly calculable descriptors are returned, false: Otherwise.
      * @param isSlowlyCalculableDescriptorInclusion True: Slowly calculable descriptors are returned, false: Otherwise.
+     * @param excludeUnsafeDescriptors True: Unsafe descriptors are excluded from the result, this does not mean no
+     *                                 NaN's can be produced, false: Otherwise.
      * @return Specified descriptors
      */
     public static Descriptor[] getSpecifiedDescriptors(
         boolean isQuicklyCalculableDescriptorInclusion,
-        boolean isSlowlyCalculableDescriptorInclusion
-    ){
-        if (isQuicklyCalculableDescriptorInclusion && isSlowlyCalculableDescriptorInclusion) {
-            return values();
-        } else if (!isQuicklyCalculableDescriptorInclusion && !isSlowlyCalculableDescriptorInclusion) {
+        boolean isSlowlyCalculableDescriptorInclusion,
+        boolean excludeUnsafeDescriptors
+    ) {
+        if (!isQuicklyCalculableDescriptorInclusion && !isSlowlyCalculableDescriptorInclusion) {
             return new Descriptor[0];
-        } else if (isQuicklyCalculableDescriptorInclusion) {
-            // TODO: Implement after analytical data are evaluated.
-            return null;
-        } else {
-            // MUST be isSlowlyCalculableDescriptorInclusion only
-            // TODO: Implement after analytical data are evaluated.
-            return null;
         }
+
+        java.util.List<Descriptor> result = new java.util.ArrayList<>();
+
+        for (Descriptor descriptor : values()) {
+            boolean includeDescriptor = false;
+
+            // Check if descriptor matches speed criteria
+            if (isQuicklyCalculableDescriptorInclusion && descriptor.isFast()) {
+                includeDescriptor = true;
+            }
+            if (isSlowlyCalculableDescriptorInclusion && !descriptor.isFast()) {
+                includeDescriptor = true;
+            }
+
+            // Exclude unsafe descriptors if requested
+            if (includeDescriptor && excludeUnsafeDescriptors && !descriptor.isSafe()) {
+                includeDescriptor = false;
+            }
+
+            if (includeDescriptor) {
+                result.add(descriptor);
+            }
+        }
+
+        return result.toArray(new Descriptor[0]);
     }
 
     /**
@@ -3481,6 +3549,7 @@ public enum Descriptor {
      * Creates a deep copy of the input molecule.
      * Note: This method is used to create a new molecule object
      * without affecting implicit hydrogen atoms.
+     * Note: If necessary Atom types must be perceived and configured manually after creation.
      *
      * @param aMolecule Source molecule to be copied (NOT MODIFIED)
      * @return New instance of the molecule
@@ -3490,12 +3559,14 @@ public enum Descriptor {
      */
     public static IAtomContainer copyMolecule(IAtomContainer aMolecule)
             throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
+        //<editor-fold desc="Checks">
         if (aMolecule == null) {
             throw new NullPointerException("Input molecule must not be null");
         }
         if (aMolecule.isEmpty()) {
             throw new IllegalArgumentException("Input molecule must not be empty");
         }
+        //</editor-fold>
         try {
             // Create a new empty atom container with the same properties
             IAtomContainer tmpMoleculeCopy = aMolecule.getBuilder().newInstance(IAtomContainer.class);
