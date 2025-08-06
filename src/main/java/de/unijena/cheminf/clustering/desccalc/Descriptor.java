@@ -558,7 +558,7 @@ public enum Descriptor {
      *
      * @see AminoAcidCountDescriptor
      */
-    AMINO_ACID_COUNT(true, true),
+    AMINO_ACID_COUNT(false, true),
     /**
      * Kier-Hall SMARTS descriptor that calculates counts of functional groups and substructures
      * based on the Kier and Hall SMARTS patterns, used for QSAR modeling and molecular characterization.
@@ -920,14 +920,14 @@ public enum Descriptor {
      *
      * @param isQuicklyCalculableDescriptorInclusion True: Quickly calculable descriptors are returned, false: Otherwise.
      * @param isSlowlyCalculableDescriptorInclusion True: Slowly calculable descriptors are returned, false: Otherwise.
-     * @param excludeUnsafeDescriptors True: Unsafe descriptors are excluded from the result, this does not mean no
-     *                                 NaN's can be produced, false: Otherwise.
+     * @param isUnsafeDescriptorInclusion True: Unsafe descriptors are included in the result, false: Unsafe descriptors
+     *                                     are excluded from the result, this does not mean no NaN's can be produced.                                NaN's can be produced, false: Otherwise.
      * @return Specified descriptors
      */
     public static Descriptor[] getSpecifiedDescriptors(
-        boolean isQuicklyCalculableDescriptorInclusion,
-        boolean isSlowlyCalculableDescriptorInclusion,
-        boolean excludeUnsafeDescriptors
+            boolean isQuicklyCalculableDescriptorInclusion,
+            boolean isSlowlyCalculableDescriptorInclusion,
+            boolean isUnsafeDescriptorInclusion
     ) {
         if (!isQuicklyCalculableDescriptorInclusion && !isSlowlyCalculableDescriptorInclusion) {
             return new Descriptor[0];
@@ -946,8 +946,8 @@ public enum Descriptor {
                 includeDescriptor = true;
             }
 
-            // Exclude unsafe descriptors if requested
-            if (includeDescriptor && excludeUnsafeDescriptors && !descriptor.isSafe()) {
+            // Include unsafe descriptors only if requested
+            if (includeDescriptor && !descriptor.isSafe() && !isUnsafeDescriptorInclusion) {
                 includeDescriptor = false;
             }
 
@@ -3549,7 +3549,7 @@ public enum Descriptor {
      * Creates a deep copy of the input molecule.
      * Note: This method is used to create a new molecule object
      * without affecting implicit hydrogen atoms.
-     * Note: If necessary Atom types must be perceived and configured manually after creation.
+     * Note: If necessary, atom types must be perceived and configured manually after creation.
      *
      * @param aMolecule Source molecule to be copied (NOT MODIFIED)
      * @return New instance of the molecule
