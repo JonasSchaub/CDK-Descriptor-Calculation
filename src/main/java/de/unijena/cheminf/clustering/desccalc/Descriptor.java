@@ -932,8 +932,8 @@ public enum Descriptor {
         if (!isQuicklyCalculableDescriptorInclusion && !isSlowlyCalculableDescriptorInclusion) {
             return new Descriptor[0];
         }
-
-        java.util.List<Descriptor> result = new java.util.ArrayList<>();
+        // Initialize ArrayList with maximum possible capacity to avoid internal resizing during element addition
+        java.util.List<Descriptor> result = new java.util.ArrayList<>(values().length);
 
         for (Descriptor descriptor : values()) {
             boolean includeDescriptor = false;
