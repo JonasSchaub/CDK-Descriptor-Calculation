@@ -2130,12 +2130,10 @@ public enum Descriptor {
                     aVector[aStartIndex] = (float) ((DoubleResult) (new FractionalPSADescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case LARGEST_PI_SYSTEM:
-                    // The largest pi system descriptor is not thread-safe, so we need to copy the molecule otherwise calculation can fail.
-                    IAtomContainer tmpMolecule = copyMolecule(anAtomContainer);
                     LargestPiSystemDescriptor largestPiSystemDescriptor = new LargestPiSystemDescriptor();
                     // Change parameters so that we can use our own setAromaticity method
                     largestPiSystemDescriptor.setParameters(new Object[] {false}); // checkAromaticity = false
-                    aVector[aStartIndex] = (float) ((IntegerResult) largestPiSystemDescriptor.calculate(tmpMolecule).getValue()).intValue();
+                    aVector[aStartIndex] = (float) ((IntegerResult) largestPiSystemDescriptor.calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case SMALL_RING:
                     IntegerArrayResult smallRingResult = (IntegerArrayResult) (new SmallRingDescriptor()).calculate(anAtomContainer).getValue();
