@@ -115,7 +115,7 @@ public enum Descriptor {
      *
      * @see WeightDescriptor
      */
-    MOLECULAR_WEIGHT(true, true),
+    MOLECULAR_WEIGHT(true, true, 1),
     /**
      * Wiener number, returns Wiener path number and Wiener polarity number.
      * Path number: sum of the distances between any two atoms in the molecule.<br>
@@ -124,20 +124,20 @@ public enum Descriptor {
      *
      * @see WienerNumbersDescriptor
      */
-    WIENER_NUMBER(true, true),
+    WIENER_NUMBER(true, true, 2),
     //<editor-fold desc="Basic Bond and Count descriptors">
     /**
      * Atom count, counts the number of all atoms in the given molecule.
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT(true, true),
+    ATOM_COUNT(true, true, 1),
     /**
      * Atom count organic subset, counts the number of all organic atoms separately in the given molecule.
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT_ORGANIC_SUBSET(true, true),
+    ATOM_COUNT_ORGANIC_SUBSET(true, true, 10),
     /**
      * Total bond count, counts the number of all bonds in a molecule, neglecting the order.
      * Double and triple bonds are counted as one bond.
@@ -145,7 +145,7 @@ public enum Descriptor {
      *
      * @see BondCountDescriptor
      */
-    BOND_COUNT_ALL(true, true),
+    BOND_COUNT_ALL(true, true, 1),
     /**
      * Bond count specified, counts the number of bonds in a molecule with specified bond orders.
      * Returns an array with counts for single, double and triple bonds.
@@ -154,7 +154,7 @@ public enum Descriptor {
      *
      * @see BondCountDescriptor
      */
-    BOND_COUNT_SPECIFIED(true, true),
+    BOND_COUNT_SPECIFIED(true, true, 3),
     /**
      * H bond acceptor count, counts hydrogen bond acceptors based on a simplified PHACIR scheme.
      * It includes: Oxygen atoms with formal charge ≤ 0 (excluding: Aromatic ether oxygens and oxygens adjacent to nitrogen)
@@ -162,28 +162,28 @@ public enum Descriptor {
      *
      * @see HBondAcceptorCountDescriptor
      */
-    H_BOND_ACCEPTOR_COUNT(true, true),
+    H_BOND_ACCEPTOR_COUNT(true, true, 1),
     /**
      * H bond donor count, counts hydrogen bond donors based on a simplified PHACIR classification.
      * It includes: OH groups where the oxygen has a formal charge ≥ 0 and NH groups where the nitrogen has a formal charge ≥ 0.
      *
      * @see HBondDonorCountDescriptor
      */
-    H_BOND_DONOR_COUNT(true, true),
+    H_BOND_DONOR_COUNT(true, true, 1),
     /**
      * Aromatic atoms count, counts the number of aromatic atoms in a molecule.
      * Note: Requires that aromatic atoms in the molecule have already been detected and marked.
      *
      * @see AromaticAtomsCountDescriptor
      */
-    AROMATIC_ATOMS_COUNT(true, true),
+    AROMATIC_ATOMS_COUNT(true, true, 1),
     /**
      * Aromatic bonds count, counts the number of aromatic bonds in a molecule.
      * Note: Requires that aromatic bonds in the molecule have already been detected and marked.
      *
      * @see AromaticBondsCountDescriptor
      */
-    AROMATIC_BONDS_COUNT(true, true),
+    AROMATIC_BONDS_COUNT(true, true, 1),
     /**
      * Rotatable bonds count, counts the number of rotatable bonds in a molecule.
      * A rotatable bond is defined as any single non-ring bond, where atoms on both sides
@@ -191,19 +191,19 @@ public enum Descriptor {
      *
      * @see RotatableBondsCountDescriptor
      */
-    ROTATABLE_BONDS_COUNT(true, true),
+    ROTATABLE_BONDS_COUNT(true, true, 1),
     /**
      * Basic group count, returns the number of basic groups in a molecule.
      *
      * @see BasicGroupCountDescriptor
      */
-    BASIC_GROUP_COUNT(true, true),
+    BASIC_GROUP_COUNT(true, true, 1),
     /**
      * Acidic group count, returns the number of acidic groups in a molecule.
      *
      * @see AcidicGroupCountDescriptor
      */
-    ACIDIC_GROUP_COUNT(true, true),
+    ACIDIC_GROUP_COUNT(true, true, 1),
     //</editor-fold>
     /**
      * TPSA descriptor, calculates the topological polar surface area (TPSA) of a molecule.
@@ -212,14 +212,14 @@ public enum Descriptor {
      *
      * @see TPSADescriptor
      */
-    TPSA(true, true),
+    TPSA(true, true, 1),
     /**
      * Largest chain descriptor, calculates the number of atoms in the longest chain in the molecule.
      * This is a simple topological descriptor that provides a measure of molecular linearity.
      *
      * @see LargestChainDescriptor
      */
-    LARGEST_CHAIN(true, true),
+    LARGEST_CHAIN(true, true, 1),
     /**
      * Longest aliphatic chain descriptor, calculates the number of atoms in the longest aliphatic chain.
      * This descriptor provides information about the maximum linear extent of non-aromatic
@@ -227,7 +227,7 @@ public enum Descriptor {
      *
      * @see LongestAliphaticChainDescriptor
      */
-    LONGEST_ALIPHATIC_CHAIN(true, true),
+    LONGEST_ALIPHATIC_CHAIN(true, true, 1),
     /**
      * BCUT descriptor, calculates Burden matrix modified eigenvalues with different weighting schemes. Returns 6 values:<br>
      * 1. BCUTw-1l, BCUTw-2l ... - nhigh lowest atom weighted BCUTS<br>
@@ -240,7 +240,7 @@ public enum Descriptor {
      *
      * @see BCUTDescriptor
      */
-    BCUT(true, false),
+    BCUT(true, false, 6),
     /**
      * Bond polarizability descriptor.
      * The BPolDescriptor calculates the bond polarizability of a molecule.
@@ -250,14 +250,14 @@ public enum Descriptor {
      *
      * @see BPolDescriptor
      */
-    B_POL(true, true),
+    B_POL(true, true, 1),
     /**
      * Rule of five descriptor, calculates the number of failures of Lipinski's Rule of Five.
      * The descriptor returns the number of violations (0-4).
      *
      * @see RuleOfFiveDescriptor
      */
-    RULE_OF_FIVE(true, true),
+    RULE_OF_FIVE(true, true, 1),
     /**
      * FMF (Framework Match Fraction) descriptor, calculates the ratio of heavy atoms in
      * the framework to the total number of heavy atoms in the molecule.
@@ -266,7 +266,7 @@ public enum Descriptor {
      *
      * @see FMFDescriptor
      */
-    FMF(true, true),
+    FMF(true, true, 1),
     /**
      * Fractional C SP3 descriptor, characterizes the non-flatness of a molecule by calculating
      * the fraction of sp3 hybridized carbon atoms over the total carbon count.
@@ -275,7 +275,7 @@ public enum Descriptor {
      *
      * @see FractionalCSP3Descriptor
      */
-    FRACTIONAL_CSP3(true, true),
+    FRACTIONAL_CSP3(true, true, 1),
     /**
      * Hybridization ratio descriptor, calculates the ratio of sp3 carbons to sp2 carbons.
      * This provides valuable information about the three-dimensionality and flatness
@@ -284,7 +284,7 @@ public enum Descriptor {
      *
      * @see HybridizationRatioDescriptor
      */
-    HYBRIDIZATION_RATIO(true, true),
+    HYBRIDIZATION_RATIO(true, true, 1),
     /**
      * Kappa shape indices descriptor, calculates Kier and Hall kappa molecular shape indices.
      * These indices compare the molecular graph with minimal and maximal molecular graphs. Returns 3 values:<br>
@@ -295,7 +295,7 @@ public enum Descriptor {
      *
      * @see KappaShapeIndicesDescriptor
      */
-    KAPPA_SHAPE_INDICES(true, true),
+    KAPPA_SHAPE_INDICES(true, true, 3),
     /**
      * Petitjean number descriptor, calculates an index characterizing molecular graph topology.
      * This topological descriptor is based on the calculation of the graph eccentricity
@@ -303,13 +303,13 @@ public enum Descriptor {
      *
      * @see PetitjeanNumberDescriptor
      */
-    PETITJEAN_NUMBER(true, true),
+    PETITJEAN_NUMBER(true, true, 1),
     /**
      * Spiro atom count descriptor, calculates the number of spiro atoms in a molecule.
      *
      * @see SpiroAtomCountDescriptor
      */
-    SPIRO_ATOM_COUNT(true, true),
+    SPIRO_ATOM_COUNT(true, true, 1),
     /**
      * VAdjMa descriptor, calculates the Vertex adjacency information (magnitude).
      * This is calculated as 1 + log2 m, where m is the number of heavy-heavy bonds.
@@ -318,7 +318,7 @@ public enum Descriptor {
      *
      * @see VAdjMaDescriptor
      */
-    V_ADJ_MAT(true, true),
+    V_ADJ_MAT(true, true, 1),
     /**
      * Weighted path descriptor, evaluates the weighted path descriptors for a molecule.
      * Returns 5 values:<br>
@@ -330,7 +330,7 @@ public enum Descriptor {
      *
      * @see WeightedPathDescriptor
      */
-    WEIGHTED_PATH(true, true),
+    WEIGHTED_PATH(true, true, 5),
     /**
      * Zagreb index descriptor, calculates the Zagreb index of a molecule.
      * The Zagreb index is the sum of the squares of atom degrees over all heavy atoms,
@@ -338,7 +338,7 @@ public enum Descriptor {
      *
      * @see ZagrebIndexDescriptor
      */
-    ZAGREB_INDEX(true, true),
+    ZAGREB_INDEX(true, true, 1),
     /**
      * CarbonTypes descriptor, calculates the frequency of occurrence of 9 different types of carbon atoms. Returns 9 values:<br>
      * 1. C1SP1 - triply bound carbon bound to one other carbon<br>
@@ -353,7 +353,7 @@ public enum Descriptor {
      *
      * @see CarbonTypesDescriptor
      */
-    CARBON_TYPES(true, true),
+    CARBON_TYPES(true, true, 9),
     //<editor-fold desc="LogP descriptors">
     /**
      * ALogP descriptor, calculates Ghose-Crippen LogP values, molar refractivity values
@@ -364,20 +364,20 @@ public enum Descriptor {
      *
      * @see ALOGPDescriptor
      */
-    A_LOG_P(true, true),
+    A_LOG_P(true, true, 3),
     /**
      * XLogP descriptor, calculates logP based on the atom-type method called XLogP.
      * Requires all hydrogens to be explicit.
      *
      * @see XLogPDescriptor
      */
-    X_LOG_P(true, true),
+    X_LOG_P(true, true, 1),
     /**
      * JPlogP descriptor, calculates the octanol-water partition coefficient based on an atom contribution model.
      *
      * @see JPlogPDescriptor
      */
-    JP_LOG_P(true, false),
+    JP_LOG_P(true, false, 1),
     /**
      * Mannhold LogP descriptor, calculates the octanol-water partition coefficient (logP) using the Mannhold method.
      * LogP describes the hydrophilicity or lipophilicity of a compound and is crucial for
@@ -385,14 +385,14 @@ public enum Descriptor {
      *
      * @see MannholdLogPDescriptor
      */
-    MANNHOLD_LOGP(true, true),
+    MANNHOLD_LOGP(true, true, 1),
     //</editor-fold>
     /**
      * APol descriptor, calculates the sum of the atomic polarizabilities (including implicit hydrogens).
      *
      * @see APolDescriptor
      */
-    A_POL(true, true),
+    A_POL(true, true, 1),
     //<editor-fold desc="Autocorrelation descriptors">
     /**
      * Autocorrelation charge descriptor, calculates topological autocorrelation vectors
@@ -403,7 +403,7 @@ public enum Descriptor {
      *
      * @see AutocorrelationDescriptorCharge
      */
-    AUTOCORRELATION_CHARGE(true, false),
+    AUTOCORRELATION_CHARGE(true, false, 5),
     /**
      * Autocorrelation mass descriptor, calculates topological autocorrelation vectors
      * that capture patterns related to atomic mass distribution across the molecular structure.
@@ -413,7 +413,7 @@ public enum Descriptor {
      *
      * @see AutocorrelationDescriptorMass
      */
-    AUTOCORRELATION_MASS(true, true),
+    AUTOCORRELATION_MASS(true, true, 5),
     /**
      * Autocorrelation polarizability descriptor, calculates topological autocorrelation vectors
      * that capture patterns related to polarizability distribution across the molecular structure.
@@ -424,7 +424,7 @@ public enum Descriptor {
      *
      * @see AutocorrelationDescriptorPolarizability
      */
-    AUTOCORRELATION_POLARIZABILITY(true, true),
+    AUTOCORRELATION_POLARIZABILITY(true, true, 5),
     //</editor-fold>
     /**
      * Fragment complexity descriptor, calculates the complexity of a molecular system.
@@ -439,7 +439,7 @@ public enum Descriptor {
      *
      * @see FragmentComplexityDescriptor
      */
-    FRAGMENT_COMPLEXITY(true, true),
+    FRAGMENT_COMPLEXITY(true, true, 1),
     //<editor-fold desc="CHI descriptors">
     /**
      * Chi chain descriptor, calculates the Kier + Hall chi chain indices of orders 3 through 7.
@@ -458,7 +458,7 @@ public enum Descriptor {
      *
      * @see ChiChainDescriptor
      */
-    CHI_CHAIN(false, true),
+    CHI_CHAIN(false, true, 10),
     /**
      * Chi cluster descriptor, calculates Kier + Hall chi cluster indices of orders 3 through 6.
      * These values characterize a molecular graph based on its cluster subgraphs.
@@ -474,7 +474,7 @@ public enum Descriptor {
      *
      * @see ChiClusterDescriptor
      */
-    CHI_CLUSTER(false, true),
+    CHI_CLUSTER(false, true, 8),
     /**
      * Chi path cluster descriptor, calculates Kier + Hall chi path cluster indices of orders 4 through 6.
      * These values characterize a molecular graph based on its path cluster subgraphs.
@@ -488,7 +488,7 @@ public enum Descriptor {
      *
      * @see ChiPathClusterDescriptor
      */
-    CHI_PATH_CLUSTER(false, true),
+    CHI_PATH_CLUSTER(false, true, 6),
     /**
      * Chi path descriptor, calculates Kier + Hall chi path indices of orders 0 through 7.
      * These values characterize a molecular graph based on its path subgraphs.
@@ -512,7 +512,7 @@ public enum Descriptor {
      *
      * @see ChiPathDescriptor
      */
-    CHI_PATH(false, true),
+    CHI_PATH(false, true, 16),
     //</editor-fold>
     /**
      * Fractional PSA descriptor, calculates the ratio of polar surface area to molecular weight.
@@ -521,7 +521,7 @@ public enum Descriptor {
      *
      * @see FractionalPSADescriptor
      */
-    FRACTIONAL_PSA(true, true),
+    FRACTIONAL_PSA(true, true, 1),
     /**
      * Largest pi system descriptor, calculates the number of atoms in the largest pi system.
      * This descriptor identifies the largest conjugated pi system within a molecule and
@@ -529,7 +529,7 @@ public enum Descriptor {
      *
      * @see LargestPiSystemDescriptor
      */
-    LARGEST_PI_SYSTEM(true, true),
+    LARGEST_PI_SYSTEM(true, true, 1),
     /**
      * Descriptor that calculates small ring information.
      * Returns 11 values:<br>
@@ -547,7 +547,7 @@ public enum Descriptor {
      *
      * @see SmallRingDescriptor
      */
-    SMALL_RING(true, true),
+    SMALL_RING(true, true, 11),
     /**
      * Amino acid count descriptor, calculates the number of each amino acid in a molecule.
      * Returns 20 values, one for each of the 20 standard amino acids:
@@ -558,7 +558,7 @@ public enum Descriptor {
      *
      * @see AminoAcidCountDescriptor
      */
-    AMINO_ACID_COUNT(false, true),
+    AMINO_ACID_COUNT(false, true, 20),
     /**
      * Kier-Hall SMARTS descriptor that calculates counts of functional groups and substructures
      * based on the Kier and Hall SMARTS patterns, used for QSAR modeling and molecular characterization.
@@ -566,7 +566,7 @@ public enum Descriptor {
      *
      * @see KierHallSmartsDescriptor
      */
-    KIER_HALL_SMARTS(true, true),
+    KIER_HALL_SMARTS(true, true, 79),
     /**
      * Eccentric connectivity index descriptor, calculates a topological descriptor that combines
      * distance and adjacency information.
@@ -576,7 +576,7 @@ public enum Descriptor {
      *
      * @see EccentricConnectivityIndexDescriptor
      */
-    ECCENTRIC_CONNECTIVITY_INDEX(true, true),
+    ECCENTRIC_CONNECTIVITY_INDEX(true, true, 1),
     /**
      * MDE descriptor, calculates molecular distance edge descriptors for carbon, oxygen and nitrogen atoms.
      * These descriptors encode information about the connectivity and distance of atoms of specific types
@@ -604,7 +604,7 @@ public enum Descriptor {
      *
      * @see MDEDescriptor
      */
-    MDE(true, true),
+    MDE(true, true, 19),
     /**
      * VABC descriptor, calculates the volume descriptor using the van der Waals volume calculation approach.
      * This descriptor estimates molecular volume based on atom contributions, considering bond types
@@ -612,7 +612,7 @@ public enum Descriptor {
      *
      * @see VABCDescriptor
      */
-    VABC(true, true);
+    VABC(true, true, 1);
 
     // Add new descriptor information here!
 
@@ -632,16 +632,23 @@ public enum Descriptor {
     private final boolean isSafe;
 
     /**
-     * Constructs a Descriptor with the specified speed and safety characteristics.
+     * The number of components calculated by this descriptor.
+     */
+    private final int descriptorComponentNumber;
+
+    /**
+     * Constructs a Descriptor with the specified speed, safety characteristics, and component number.
      *
      * @param isFast true if the descriptor is quickly calculable, false if it requires
      *               more intensive computation
      * @param isSafe true if the descriptor is safe and reliable, false if it may produce
      *               inconsistent results or NaN values
+     * @param descriptorComponentNumber the number of components calculated by this descriptor
      */
-    Descriptor(boolean isFast, boolean isSafe) {
+    Descriptor(boolean isFast, boolean isSafe, int descriptorComponentNumber) {
         this.isFast = isFast;
         this.isSafe = isSafe;
+        this.descriptorComponentNumber = descriptorComponentNumber;
     }
 
     /**
@@ -663,6 +670,15 @@ public enum Descriptor {
     public boolean isSafe() {
         return isSafe;
     }
+
+    /**
+     * Returns the number of components calculated by this descriptor.
+     *
+     * @return the number of components calculated by this descriptor
+     */
+    public int getDescriptorComponentNumber() {
+        return descriptorComponentNumber;
+    }
     //</editor-fold>
 
     //<editor-fold desc="Private static final LOGGER">
@@ -672,224 +688,170 @@ public enum Descriptor {
     private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());
     //</editor-fold>
     /**
-     * EnumMap that maps a descriptor to its number of calculated components.
-     */
-    private static final EnumMap<Descriptor, Integer> descriptorToComponentNumberMap = new EnumMap<>(Descriptor.class);
-    /**
      * EnumMap that maps a descriptor to an instance of its CDK descriptor class
      */
     private static final EnumMap<Descriptor, IMolecularDescriptor> descriptorToCdkObjectMap = new EnumMap<>(Descriptor.class);
     /*
-     * Static initializer block to populate the descriptorToComponentNumberMap and descriptorToCdkObjectMap.
+     * Static initializer block to populate the descriptorToCdkObjectMap.
      */
     static {
         try {
-            // MOLECULAR_WEIGHT has 1 component
-            descriptorToComponentNumberMap.put(MOLECULAR_WEIGHT, 1);
+            // MOLECULAR_WEIGHT
             descriptorToCdkObjectMap.put(MOLECULAR_WEIGHT, new WeightDescriptor());
 
-            // WIENER_NUMBER has 2 components, Wiener path number and Wiener polarity number
-            descriptorToComponentNumberMap.put(WIENER_NUMBER, 2);
+            // WIENER_NUMBER
             descriptorToCdkObjectMap.put(WIENER_NUMBER, new WienerNumbersDescriptor());
 
-            // ATOM_COUNT has 1 component
-            descriptorToComponentNumberMap.put(ATOM_COUNT, 1);
+            // ATOM_COUNT
             descriptorToCdkObjectMap.put(ATOM_COUNT, new AtomCountDescriptor());
 
-            // ATOM_COUNT_ORGANIC_SUBSET has 10 components
-            descriptorToComponentNumberMap.put(ATOM_COUNT_ORGANIC_SUBSET, 10);
+            // ATOM_COUNT_ORGANIC_SUBSET
             descriptorToCdkObjectMap.put(ATOM_COUNT_ORGANIC_SUBSET, new AtomCountDescriptor());
 
-            // H_BOND_ACCEPTOR_COUNT has 1 component
-            descriptorToComponentNumberMap.put(H_BOND_ACCEPTOR_COUNT, 1);
+            // H_BOND_ACCEPTOR_COUNT
             descriptorToCdkObjectMap.put(H_BOND_ACCEPTOR_COUNT, new HBondAcceptorCountDescriptor());
 
-            // H_BOND_DONOR_COUNT has 1 component
-            descriptorToComponentNumberMap.put(H_BOND_DONOR_COUNT, 1);
+            // H_BOND_DONOR_COUNT
             descriptorToCdkObjectMap.put(H_BOND_DONOR_COUNT, new HBondDonorCountDescriptor());
 
-            // TPSA has 1 component
-            descriptorToComponentNumberMap.put(TPSA, 1);
+            // TPSA
             descriptorToCdkObjectMap.put(TPSA, new TPSADescriptor());
 
-            // LARGEST_CHAIN has 1 component
-            descriptorToComponentNumberMap.put(LARGEST_CHAIN, 1);
+            // LARGEST_CHAIN
             descriptorToCdkObjectMap.put(LARGEST_CHAIN, new LargestChainDescriptor());
 
-            // LONGEST_ALIPHATIC_CHAIN has 1 component
-            descriptorToComponentNumberMap.put(LONGEST_ALIPHATIC_CHAIN, 1);
+            // LONGEST_ALIPHATIC_CHAIN
             descriptorToCdkObjectMap.put(LONGEST_ALIPHATIC_CHAIN, new LongestAliphaticChainDescriptor());
 
-            // MANNHOLD_LOGP has 1 component
-            descriptorToComponentNumberMap.put(MANNHOLD_LOGP, 1);
+            // MANNHOLD_LOGP
             descriptorToCdkObjectMap.put(MANNHOLD_LOGP, new MannholdLogPDescriptor());
 
-            // BCUT has 6 components
-            descriptorToComponentNumberMap.put(BCUT, 6);
+            // BCUT
             BCUTDescriptor bcutDescriptor = new BCUTDescriptor();
             bcutDescriptor.setParameters(new Object[] {1, 1, false}); // nhigh = 1, nlow = 1, checkAromaticity = false
             descriptorToCdkObjectMap.put(BCUT, bcutDescriptor);
 
-            // BOND_COUNT has 1 component
-            descriptorToComponentNumberMap.put(BOND_COUNT_ALL, 1);
+            // BOND_COUNT_ALL
             descriptorToCdkObjectMap.put(BOND_COUNT_ALL, new BondCountDescriptor());
 
-            // BOND_COUNT_SPECIFIED has 3 components (single, double, triple bonds)
-            descriptorToComponentNumberMap.put(BOND_COUNT_SPECIFIED, 3);
+            // BOND_COUNT_SPECIFIED
             descriptorToCdkObjectMap.put(BOND_COUNT_SPECIFIED, new BondCountDescriptor());
 
-            // B_POL has 1 component
-            descriptorToComponentNumberMap.put(B_POL, 1);
+            // B_POL
             descriptorToCdkObjectMap.put(B_POL, new BPolDescriptor());
 
-            // RULE_OF_FIVE has 1 component
-            descriptorToComponentNumberMap.put(RULE_OF_FIVE, 1);
+            // RULE_OF_FIVE
             descriptorToCdkObjectMap.put(RULE_OF_FIVE, new RuleOfFiveDescriptor());
 
-            // AROMATIC_ATOMS_COUNT has 1 component
-            descriptorToComponentNumberMap.put(AROMATIC_ATOMS_COUNT, 1);
+            // AROMATIC_ATOMS_COUNT
             descriptorToCdkObjectMap.put(AROMATIC_ATOMS_COUNT, new AromaticAtomsCountDescriptor());
 
-            // AROMATIC_BONDS_COUNT has 1 component
-            descriptorToComponentNumberMap.put(AROMATIC_BONDS_COUNT, 1);
+            // AROMATIC_BONDS_COUNT
             descriptorToCdkObjectMap.put(AROMATIC_BONDS_COUNT, new AromaticBondsCountDescriptor());
 
-            // ROTATABLE_BONDS_COUNT has 1 component
-            descriptorToComponentNumberMap.put(ROTATABLE_BONDS_COUNT, 1);
+            // ROTATABLE_BONDS_COUNT
             descriptorToCdkObjectMap.put(ROTATABLE_BONDS_COUNT, new RotatableBondsCountDescriptor());
 
-            // FMF has 1 component
-            descriptorToComponentNumberMap.put(FMF, 1);
+            // FMF
             descriptorToCdkObjectMap.put(FMF, new FMFDescriptor());
 
-            // FRACTIONAL_CSP3 has 1 component
-            descriptorToComponentNumberMap.put(FRACTIONAL_CSP3, 1);
+            // FRACTIONAL_CSP3
             descriptorToCdkObjectMap.put(FRACTIONAL_CSP3, new FractionalCSP3Descriptor());
 
-            // HYBRIDIZATION_RATIO has 1 component
-            descriptorToComponentNumberMap.put(HYBRIDIZATION_RATIO, 1);
+            // HYBRIDIZATION_RATIO
             descriptorToCdkObjectMap.put(HYBRIDIZATION_RATIO, new HybridizationRatioDescriptor());
 
-            // KAPPA_SHAPE_INDICES has 3 components
-            descriptorToComponentNumberMap.put(KAPPA_SHAPE_INDICES, 3);
+            // KAPPA_SHAPE_INDICES
             descriptorToCdkObjectMap.put(KAPPA_SHAPE_INDICES, new KappaShapeIndicesDescriptor());
 
-            // PETITJEAN_NUMBER has 1 component
-            descriptorToComponentNumberMap.put(PETITJEAN_NUMBER, 1);
+            // PETITJEAN_NUMBER
             descriptorToCdkObjectMap.put(PETITJEAN_NUMBER, new PetitjeanNumberDescriptor());
 
-            // SPIRO_ATOM_COUNT has 1 component
-            descriptorToComponentNumberMap.put(SPIRO_ATOM_COUNT, 1);
+            // SPIRO_ATOM_COUNT
             descriptorToCdkObjectMap.put(SPIRO_ATOM_COUNT, new SpiroAtomCountDescriptor());
 
-            // V_ADJ_MAT has 1 component
-            descriptorToComponentNumberMap.put(V_ADJ_MAT, 1);
+            // V_ADJ_MAT
             descriptorToCdkObjectMap.put(V_ADJ_MAT, new VAdjMaDescriptor());
 
-            // WEIGHTED_PATH has 5 components
-            descriptorToComponentNumberMap.put(WEIGHTED_PATH, 5);
+            // WEIGHTED_PATH
             descriptorToCdkObjectMap.put(WEIGHTED_PATH, new WeightedPathDescriptor());
 
-            // ZAGREB_INDEX has 1 component
-            descriptorToComponentNumberMap.put(ZAGREB_INDEX, 1);
+            // ZAGREB_INDEX
             descriptorToCdkObjectMap.put(ZAGREB_INDEX, new ZagrebIndexDescriptor());
 
-            // CARBON_TYPES has 9 components
-            descriptorToComponentNumberMap.put(CARBON_TYPES, 9);
+            // CARBON_TYPES
             descriptorToCdkObjectMap.put(CARBON_TYPES, new CarbonTypesDescriptor());
 
-            // A_LOG_P has 3 components
-            descriptorToComponentNumberMap.put(A_LOG_P, 3);
+            // A_LOG_P
             descriptorToCdkObjectMap.put(A_LOG_P, new ALOGPDescriptor());
 
-            // X_LOG_P has 1 component
-            descriptorToComponentNumberMap.put(X_LOG_P, 1);
+            // X_LOG_P
             descriptorToCdkObjectMap.put(X_LOG_P, new XLogPDescriptor());
 
-            // JP_LOG_P has 1 component
-            descriptorToComponentNumberMap.put(JP_LOG_P, 1);
+            // JP_LOG_P
             descriptorToCdkObjectMap.put(JP_LOG_P, new JPlogPDescriptor());
 
-            // A_POL has 1 component
-            descriptorToComponentNumberMap.put(A_POL, 1);
+            // A_POL
             descriptorToCdkObjectMap.put(A_POL, new APolDescriptor());
 
-            // AUTOCORRELATION_CHARGE has 5 components
-            descriptorToComponentNumberMap.put(AUTOCORRELATION_CHARGE, 5);
+            // AUTOCORRELATION_CHARGE
             descriptorToCdkObjectMap.put(AUTOCORRELATION_CHARGE, new AutocorrelationDescriptorCharge());
 
-            // AUTOCORRELATION_MASS has 5 components
-            descriptorToComponentNumberMap.put(AUTOCORRELATION_MASS, 5);
+            // AUTOCORRELATION_MASS
             descriptorToCdkObjectMap.put(AUTOCORRELATION_MASS, new AutocorrelationDescriptorMass());
 
-            // AUTOCORRELATION_POLARIZABILITY has 5 components
-            descriptorToComponentNumberMap.put(AUTOCORRELATION_POLARIZABILITY, 5);
+            // AUTOCORRELATION_POLARIZABILITY
             descriptorToCdkObjectMap.put(AUTOCORRELATION_POLARIZABILITY, new AutocorrelationDescriptorPolarizability());
 
-            // FRAGMENT_COMPLEXITY has 1 component
-            descriptorToComponentNumberMap.put(FRAGMENT_COMPLEXITY, 1);
+            // FRAGMENT_COMPLEXITY
             descriptorToCdkObjectMap.put(FRAGMENT_COMPLEXITY, new FragmentComplexityDescriptor());
 
-            // CHI_CHAIN has 10 components
-            descriptorToComponentNumberMap.put(CHI_CHAIN, 10);
+            // CHI_CHAIN
             descriptorToCdkObjectMap.put(CHI_CHAIN, new ChiChainDescriptor());
 
-            // CHI_CLUSTER has 8 components
-            descriptorToComponentNumberMap.put(CHI_CLUSTER, 8);
+            // CHI_CLUSTER
             descriptorToCdkObjectMap.put(CHI_CLUSTER, new ChiClusterDescriptor());
 
-            // CHI_PATH_CLUSTER has 6 components
-            descriptorToComponentNumberMap.put(CHI_PATH_CLUSTER, 6);
+            // CHI_PATH_CLUSTER
             descriptorToCdkObjectMap.put(CHI_PATH_CLUSTER, new ChiPathClusterDescriptor());
 
-            // CHI_PATH has 16 components
-            descriptorToComponentNumberMap.put(CHI_PATH, 16);
+            // CHI_PATH
             descriptorToCdkObjectMap.put(CHI_PATH, new ChiPathDescriptor());
 
-            // FRACTIONAL_PSA has 1 component
-            descriptorToComponentNumberMap.put(FRACTIONAL_PSA, 1);
+            // FRACTIONAL_PSA
             descriptorToCdkObjectMap.put(FRACTIONAL_PSA, new FractionalPSADescriptor());
 
-            // LARGEST_PI_SYSTEM has 1 component
-            descriptorToComponentNumberMap.put(LARGEST_PI_SYSTEM, 1);
+            // LARGEST_PI_SYSTEM
             LargestPiSystemDescriptor largestPiSystemDescriptor = new LargestPiSystemDescriptor();
             largestPiSystemDescriptor.setParameters(new Object[] {false}); //do not check aromaticity again
             descriptorToCdkObjectMap.put(LARGEST_PI_SYSTEM, new LargestPiSystemDescriptor());
 
-            // SMALL_RING has 4 components
-            descriptorToComponentNumberMap.put(SMALL_RING, 11);
+            // SMALL_RING
             descriptorToCdkObjectMap.put(SMALL_RING, new SmallRingDescriptor());
 
-            // Basic Group Count has 1 component
+            // Basic Group Count
             BasicGroupCountDescriptor basicGroupCountDescriptor = new BasicGroupCountDescriptor();
             basicGroupCountDescriptor.initialise(SilentChemObjectBuilder.getInstance());
             descriptorToCdkObjectMap.put(BASIC_GROUP_COUNT, basicGroupCountDescriptor);
-            descriptorToComponentNumberMap.put(BASIC_GROUP_COUNT, 1);
 
-            // Acidic Group Count has 1 component
+            // Acidic Group Count
             AcidicGroupCountDescriptor acidicGroupCountDescriptor = new AcidicGroupCountDescriptor();
             acidicGroupCountDescriptor.initialise(SilentChemObjectBuilder.getInstance());
             descriptorToCdkObjectMap.put(ACIDIC_GROUP_COUNT, acidicGroupCountDescriptor);
-            descriptorToComponentNumberMap.put(ACIDIC_GROUP_COUNT, 1);
 
-            // AminoAcidCount has 20 components
-            descriptorToComponentNumberMap.put(AMINO_ACID_COUNT, 20);
+            // AminoAcidCount
             descriptorToCdkObjectMap.put(AMINO_ACID_COUNT, new AminoAcidCountDescriptor());
 
-            // Kier-Hall SMARTS has 79 components
-            descriptorToComponentNumberMap.put(KIER_HALL_SMARTS, 79);
+            // Kier-Hall SMARTS
             descriptorToCdkObjectMap.put(KIER_HALL_SMARTS, new KierHallSmartsDescriptor());
 
-            // ECCENTRIC_CONNECTIVITY_INDEX has 1 component
-            descriptorToComponentNumberMap.put(ECCENTRIC_CONNECTIVITY_INDEX, 1);
+            // ECCENTRIC_CONNECTIVITY_INDEX
             descriptorToCdkObjectMap.put(ECCENTRIC_CONNECTIVITY_INDEX, new EccentricConnectivityIndexDescriptor());
 
-            // MDE has 19 components
-            descriptorToComponentNumberMap.put(MDE, 19);
+            // MDE
             descriptorToCdkObjectMap.put(MDE, new MDEDescriptor());
 
-            // VABC has 1 component
-            descriptorToComponentNumberMap.put(VABC, 1);
+            // VABC
             descriptorToCdkObjectMap.put(VABC, new VABCDescriptor());
 
             // Add new descriptor information here!
@@ -992,7 +954,7 @@ public enum Descriptor {
         try {
             int tmpTotalNumberOfComponents = 0;
             for (Descriptor tmpDescriptor : aDescriptors) {
-                tmpTotalNumberOfComponents += descriptorToComponentNumberMap.get(tmpDescriptor);
+                tmpTotalNumberOfComponents += tmpDescriptor.getDescriptorComponentNumber();
             }
             return tmpTotalNumberOfComponents;
         } catch (Exception anException) {
@@ -1127,7 +1089,7 @@ public enum Descriptor {
             int[] tmpStartIndices = new int[aDescriptors.length];
             for (int i = 0; i < aDescriptors.length; i++) {
                 tmpStartIndices[i] = aStartIndex;
-                aStartIndex += descriptorToComponentNumberMap.get(aDescriptors[i]);
+                aStartIndex += aDescriptors[i].getDescriptorComponentNumber();
             }
             if (anIsParallelCalculation) {
                 try {
@@ -1313,7 +1275,7 @@ public enum Descriptor {
             int[] tmpStartIndices = new int[aDescriptors.length];
             for (int i = 0; i < aDescriptors.length; i++) {
                 tmpStartIndices[i] = aStartIndex;
-                aStartIndex += descriptorToComponentNumberMap.get(aDescriptors[i]);
+                aStartIndex += aDescriptors[i].getDescriptorComponentNumber();
             }
             if (anIsParallelCalculation) {
                 try {
@@ -1500,7 +1462,7 @@ public enum Descriptor {
             int[] tmpStartIndices = new int[aDescriptors.length];
             for (int i = 0; i < aDescriptors.length; i++) {
                 tmpStartIndices[i] = aStartIndex;
-                aStartIndex += descriptorToComponentNumberMap.get(aDescriptors[i]);
+                aStartIndex += aDescriptors[i].getDescriptorComponentNumber();
             }
             if (anIsParallelCalculation) {
                 try {
@@ -1872,10 +1834,10 @@ public enum Descriptor {
                     throw new UnsupportedOperationException(aDescriptor + ": This descriptor does not have a routine yet!");
             }
             // Check for NaN values in the calculated result and track them
-            int numComponents = descriptorToComponentNumberMap.get(aDescriptor);
+            int numComponents = aDescriptor.getDescriptorComponentNumber();
             return !checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositions);
         } catch (Exception anException) {
-            int numComponents = descriptorToComponentNumberMap.get(aDescriptor);
+            int numComponents = aDescriptor.getDescriptorComponentNumber();
             for (int i = 0; i < numComponents; i++) {
                 aVector[aStartIndex + i] = Float.NaN;
                 // Track NaN position if aNanPositions is provided
@@ -2181,10 +2143,10 @@ public enum Descriptor {
                     throw new UnsupportedOperationException(aDescriptor + ": This descriptor does not have a routine yet!");
             }
             // Check for NaN values in the calculated result and track them
-            int numComponents = descriptorToComponentNumberMap.get(aDescriptor);
+            int numComponents = aDescriptor.getDescriptorComponentNumber();
             return !checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositions);
         } catch (Exception anException) {
-            int numComponents = descriptorToComponentNumberMap.get(aDescriptor);
+            int numComponents = aDescriptor.getDescriptorComponentNumber();
             for (int i = 0; i < numComponents; i++) {
                 aVector[aStartIndex + i] = Float.NaN;
                 // Track NaN position if aNanPositions is provided
@@ -2479,10 +2441,10 @@ public enum Descriptor {
                     throw new UnsupportedOperationException(aDescriptor + ": This descriptor does not have a routine yet!");
             }
             // Check for NaN values in the calculated result and track them
-            int numComponents = descriptorToComponentNumberMap.get(aDescriptor);
+            int numComponents = aDescriptor.getDescriptorComponentNumber();
             return !checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositions);
         } catch (Exception anException) {
-            int numComponents = descriptorToComponentNumberMap.get(aDescriptor);
+            int numComponents = aDescriptor.getDescriptorComponentNumber();
             for (int i = 0; i < numComponents; i++) {
                 aVector[aStartIndex + i] = Float.NaN;
                 if (aNanPositions != null) {
