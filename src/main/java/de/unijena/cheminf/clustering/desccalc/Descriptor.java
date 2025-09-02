@@ -857,10 +857,7 @@ public enum Descriptor {
             // Add new descriptor information here!
 
         } catch (Exception anException) {
-            Descriptor.LOGGER.log(
-                    Level.SEVERE,
-                    "Failed to initialize descriptors", anException
-            );
+            throw new RuntimeException("Failed to initialize descriptors, this should never happen. ", anException);
         }
 
     }
@@ -874,6 +871,15 @@ public enum Descriptor {
      */
     public static Descriptor[] getAllDescriptors(){
         return values();
+    }
+
+    /**
+     * Returns the descriptor to CDK object map.
+     *
+     * @return The map containing CDK descriptor instances
+     */
+    static EnumMap<Descriptor, IMolecularDescriptor> getDescriptorToCdkObjectMap() {
+        return descriptorToCdkObjectMap;
     }
 
     /**
@@ -1679,154 +1685,154 @@ public enum Descriptor {
         try {
             switch (aDescriptor) {
                 case MOLECULAR_WEIGHT:
-                    setMolecularWeight(anAtomContainer, aVector, aStartIndex);
+                    setMolecularWeightSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case WIENER_NUMBER:
-                    setWienerNumber(anAtomContainer, aVector, aStartIndex);
+                    setWienerNumberSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case ATOM_COUNT:
-                    setAtomCount(anAtomContainer, aVector, aStartIndex);
+                    setAtomCountSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case ATOM_COUNT_ORGANIC_SUBSET:
-                    setAtomCountOrganicSubset(anAtomContainer, aVector, aStartIndex);
+                    setAtomCountOrganicSubsetSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case H_BOND_ACCEPTOR_COUNT:
-                    setHBondAcceptorCount(anAtomContainer, aVector, aStartIndex);
+                    setHBondAcceptorCountSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case H_BOND_DONOR_COUNT:
-                    setHBondDonorCount(anAtomContainer, aVector, aStartIndex);
+                    setHBondDonorCountSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case TPSA:
-                    setTPSA(anAtomContainer, aVector, aStartIndex);
+                    setTPSASynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case LARGEST_CHAIN:
-                    setLargestChain(anAtomContainer, aVector, aStartIndex);
+                    setLargestChainSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case LONGEST_ALIPHATIC_CHAIN:
-                    setLongestAliphaticChain(anAtomContainer, aVector, aStartIndex);
+                    setLongestAliphaticChainSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case MANNHOLD_LOGP:
-                    setMannholdLogP(anAtomContainer, aVector, aStartIndex);
+                    setMannholdLogPSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case BCUT:
-                    setBCUT(anAtomContainer, aVector, aStartIndex);
+                    setBCUTSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case BOND_COUNT_ALL:
-                    setBondCountAll(anAtomContainer, aVector, aStartIndex);
+                    setBondCountAllSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case BOND_COUNT_SPECIFIED:
-                    setBondCountSpecified(anAtomContainer, aVector, aStartIndex);
+                    setBondCountSpecifiedSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case B_POL:
-                    setBPol(anAtomContainer, aVector, aStartIndex);
+                    setBPolSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case RULE_OF_FIVE:
-                    setRuleOfFive(anAtomContainer, aVector, aStartIndex);
+                    setRuleOfFiveSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case AROMATIC_ATOMS_COUNT:
-                    setAromaticAtomsCount(anAtomContainer, aVector, aStartIndex);
+                    setAromaticAtomsCountSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case AROMATIC_BONDS_COUNT:
-                    setAromaticBondsCount(anAtomContainer, aVector, aStartIndex);
+                    setAromaticBondsCountSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case ROTATABLE_BONDS_COUNT:
-                    setRotatableBondsCount(anAtomContainer, aVector, aStartIndex);
+                    setRotatableBondsCountSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case FMF:
-                    setFMF(anAtomContainer, aVector, aStartIndex);
+                    setFMFSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case FRACTIONAL_CSP3:
-                    setFractionalCSP3(anAtomContainer, aVector, aStartIndex);
+                    setFractionalCSP3Synchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case HYBRIDIZATION_RATIO:
-                    setHybridizationRatio(anAtomContainer, aVector, aStartIndex);
+                    setHybridizationRatioSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case KAPPA_SHAPE_INDICES:
-                    setKappaShapeIndices(anAtomContainer, aVector, aStartIndex);
+                    setKappaShapeIndicesSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case PETITJEAN_NUMBER:
-                    setPetitjeanNumber(anAtomContainer, aVector, aStartIndex);
+                    setPetitjeanNumberSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case SPIRO_ATOM_COUNT:
-                    setSpiroAtomCount(anAtomContainer, aVector, aStartIndex);
+                    setSpiroAtomCountSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case V_ADJ_MAT:
-                    setVAdjMat(anAtomContainer, aVector, aStartIndex);
+                    setVAdjMatSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case WEIGHTED_PATH:
-                    setWeightedPath(anAtomContainer, aVector, aStartIndex);
+                    setWeightedPathSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case ZAGREB_INDEX:
-                    setZagrebIndex(anAtomContainer, aVector, aStartIndex);
+                    setZagrebIndexSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case CARBON_TYPES:
-                    setCarbonTypesDescriptor(anAtomContainer, aVector, aStartIndex);
+                    setCarbonTypesDescriptorSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case A_LOG_P:
-                    setALogP(anAtomContainer, aVector, aStartIndex);
+                    setALogPSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case X_LOG_P:
-                    setXLogP(anAtomContainer, aVector, aStartIndex);
+                    setXLogPSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case JP_LOG_P:
-                    setJPLogP(anAtomContainer, aVector, aStartIndex);
+                    setJPLogPSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case A_POL:
-                    setAPol(anAtomContainer, aVector, aStartIndex);
+                    setAPolSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case AUTOCORRELATION_CHARGE:
-                    setAutocorrelationCharge(anAtomContainer, aVector, aStartIndex);
+                    setAutocorrelationChargeSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case AUTOCORRELATION_MASS:
-                    setAutocorrelationMass(anAtomContainer, aVector, aStartIndex);
+                    setAutocorrelationMassSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case AUTOCORRELATION_POLARIZABILITY:
-                    setAutocorrelationPolarizability(anAtomContainer, aVector, aStartIndex);
+                    setAutocorrelationPolarizabilitySynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case FRAGMENT_COMPLEXITY:
-                    setFragmentComplexity(anAtomContainer, aVector, aStartIndex);
+                    setFragmentComplexitySynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case CHI_CHAIN:
-                    setChiChain(anAtomContainer, aVector, aStartIndex);
+                    setChiChainSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case CHI_CLUSTER:
-                    setChiCluster(anAtomContainer, aVector, aStartIndex);
+                    setChiClusterSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case CHI_PATH_CLUSTER:
-                    setChiPathCluster(anAtomContainer, aVector, aStartIndex);
+                    setChiPathClusterSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case CHI_PATH:
-                    setChiPath(anAtomContainer, aVector, aStartIndex);
+                    setChiPathSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case FRACTIONAL_PSA:
-                    setFractionalPSA(anAtomContainer, aVector, aStartIndex);
+                    setFractionalPSASynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case LARGEST_PI_SYSTEM:
-                    setLargestPiSystem(anAtomContainer, aVector, aStartIndex);
+                    setLargestPiSystemSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case SMALL_RING:
-                    setSmallRing(anAtomContainer, aVector, aStartIndex);
+                    setSmallRingSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case BASIC_GROUP_COUNT:
-                    setBasicGroupCount(anAtomContainer, aVector, aStartIndex);
+                    setBasicGroupCountSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case ACIDIC_GROUP_COUNT:
-                    setAcidicGroupCount(anAtomContainer, aVector, aStartIndex);
+                    setAcidicGroupCountSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case AMINO_ACID_COUNT:
-                    setAminoAcidCount(anAtomContainer, aVector, aStartIndex);
+                    setAminoAcidCountSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case KIER_HALL_SMARTS:
-                    setKierHallSmarts(anAtomContainer, aVector, aStartIndex);
+                    setKierHallSmartsSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case ECCENTRIC_CONNECTIVITY_INDEX:
-                    setEccentricConnectivityIndex(anAtomContainer, aVector, aStartIndex);
+                    setEccentricConnectivityIndexSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case MDE:
-                    setMDE(anAtomContainer, aVector, aStartIndex);
+                    setMDESynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case VABC:
-                    setVABC(anAtomContainer, aVector, aStartIndex);
+                    setVABCSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
 
                 // Add new descriptor information here!
@@ -2477,8 +2483,8 @@ public enum Descriptor {
      *                      pairs of NaN values
      * @return true if any NaN values were found, false otherwise
      */
-    private static boolean checkAndTrackNaNValues(float[] aVector, int aStartIndex, int numComponents,
-                                                  int aMoleculeIndex, List<int[]> aNanPositions) {
+    static boolean checkAndTrackNaNValues(float[] aVector, int aStartIndex, int numComponents,
+                                          int aMoleculeIndex, List<int[]> aNanPositions) {
         boolean foundNaN = false;
         for (int i = 0; i < numComponents; i++) {
             if (Float.isNaN(aVector[aStartIndex + i])) {
@@ -2504,7 +2510,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setMolecularWeight(
+    private static synchronized void setMolecularWeightSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2521,7 +2527,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setWienerNumber(
+    private static synchronized void setWienerNumberSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2540,7 +2546,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setAtomCount(
+    private static synchronized void setAtomCountSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2557,7 +2563,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setAtomCountOrganicSubset(
+    private static synchronized void setAtomCountOrganicSubsetSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2600,7 +2606,7 @@ public enum Descriptor {
             }
             Descriptor.LOGGER.log(
                     Level.WARNING,
-                    "Descriptor.setAtomCountOrganicSubset: An exception occurred while calculating atom counts for molecule index "
+                    "Descriptor.setAtomCountOrganicSubsetSynchronized: An exception occurred while calculating atom counts for molecule index "
                             + aStartIndex
                             + ".",
                     e
@@ -2617,7 +2623,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setHBondAcceptorCount(
+    private static synchronized void setHBondAcceptorCountSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2634,7 +2640,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setHBondDonorCount(
+    private static synchronized void setHBondDonorCountSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2651,7 +2657,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setTPSA(
+    private static synchronized void setTPSASynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2668,7 +2674,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setLargestChain(
+    private static synchronized void setLargestChainSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2685,7 +2691,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setLongestAliphaticChain(
+    private static synchronized void setLongestAliphaticChainSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2702,7 +2708,7 @@ public enum Descriptor {
      * @param aVector Vector of the molecule to be filled with calculated descriptor components (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector where the calculated descriptor components will be stored
      */
-    private static synchronized void setMannholdLogP(
+    private static synchronized void setMannholdLogPSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2719,7 +2725,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setBCUT(
+    private static synchronized void setBCUTSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2739,7 +2745,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setBondCountAll(
+    private static synchronized void setBondCountAllSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2756,7 +2762,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setBondCountSpecified(
+    private static synchronized void setBondCountSpecifiedSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2778,7 +2784,7 @@ public enum Descriptor {
             }
             Descriptor.LOGGER.log(
                     Level.WARNING,
-                    "Descriptor.setBondCountSpecified: An exception occurred while calculating bond counts for molecule index "
+                    "Descriptor.setBondCountSpecifiedSynchronized: An exception occurred while calculating bond counts for molecule index "
                             + aStartIndex
                             + ".",
                     e
@@ -2795,7 +2801,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setBPol(
+    private static synchronized void setBPolSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2812,7 +2818,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setRuleOfFive(
+    private static synchronized void setRuleOfFiveSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2829,7 +2835,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setAromaticAtomsCount(
+    private static synchronized void setAromaticAtomsCountSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2846,7 +2852,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setAromaticBondsCount(
+    private static synchronized void setAromaticBondsCountSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2863,7 +2869,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setRotatableBondsCount(
+    private static synchronized void setRotatableBondsCountSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2880,7 +2886,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setFMF(
+    private static synchronized void setFMFSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2897,7 +2903,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setFractionalCSP3(
+    private static synchronized void setFractionalCSP3Synchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2914,7 +2920,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setHybridizationRatio(
+    private static synchronized void setHybridizationRatioSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2928,7 +2934,7 @@ public enum Descriptor {
             aVector[aStartIndex] = Float.NaN;
             Descriptor.LOGGER.log(
                     Level.WARNING,
-                    "Descriptor.setHybridizationRatio: An exception occurred while calculating hybridization ratio for molecule index "
+                    "Descriptor.setHybridizationRatioSynchronized: An exception occurred while calculating hybridization ratio for molecule index "
                             + aStartIndex + ".",
                     anException
             );
@@ -2944,7 +2950,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setKappaShapeIndices(
+    private static synchronized void setKappaShapeIndicesSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2964,7 +2970,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setPetitjeanNumber(
+    private static synchronized void setPetitjeanNumberSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2981,7 +2987,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setSpiroAtomCount(
+    private static synchronized void setSpiroAtomCountSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -2998,7 +3004,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setVAdjMat(
+    private static synchronized void setVAdjMatSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3015,7 +3021,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setWeightedPath(
+    private static synchronized void setWeightedPathSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3035,7 +3041,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setZagrebIndex(
+    private static synchronized void setZagrebIndexSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3052,7 +3058,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setCarbonTypesDescriptor(
+    private static synchronized void setCarbonTypesDescriptorSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3072,7 +3078,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setALogP(
+    private static synchronized void setALogPSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3091,7 +3097,7 @@ public enum Descriptor {
             aVector[aStartIndex + 2] = Float.NaN;
             Descriptor.LOGGER.log(
                     Level.WARNING,
-                    "Descriptor.setALogP: An exception occurred while calculating ALogP for molecule index "
+                    "Descriptor.setALogPSynchronized: An exception occurred while calculating ALogP for molecule index "
                             + aStartIndex
                             + ".",
                     anException
@@ -3109,7 +3115,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setXLogP(
+    private static synchronized void setXLogPSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3123,7 +3129,7 @@ public enum Descriptor {
             aVector[aStartIndex] = Float.NaN;
             Descriptor.LOGGER.log(
                     Level.WARNING,
-                    "Descriptor.setXLogP: An exception occurred while calculating XLogP for molecule index "
+                    "Descriptor.setXLogPSynchronized: An exception occurred while calculating XLogP for molecule index "
                             + aStartIndex
                             + ".",
                     anException
@@ -3139,7 +3145,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setJPLogP(
+    private static synchronized void setJPLogPSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3156,7 +3162,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setAPol(
+    private static synchronized void setAPolSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3173,7 +3179,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setAutocorrelationCharge(
+    private static synchronized void setAutocorrelationChargeSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3193,7 +3199,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setAutocorrelationMass(
+    private static synchronized void setAutocorrelationMassSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3213,7 +3219,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setAutocorrelationPolarizability(
+    private static synchronized void setAutocorrelationPolarizabilitySynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3233,7 +3239,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setFragmentComplexity(
+    private static synchronized void setFragmentComplexitySynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3250,7 +3256,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setChiChain(
+    private static synchronized void setChiChainSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3270,7 +3276,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setChiCluster(
+    private static synchronized void setChiClusterSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3290,7 +3296,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setChiPathCluster(
+    private static synchronized void setChiPathClusterSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3310,7 +3316,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setChiPath(
+    private static synchronized void setChiPathSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3330,7 +3336,7 @@ public enum Descriptor {
      *  @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      *  @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setFractionalPSA(
+    private static synchronized void setFractionalPSASynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3347,7 +3353,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setLargestPiSystem(
+    private static synchronized void setLargestPiSystemSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3364,7 +3370,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setSmallRing(
+    private static synchronized void setSmallRingSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3384,7 +3390,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setBasicGroupCount(
+    private static synchronized void setBasicGroupCountSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3401,7 +3407,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setAcidicGroupCount(
+    private static synchronized void setAcidicGroupCountSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3418,7 +3424,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setAminoAcidCount(
+    private static synchronized void setAminoAcidCountSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3437,7 +3443,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setKierHallSmarts(
+    private static synchronized void setKierHallSmartsSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3457,7 +3463,7 @@ public enum Descriptor {
      * @param aVector Vector to be filled with descriptor value (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector
      */
-    private static synchronized void setEccentricConnectivityIndex(
+    private static synchronized void setEccentricConnectivityIndexSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3474,7 +3480,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setMDE(
+    private static synchronized void setMDESynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3494,7 +3500,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setVABC(
+    private static synchronized void setVABCSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
@@ -3517,7 +3523,7 @@ public enum Descriptor {
      * @throws IllegalArgumentException If the input molecule is empty
      * @throws CloneNotSupportedException If the molecule cannot be properly copied
      */
-    public static IAtomContainer copyMolecule(IAtomContainer aMolecule)
+    static IAtomContainer copyMolecule(IAtomContainer aMolecule)
             throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
         //<editor-fold desc="Checks">
         if (aMolecule == null) {
@@ -3584,7 +3590,7 @@ public enum Descriptor {
      * @throws IllegalArgumentException If the input molecule is empty
      * @throws CloneNotSupportedException If the molecule cannot be properly processed
      */
-    public static IAtomContainer createMoleculeWithExplicitHydrogens(
+    static IAtomContainer createMoleculeWithExplicitHydrogens(
             IAtomContainer aMolecule
     ) throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
         //<editor-fold desc="Checks">

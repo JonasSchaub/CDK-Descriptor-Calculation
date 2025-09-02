@@ -26,6 +26,7 @@
 package de.unijena.cheminf.clustering.desccalc;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.aromaticity.Aromaticity;
 import org.openscience.cdk.aromaticity.ElectronDonation;
@@ -38,10 +39,14 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Test class for Descriptor class.
@@ -4645,6 +4650,97 @@ class DescriptorTest {
             Assertions.assertTrue(hasAromaticBonds,
                     "Model " + modelName + " should identify aromatic bonds");
         }
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Disabled Test for descriptor calculator to test which descriptors cause issues in parallelization">
+    @Disabled
+    public void testDescriptorCalculator() throws Exception {
+        String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        int tmpNumberOfMolecules = 1000;
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
+
+        for (int i = 0; i < tmpNumberOfMolecules; i++) {
+            IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+            Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
+            tmpMoleculesArray[i] = tmpMolecule;
+        }
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = Descriptor.getAllDescriptors();
+        int tmpNumberOfComponents = Descriptor.getNumberOfComponents(tmpDescriptors);
+
+        // Create matrices and NaN position lists
+        int numberOfMethods = 5;
+        float[][][] matrices = new float[numberOfMethods][tmpNumberOfMolecules][tmpNumberOfComponents];
+        List<List<int[]>> nanPositionsList = new ArrayList<>();
+        for (int i = 0; i < numberOfMethods; i++) {
+            nanPositionsList.add(Collections.synchronizedList(new LinkedList<>()));
+        }
+
+        // Execute calculations: first serial (reference), then parallel
+        for (int methodIndex = 0; methodIndex < numberOfMethods; methodIndex++) {
+            boolean isParallel = methodIndex > 0; // First method (index 0) is serial reference
+
+            boolean result = DescriptorCalculator.setDescriptorsForMoleculesByMoleculeParallelization(
+                    tmpDescriptors,
+                    tmpMoleculesArray,
+                    matrices[methodIndex],
+                    0,
+                    isParallel,
+                    nanPositionsList.get(methodIndex)
+            );
+
+            // Assert expected results
+            if (methodIndex == 0) {
+                Assertions.assertTrue(result); // Reference method should return true
+            } else {
+                Assertions.assertFalse(result); // Parallel methods should return false
+            }
+        }
+
+        // Output results
+        System.out.println("Comparison of calculation methods for: " + tmpSmiles);
+        System.out.println("Selected descriptors: " + Arrays.toString(tmpDescriptors));
+
+        DecimalFormat df = new DecimalFormat("0.0000", DecimalFormatSymbols.getInstance(Locale.US));
+
+        // Differences occur due to parallelization, evidenced by variance in NaN value counts across calculation methods
+        for (int i = 0; i < numberOfMethods; i++) {
+            String methodName = (i == 0) ? "reference" : String.valueOf(i);
+            System.out.println(nanPositionsList.get(i).size() + " NaN positions in method " + methodName);
+        }
+        // Collect all problematic component indices
+        Set<Integer> problematicComponents = new HashSet<>();
+
+        // Collect components with deviating values from reference matrix (index 0)
+        for (int mol = 0; mol < tmpNumberOfMolecules; mol++) {
+            for (int comp = 0; comp < tmpNumberOfComponents; comp++) {
+                float referenceValue = matrices[0][mol][comp]; // Reference matrix is at index 0
+                for (int methodIndex = 1; methodIndex < numberOfMethods; methodIndex++) {
+                    if (matrices[methodIndex][mol][comp] != referenceValue) {
+                        problematicComponents.add(comp);
+                        break; // No need to check other methods for this component
+                    }
+                }
+            }
+        }
+
+        // List problematic components
+        if (!problematicComponents.isEmpty()) {
+            System.out.println("\n=== PROBLEMATIC COMPONENTS ===");
+            System.out.println("Number of problematic components: " + problematicComponents.size());
+
+            // Sort by component index
+            List<Integer> sortedProblematicComponents = new ArrayList<>(problematicComponents);
+            Collections.sort(sortedProblematicComponents);
+
+            System.out.println("Component indices: " + sortedProblematicComponents);
+
+        } else {
+            System.out.println("\n=== NO PROBLEMATIC COMPONENTS FOUND ===");
+        }
+
     }
     //</editor-fold>
 }
