@@ -78,6 +78,7 @@ import static de.unijena.cheminf.clustering.desccalc.Descriptor.ZAGREB_INDEX;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.createMoleculeWithExplicitHydrogens;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.getDescriptorToCdkObjectMap;
 
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.qsar.descriptors.molecular.AtomCountDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.BondCountDescriptor;
@@ -116,12 +117,80 @@ public class DescriptorCalculator {
 
     }
 
-        //<editor-fold desc="Private static final LOGGER">
-        /**
-         * Logger of this class.
-         */
-        private static final Logger LOGGER = Logger.getLogger(DescriptorCalculator.class.getName());
-        //</editor-fold>
+    //<editor-fold desc="Private static final LOGGER">
+    /**
+     * Logger of this class.
+     */
+    private static final Logger LOGGER = Logger.getLogger(DescriptorCalculator.class.getName());
+    //</editor-fold>
+
+    //<editor-fold desc="Private static final descriptor instances for descriptors with parameters">
+    /**
+     * Elements considered in the organic subset (C, H, N, O, S, P, F, Br, Cl, I) for the AtomCountDescriptor
+     */
+    private static final String[] ORGANIC_SUBSET_ELEMENTS = {
+            "C", "H", "N", "O", "S", "P", "F", "Br", "Cl", "I"
+    };
+
+    /**
+     * Bond types for BondCountDescriptor (single, double, triple bonds)
+     */
+    private static final String[] BOND_TYPES = {
+            "s", "d", "t"  // single, double, triple
+    };
+
+    /**
+     * Pre-created AtomCountDescriptor instances for each element in the organic subset to avoid
+     * repeated instantiation during calculations.
+     */
+    private static final AtomCountDescriptor[] ORGANIC_SUBSET_DESCRIPTORS;
+    /**
+     * Pre-created BondCountDescriptor instances for each bond type to avoid
+     * repeated instantiation during calculations.
+     */
+    private static final BondCountDescriptor[] BOND_COUNT_DESCRIPTORS;
+
+    // Initialize BOND_COUNT_DESCRIPTORS in the static block (add to existing block)
+    static {
+        try {
+            ORGANIC_SUBSET_DESCRIPTORS = createOrganicSubsetDescriptors();
+            BOND_COUNT_DESCRIPTORS = createBondCountDescriptors();
+        } catch (CDKException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Method to create AtomCountDescriptor instances for the organic subset elements
+    private static AtomCountDescriptor[] createOrganicSubsetDescriptors() throws CDKException {
+        AtomCountDescriptor[] descriptors = new AtomCountDescriptor[ORGANIC_SUBSET_ELEMENTS.length];
+        for (int i = 0; i < ORGANIC_SUBSET_ELEMENTS.length; i++) {
+            AtomCountDescriptor desc = new AtomCountDescriptor();
+            try {
+                desc.setParameters(new Object[]{ORGANIC_SUBSET_ELEMENTS[i]});
+            } catch (CDKException e) {
+                throw new RuntimeException(e);
+            }
+            descriptors[i] = desc;
+        }
+        return descriptors;
+    }
+
+    // Method to create BondCountDescriptor instances for the bond types
+    private static BondCountDescriptor[] createBondCountDescriptors() throws CDKException {
+        BondCountDescriptor[] descriptors = new BondCountDescriptor[BOND_TYPES.length];
+        for (int i = 0; i < BOND_TYPES.length; i++) {
+            BondCountDescriptor desc = new BondCountDescriptor();
+            try {
+                desc.setParameters(new Object[]{BOND_TYPES[i]});
+            } catch (CDKException e) {
+                throw new RuntimeException(e);
+            }
+            descriptors[i] = desc;
+        }
+        return descriptors;
+    }
+
+    //</editor-fold>
 
     /**
      * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
@@ -628,37 +697,9 @@ public class DescriptorCalculator {
             int aStartIndex
     ) {
         try {
-            AtomCountDescriptor atomCountDesc = (AtomCountDescriptor) getDescriptorToCdkObjectMap().get(ATOM_COUNT_ORGANIC_SUBSET);
-            //set parameter to count carbon atoms
-            atomCountDesc.setParameters(new Object[]{"C"});
-            aVector[aStartIndex] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count hydrogen atoms
-            atomCountDesc.setParameters(new Object[]{"H"});
-            aVector[aStartIndex + 1] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count nitrogen atoms
-            atomCountDesc.setParameters(new Object[]{"N"});
-            aVector[aStartIndex + 2] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count oxygen atoms
-            atomCountDesc.setParameters(new Object[]{"O"});
-            aVector[aStartIndex + 3] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count sulfur atoms
-            atomCountDesc.setParameters(new Object[]{"S"});
-            aVector[aStartIndex + 4] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count phosphorus atoms
-            atomCountDesc.setParameters(new Object[]{"P"});
-            aVector[aStartIndex + 5] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count fluorine atoms
-            atomCountDesc.setParameters(new Object[]{"F"});
-            aVector[aStartIndex + 6] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count bromine atoms
-            atomCountDesc.setParameters(new Object[]{"Br"});
-            aVector[aStartIndex + 7] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count chlorine atoms
-            atomCountDesc.setParameters(new Object[]{"Cl"});
-            aVector[aStartIndex + 8] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count iodine atoms
-            atomCountDesc.setParameters(new Object[]{"I"});
-            aVector[aStartIndex + 9] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+            for (int i = 0; i < ORGANIC_SUBSET_DESCRIPTORS.length; i++) {
+                aVector[aStartIndex + i] = (float) ((IntegerResult) ORGANIC_SUBSET_DESCRIPTORS[i].calculate(anAtomContainer).getValue()).intValue();
+            }
         } catch (Exception e) {
             for (int i = 0; i < 10; i++) {
                 aVector[aStartIndex + i] = Float.NaN;
@@ -836,15 +877,11 @@ public class DescriptorCalculator {
     ) {
         try {
             // Single bonds (s)
-            BondCountDescriptor bondCountDesc = (BondCountDescriptor)getDescriptorToCdkObjectMap().get(BOND_COUNT_SPECIFIED);
-            bondCountDesc.setParameters(new Object[]{"s"});
-            aVector[aStartIndex] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
+            aVector[aStartIndex] = (float) ((IntegerResult) BOND_COUNT_DESCRIPTORS[0].calculate(anAtomContainer).getValue()).intValue();
             // Double bonds (d)
-            bondCountDesc.setParameters(new Object[]{"d"});
-            aVector[aStartIndex + 1] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
+            aVector[aStartIndex + 1] = (float) ((IntegerResult) BOND_COUNT_DESCRIPTORS[1].calculate(anAtomContainer).getValue()).intValue();
             // Triple bonds (t)
-            bondCountDesc.setParameters(new Object[]{"t"});
-            aVector[aStartIndex + 2] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
+            aVector[aStartIndex + 2] = (float) ((IntegerResult) BOND_COUNT_DESCRIPTORS[2].calculate(anAtomContainer).getValue()).intValue();
         } catch (Exception e) {
             for (int i = 0; i < 3; i++) {
                 aVector[aStartIndex + i] = Float.NaN;
