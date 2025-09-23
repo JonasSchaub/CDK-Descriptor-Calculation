@@ -4654,8 +4654,11 @@ class DescriptorTest {
     //</editor-fold>
 
     //<editor-fold desc="Disabled Test for descriptor calculator to test which descriptors cause issues in parallelization">
-    @Disabled
-    public void testDescriptorCalculator() throws Exception {
+    /**
+     * Tests integrity of DescriptorCalcuilator methods.
+     */
+    @Test
+    public void test_IntegrityDescriptorCalculator() throws Exception {
         String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         int tmpNumberOfMolecules = 1000;
@@ -4667,6 +4670,70 @@ class DescriptorTest {
             tmpMoleculesArray[i] = tmpMolecule;
         }
         int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = Descriptor.getAllDescriptors();
+        int tmpNumberOfComponents = Descriptor.getNumberOfComponents(tmpDescriptors);
+        boolean tmpIsParallelCalculation = false;
+
+        try {
+
+            float[][] tmpMatrix1 = new float[tmpNumberOfMolecules][];
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                tmpMatrix1[i] = new float[tmpNumberOfComponents];
+            }
+            List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix1,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+
+            float[][] tmpMatrix2 = new float[tmpNumberOfMolecules][];
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                tmpMatrix2[i] = new float[tmpNumberOfComponents];
+            }
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    DescriptorCalculator.setDescriptorsForMoleculesByMoleculeParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix2,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                for (int j = 0; j < tmpNumberOfComponents; j++) {
+                    Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix2[i][j]);
+                }
+            }
+
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
+    /**
+     * Tests DescriptorCalculator.setDescriptorsForMoleculesByMoleculeParallelization to analyze which descriptors cause issues in parallelization.
+     */
+    @Disabled
+    @Test
+    public void testDescriptorCalculator() throws Exception {
+        String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        int tmpNumberOfMolecules = 1000;
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
+
+        for (int i = 0; i < tmpNumberOfMolecules; i++) {
+            IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+            Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
+            tmpMoleculesArray[i] = tmpMolecule;
+        }
         Descriptor[] tmpDescriptors = Descriptor.getAllDescriptors();
         int tmpNumberOfComponents = Descriptor.getNumberOfComponents(tmpDescriptors);
 
@@ -4742,5 +4809,128 @@ class DescriptorTest {
         }
 
     }
+
+    /**
+     * Tests DescriptorCalculator.setDescriptorsForMoleculesByMoleculeParallelization for each individual descriptor
+     * to analyze which descriptors cause issues in parallelization.
+     */
+    @Disabled
+    @Test
+    public void testIndividualDescriptorsParallelization() throws Exception {
+        String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        int tmpNumberOfMolecules = 1000;
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
+
+        for (int i = 0; i < tmpNumberOfMolecules; i++) {
+            IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+            Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
+            tmpMoleculesArray[i] = tmpMolecule;
+        }
+
+        Descriptor[] allDescriptors = Descriptor.getAllDescriptors();
+        List<Descriptor> problematicDescriptors = new ArrayList<>();
+
+        System.out.println("Testing individual descriptors for parallelization compatibility:");
+        System.out.println("Molecule: " + tmpSmiles);
+        System.out.println("Number of molecules: " + tmpNumberOfMolecules);
+        System.out.println("Total descriptors to test: " + allDescriptors.length);
+        System.out.println();
+
+        // Test each descriptor individually
+        for (Descriptor descriptor : allDescriptors) {
+            int numberOfMethods = 3; // Serial reference + 2 parallel runs
+            int tmpNumberOfComponents = descriptor.getDescriptorComponentNumber();
+            float[][][] matrices = new float[numberOfMethods][tmpNumberOfMolecules][tmpNumberOfComponents];
+            List<List<int[]>> nanPositionsList = new ArrayList<>();
+
+            for (int i = 0; i < numberOfMethods; i++) {
+                nanPositionsList.add(Collections.synchronizedList(new LinkedList<>()));
+            }
+
+            // Execute calculations: first serial (reference), then parallel
+            for (int methodIndex = 0; methodIndex < numberOfMethods; methodIndex++) {
+                boolean isParallel = methodIndex > 0;
+
+                boolean result = DescriptorCalculator.setDescriptorsForMoleculesByMoleculeParallelization(
+                        new Descriptor[]{descriptor},
+                        tmpMoleculesArray,
+                        matrices[methodIndex],
+                        0,
+                        isParallel,
+                        nanPositionsList.get(methodIndex)
+                );
+                // Assert expected results
+                if (methodIndex == 0) {
+                    Assertions.assertTrue(result); // Reference method should return true
+                }
+            }
+
+            // Use your original logic for comparison
+            System.out.println("Descriptor: " + descriptor.name());
+
+            // Differences occur due to parallelization, evidenced by variance in NaN value counts across calculation methods
+            for (int i = 0; i < numberOfMethods; i++) {
+                String methodName = (i == 0) ? "reference" : String.valueOf(i);
+                System.out.println(nanPositionsList.get(i).size() + " NaN positions in method " + methodName);
+            }
+
+            // Collect all problematic component indices
+            Set<Integer> problematicComponents = new HashSet<>();
+
+            // Collect components with deviating values from reference matrix (index 0)
+            for (int mol = 0; mol < tmpNumberOfMolecules; mol++) {
+                for (int comp = 0; comp < tmpNumberOfComponents; comp++) {
+                    float referenceValue = matrices[0][mol][comp]; // Reference matrix is at index 0
+                    for (int methodIndex = 1; methodIndex < numberOfMethods; methodIndex++) {
+                        if (matrices[methodIndex][mol][comp] != referenceValue) {
+                            problematicComponents.add(comp);
+                            break; // No need to check other methods for this component
+                        }
+                    }
+                }
+            }
+
+            // List problematic components
+            if (!problematicComponents.isEmpty()) {
+                System.out.println("=== PROBLEMATIC COMPONENTS ===");
+                System.out.println("Number of problematic components: " + problematicComponents.size());
+
+                // Sort by component index
+                List<Integer> sortedProblematicComponents = new ArrayList<>(problematicComponents);
+                Collections.sort(sortedProblematicComponents);
+
+                System.out.println("Component indices: " + sortedProblematicComponents);
+
+                problematicDescriptors.add(descriptor);
+            } else {
+                System.out.println("=== NO PROBLEMATIC COMPONENTS FOUND ===");
+            }
+
+            System.out.println(); // Empty line for separation
+        }
+
+        // Summary
+        System.out.println();
+        System.out.println("=== FINAL SUMMARY ===");
+        System.out.printf("Total descriptors tested: %d%n", allDescriptors.length);
+        System.out.printf("Problematic descriptors: %d%n", problematicDescriptors.size());
+
+        if (!problematicDescriptors.isEmpty()) {
+            System.out.println();
+            System.out.println("=== PROBLEMATIC DESCRIPTORS ===");
+            for (Descriptor descriptor : problematicDescriptors) {
+                System.out.printf("- %s (components: %d, fast: %s, safe: %s)%n",
+                        descriptor.name(),
+                        descriptor.getDescriptorComponentNumber(),
+                        descriptor.isFast(),
+                        descriptor.isSafe());
+            }
+        } else {
+            System.out.println();
+            System.out.println("=== ALL DESCRIPTORS ARE THREAD-SAFE ===");
+        }
+    }
+
     //</editor-fold>
 }
