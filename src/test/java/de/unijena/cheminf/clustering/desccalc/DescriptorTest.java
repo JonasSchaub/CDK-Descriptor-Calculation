@@ -30,6 +30,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.aromaticity.Aromaticity;
 import org.openscience.cdk.aromaticity.ElectronDonation;
+import org.openscience.cdk.fingerprint.IFingerprinter;
+import org.openscience.cdk.fingerprint.PubchemFingerprinter;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
@@ -41,6 +43,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -285,7 +288,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor ATOM_COUNT_ORGANIC_SUBSET.
+     * Tests method for the organic subset of individual atom counts (C, H, N, O, S, P, F, Br, Cl, I) in a complex molecule.
      */
     @Test
     public void test_ATOM_COUNT_ORGANIC_SUBSET() throws Exception {
@@ -294,7 +297,18 @@ class DescriptorTest {
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ATOM_COUNT_ORGANIC_SUBSET};
+        Descriptor[] tmpDescriptors = new Descriptor[]{
+                Descriptor.ATOM_COUNT_C,
+                Descriptor.ATOM_COUNT_H,
+                Descriptor.ATOM_COUNT_N,
+                Descriptor.ATOM_COUNT_O,
+                Descriptor.ATOM_COUNT_S,
+                Descriptor.ATOM_COUNT_P,
+                Descriptor.ATOM_COUNT_F,
+                Descriptor.ATOM_COUNT_BR,
+                Descriptor.ATOM_COUNT_CL,
+                Descriptor.ATOM_COUNT_I
+        };
         boolean tmpIsParallelCalculation = false;
 
         try {
@@ -1126,7 +1140,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor BOND_COUNT_SPECIFIED.
+     * Tests method for descriptors BOND_COUNT_SINGLE, BOND_COUNT_DOUBLE, and BOND_COUNT_TRIPLE.
      */
     @Test
     public void test_BOND_COUNT_SPECIFIED() throws Exception {
@@ -1135,7 +1149,11 @@ class DescriptorTest {
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BOND_COUNT_SPECIFIED};
+        Descriptor[] tmpDescriptors = new Descriptor[]{
+                Descriptor.BOND_COUNT_SINGLE,
+                Descriptor.BOND_COUNT_DOUBLE,
+                Descriptor.BOND_COUNT_TRIPLE
+        };
         boolean tmpIsParallelCalculation = false;
         DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
         DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
@@ -4158,6 +4176,55 @@ class DescriptorTest {
             Assertions.fail();
         }
     }
+
+    /**
+     * Tests PubChem fingerprint functionality.
+     */
+    @Test
+    public void test_PUBCHEM_FINGERPRINT() throws Exception {
+        String tmpSmiles = "C1=CC=C(C=C1)C[N+]2=C(C=C(C=C2C=CC3=CC=CC=C3)C4=CC=CC=C4)C5=CC=CC=C5"; // 1-Benzyl-2,4-diphenyl-6-(2-phenylethenyl)pyridin-1-ium CID: 3828524
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+        Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.PUBCHEM_FINGERPRINTER};
+        boolean tmpIsParallelCalculation = false;
+
+        try {
+            // Test descriptor component count
+            Assertions.assertEquals(881, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[1][881];
+            List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
+
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+
+            // Verify that expected bits are set (convert reference fingerprint to expected values)
+            IFingerprinter printer = new PubchemFingerprinter(SilentChemObjectBuilder.getInstance());
+            BitSet ref = PubchemFingerprinter
+                    .decode("AAADceB+AAAAAAAAAAAAAAAAAAAAAAAAAAA8YMGCAAAAAAAB1AAAHAAAAAAADAjBHgQwgJMMEACgAyRiRACCgCAhAiAI2CA4ZJgIIOLAkZGEIAhggADIyAcQgMAOgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==");
+
+            // Convert reference BitSet to expected float array for comparison
+            for (int i = 0; i < 881; i++) {
+                float expected = ref.get(i) ? 1.0f : 0.0f;
+                Assertions.assertEquals(expected, tmpMatrix[0][i], "Bit " + i + " mismatch");
+            }
+
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
+
     // Add new descriptor tests here!
 
     //</editor-fold>
@@ -4655,7 +4722,7 @@ class DescriptorTest {
 
     //<editor-fold desc="Disabled Test for descriptor calculator to test which descriptors cause issues in parallelization">
     /**
-     * Tests integrity of DescriptorCalcuilator methods.
+     * Tests integrity of DescriptorCalculator methods.
      */
     @Test
     public void test_IntegrityDescriptorCalculator() throws Exception {
@@ -4670,7 +4737,7 @@ class DescriptorTest {
             tmpMoleculesArray[i] = tmpMolecule;
         }
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = Descriptor.getAllDescriptors();
+        Descriptor[] tmpDescriptors = Descriptor.getSpecifiedDescriptors(true, true, true, false);
         int tmpNumberOfComponents = Descriptor.getNumberOfComponents(tmpDescriptors);
         boolean tmpIsParallelCalculation = false;
 
@@ -4718,6 +4785,7 @@ class DescriptorTest {
             Assertions.fail();
         }
     }
+
     /**
      * Tests DescriptorCalculator.setDescriptorsForMoleculesByMoleculeParallelization to analyze which descriptors cause issues in parallelization.
      */
@@ -4734,7 +4802,7 @@ class DescriptorTest {
             Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
             tmpMoleculesArray[i] = tmpMolecule;
         }
-        Descriptor[] tmpDescriptors = Descriptor.getAllDescriptors();
+        Descriptor[] tmpDescriptors = Descriptor.getSpecifiedDescriptors(true, true, true, false);
         int tmpNumberOfComponents = Descriptor.getNumberOfComponents(tmpDescriptors);
 
         // Create matrices and NaN position lists
@@ -4828,7 +4896,7 @@ class DescriptorTest {
             tmpMoleculesArray[i] = tmpMolecule;
         }
 
-        Descriptor[] allDescriptors = Descriptor.getAllDescriptors();
+        Descriptor[] allDescriptors = Descriptor.getSpecifiedDescriptors(true, true, true, false);
         List<Descriptor> problematicDescriptors = new ArrayList<>();
 
         System.out.println("Testing individual descriptors for parallelization compatibility:");

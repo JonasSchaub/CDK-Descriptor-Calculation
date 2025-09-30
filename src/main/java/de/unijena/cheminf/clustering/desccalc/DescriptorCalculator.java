@@ -30,7 +30,16 @@ import static de.unijena.cheminf.clustering.desccalc.Descriptor.AMINO_ACID_COUNT
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.AROMATIC_ATOMS_COUNT;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.AROMATIC_BONDS_COUNT;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.ATOM_COUNT;
-import static de.unijena.cheminf.clustering.desccalc.Descriptor.ATOM_COUNT_ORGANIC_SUBSET;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.ATOM_COUNT_BR;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.ATOM_COUNT_C;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.ATOM_COUNT_CL;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.ATOM_COUNT_F;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.ATOM_COUNT_H;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.ATOM_COUNT_I;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.ATOM_COUNT_N;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.ATOM_COUNT_O;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.ATOM_COUNT_P;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.ATOM_COUNT_S;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.AUTOCORRELATION_CHARGE;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.AUTOCORRELATION_MASS;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.AUTOCORRELATION_POLARIZABILITY;
@@ -39,7 +48,9 @@ import static de.unijena.cheminf.clustering.desccalc.Descriptor.A_POL;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.BASIC_GROUP_COUNT;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.BCUT;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.BOND_COUNT_ALL;
-import static de.unijena.cheminf.clustering.desccalc.Descriptor.BOND_COUNT_SPECIFIED;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.BOND_COUNT_DOUBLE;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.BOND_COUNT_SINGLE;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.BOND_COUNT_TRIPLE;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.B_POL;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.CARBON_TYPES;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.CHI_CHAIN;
@@ -77,16 +88,16 @@ import static de.unijena.cheminf.clustering.desccalc.Descriptor.X_LOG_P;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.ZAGREB_INDEX;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.createMoleculeWithExplicitHydrogens;
 import static de.unijena.cheminf.clustering.desccalc.Descriptor.getDescriptorToCdkObjectMap;
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.isFingerprint;
 
-import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.qsar.descriptors.molecular.AtomCountDescriptor;
-import org.openscience.cdk.qsar.descriptors.molecular.BondCountDescriptor;
+import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.result.DoubleArrayResult;
 import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.IntegerArrayResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
 
+import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -106,7 +117,6 @@ import java.util.stream.IntStream;
  * @author Jonas Schaub
  * @author Manuel Schauer
  */
-@Deprecated
 public class DescriptorCalculator {
 
     /**
@@ -124,73 +134,10 @@ public class DescriptorCalculator {
     private static final Logger LOGGER = Logger.getLogger(DescriptorCalculator.class.getName());
     //</editor-fold>
 
-    //<editor-fold desc="Private static final descriptor instances for descriptors with parameters">
     /**
-     * Elements considered in the organic subset (C, H, N, O, S, P, F, Br, Cl, I) for the AtomCountDescriptor
+     * Map of Descriptor enum values to corresponding CDK descriptor instances.
      */
-    private static final String[] ORGANIC_SUBSET_ELEMENTS = {
-            "C", "H", "N", "O", "S", "P", "F", "Br", "Cl", "I"
-    };
-
-    /**
-     * Bond types for BondCountDescriptor (single, double, triple bonds)
-     */
-    private static final String[] BOND_TYPES = {
-            "s", "d", "t"  // single, double, triple
-    };
-
-    /**
-     * Pre-created AtomCountDescriptor instances for each element in the organic subset to avoid
-     * repeated instantiation during calculations.
-     */
-    private static final AtomCountDescriptor[] ORGANIC_SUBSET_DESCRIPTORS;
-    /**
-     * Pre-created BondCountDescriptor instances for each bond type to avoid
-     * repeated instantiation during calculations.
-     */
-    private static final BondCountDescriptor[] BOND_COUNT_DESCRIPTORS;
-
-    // Initialize BOND_COUNT_DESCRIPTORS in the static block (add to existing block)
-    static {
-        try {
-            ORGANIC_SUBSET_DESCRIPTORS = createOrganicSubsetDescriptors();
-            BOND_COUNT_DESCRIPTORS = createBondCountDescriptors();
-        } catch (CDKException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // Method to create AtomCountDescriptor instances for the organic subset elements
-    private static AtomCountDescriptor[] createOrganicSubsetDescriptors() throws CDKException {
-        AtomCountDescriptor[] descriptors = new AtomCountDescriptor[ORGANIC_SUBSET_ELEMENTS.length];
-        for (int i = 0; i < ORGANIC_SUBSET_ELEMENTS.length; i++) {
-            AtomCountDescriptor desc = new AtomCountDescriptor();
-            try {
-                desc.setParameters(new Object[]{ORGANIC_SUBSET_ELEMENTS[i]});
-            } catch (CDKException e) {
-                throw new RuntimeException(e);
-            }
-            descriptors[i] = desc;
-        }
-        return descriptors;
-    }
-
-    // Method to create BondCountDescriptor instances for the bond types
-    private static BondCountDescriptor[] createBondCountDescriptors() throws CDKException {
-        BondCountDescriptor[] descriptors = new BondCountDescriptor[BOND_TYPES.length];
-        for (int i = 0; i < BOND_TYPES.length; i++) {
-            BondCountDescriptor desc = new BondCountDescriptor();
-            try {
-                desc.setParameters(new Object[]{BOND_TYPES[i]});
-            } catch (CDKException e) {
-                throw new RuntimeException(e);
-            }
-            descriptors[i] = desc;
-        }
-        return descriptors;
-    }
-
-    //</editor-fold>
+    private static final EnumMap<Descriptor, IMolecularDescriptor> descriptorToCdkObjectMap = getDescriptorToCdkObjectMap();
 
     /**
      * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
@@ -239,6 +186,14 @@ public class DescriptorCalculator {
                         "DescriptorCalculator.setCalculatedDescriptorComponentsByMoleculeParallelization: A descriptor in aDescriptors is null."
                 );
                 throw new IllegalArgumentException("DescriptorCalculator.setCalculatedDescriptorComponentsByMoleculeParallelization: A descriptor in aDescriptors is null.");
+            }
+
+            if (isFingerprint(tmpDescriptor)) {
+                DescriptorCalculator.LOGGER.log(
+                        Level.SEVERE,
+                        "DescriptorCalculator.setCalculatedDescriptorComponentsByMoleculeParallelization: Fingerprint descriptors are not supported."
+                );
+                throw new IllegalArgumentException("DescriptorCalculator.setCalculatedDescriptorComponentsByMoleculeParallelization: Fingerprint descriptors are not supported.");
             }
         }
         if (anAtomContainerArray == null || anAtomContainerArray.length == 0) {
@@ -453,8 +408,35 @@ public class DescriptorCalculator {
                 case ATOM_COUNT:
                     setAtomCount(anAtomContainer, aVector, aStartIndex);
                     break;
-                case ATOM_COUNT_ORGANIC_SUBSET:
-                    setAtomCountOrganicSubset(anAtomContainer, aVector, aStartIndex);
+                case ATOM_COUNT_C:
+                    setAtomCountC(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_H:
+                    setAtomCountH(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_N:
+                    setAtomCountN(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_O:
+                    setAtomCountO(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_S:
+                    setAtomCountS(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_P:
+                    setAtomCountP(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_F:
+                    setAtomCountF(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_BR:
+                    setAtomCountBr(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_CL:
+                    setAtomCountCl(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_I:
+                    setAtomCountI(anAtomContainer, aVector, aStartIndex);
                     break;
                 case H_BOND_ACCEPTOR_COUNT:
                     setHBondAcceptorCount(anAtomContainer, aVector, aStartIndex);
@@ -480,8 +462,14 @@ public class DescriptorCalculator {
                 case BOND_COUNT_ALL:
                     setBondCountAll(anAtomContainer, aVector, aStartIndex);
                     break;
-                case BOND_COUNT_SPECIFIED:
-                    setBondCountSpecified(anAtomContainer, aVector, aStartIndex);
+                case BOND_COUNT_SINGLE:
+                    setBondCountSingle(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case BOND_COUNT_DOUBLE:
+                    setBondCountDouble(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case BOND_COUNT_TRIPLE:
+                    setBondCountTriple(anAtomContainer, aVector, aStartIndex);
                     break;
                 case B_POL:
                     setBPol(anAtomContainer, aVector, aStartIndex);
@@ -640,7 +628,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(MOLECULAR_WEIGHT).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(MOLECULAR_WEIGHT).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -658,7 +646,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        DoubleArrayResult tmpResult = (DoubleArrayResult) getDescriptorToCdkObjectMap().get(WIENER_NUMBER).calculate(anAtomContainer).getValue();
+        DoubleArrayResult tmpResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(WIENER_NUMBER).calculate(anAtomContainer).getValue();
         aVector[aStartIndex] = (float) tmpResult.get(0); //Wiener path number
         aVector[aStartIndex + 1] = (float) tmpResult.get(1); //Wiener polarity number
     }
@@ -678,11 +666,11 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
-     * Sets atom count for organic subset (C, H, N, O, S, P, F, Br, Cl, I).
+     * Sets atom count for carbon.
      * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
      * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
@@ -691,27 +679,175 @@ public class DescriptorCalculator {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static void setAtomCountOrganicSubset(
+    private static void setAtomCountC(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
     ) {
-        try {
-            for (int i = 0; i < ORGANIC_SUBSET_DESCRIPTORS.length; i++) {
-                aVector[aStartIndex + i] = (float) ((IntegerResult) ORGANIC_SUBSET_DESCRIPTORS[i].calculate(anAtomContainer).getValue()).intValue();
-            }
-        } catch (Exception e) {
-            for (int i = 0; i < 10; i++) {
-                aVector[aStartIndex + i] = Float.NaN;
-            }
-            DescriptorCalculator.LOGGER.log(
-                    Level.WARNING,
-                    "Descriptor.setAtomCountOrganicSubset: An exception occurred while calculating atom counts for molecule index "
-                            + aStartIndex
-                            + ".",
-                    e
-            );
-        }
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_C).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for hydrogen.
+     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
+     * Use only in single-threaded contexts or when thread safety is ensured externally.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static void setAtomCountH(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_H).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for nitrogen.
+     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
+     * Use only in single-threaded contexts or when thread safety is ensured externally.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     *
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static void setAtomCountN(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_N).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for oxygen.
+     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
+     * Use only in single-threaded contexts or when thread safety is ensured externally.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static void setAtomCountO(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_O).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for sulfur.
+     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
+     * Use only in single-threaded contexts or when thread safety is ensured externally.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static void setAtomCountS(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_S).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for phosphorus.
+     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
+     * Use only in single-threaded contexts or when thread safety is ensured externally.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static void setAtomCountP(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_P).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for fluoride.
+     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
+     * Use only in single-threaded contexts or when thread safety is ensured externally.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static void setAtomCountF(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_F).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for bromide.
+     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
+     * Use only in single-threaded contexts or when thread safety is ensured externally.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static void setAtomCountBr(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_BR).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for cloride.
+     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
+     * Use only in single-threaded contexts or when thread safety is ensured externally.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static void setAtomCountCl(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_CL).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for iodine.
+     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
+     * Use only in single-threaded contexts or when thread safety is ensured externally.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static void setAtomCountI(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_I).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -729,7 +865,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(H_BOND_ACCEPTOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(H_BOND_ACCEPTOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -747,7 +883,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(H_BOND_DONOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(H_BOND_DONOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -765,7 +901,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(TPSA).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(TPSA).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -783,7 +919,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(LARGEST_CHAIN).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LARGEST_CHAIN).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -801,7 +937,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(LONGEST_ALIPHATIC_CHAIN).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LONGEST_ALIPHATIC_CHAIN).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -818,7 +954,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(MANNHOLD_LOGP).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(MANNHOLD_LOGP).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -836,7 +972,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        DoubleArrayResult result = (DoubleArrayResult) getDescriptorToCdkObjectMap().get(BCUT).calculate(anAtomContainer).getValue();
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(BCUT).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 6; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
@@ -857,11 +993,11 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(BOND_COUNT_ALL).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_ALL).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
-     * Sets specific bond counts (single, double, triple).
+     * Sets specific single bond count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
      * Use only in single-threaded contexts or when thread safety is ensured externally.
@@ -870,30 +1006,47 @@ public class DescriptorCalculator {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static void setBondCountSpecified(
+    private static void setBondCountSingle(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
     ) {
-        try {
-            // Single bonds (s)
-            aVector[aStartIndex] = (float) ((IntegerResult) BOND_COUNT_DESCRIPTORS[0].calculate(anAtomContainer).getValue()).intValue();
-            // Double bonds (d)
-            aVector[aStartIndex + 1] = (float) ((IntegerResult) BOND_COUNT_DESCRIPTORS[1].calculate(anAtomContainer).getValue()).intValue();
-            // Triple bonds (t)
-            aVector[aStartIndex + 2] = (float) ((IntegerResult) BOND_COUNT_DESCRIPTORS[2].calculate(anAtomContainer).getValue()).intValue();
-        } catch (Exception e) {
-            for (int i = 0; i < 3; i++) {
-                aVector[aStartIndex + i] = Float.NaN;
-            }
-            DescriptorCalculator.LOGGER.log(
-                    Level.WARNING,
-                    "Descriptor.setBondCountSpecified: An exception occurred while calculating bond counts for molecule index "
-                            + aStartIndex
-                            + ".",
-                    e
-            );
-        }
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_SINGLE).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets specific double bond count.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
+     * Use only in single-threaded contexts or when thread safety is ensured externally.
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static void setBondCountDouble(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_DOUBLE).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets specific triple bond count.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static void setBondCountTriple(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_TRIPLE).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -911,7 +1064,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(B_POL).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(B_POL).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -929,7 +1082,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(RULE_OF_FIVE).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(RULE_OF_FIVE).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -947,7 +1100,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(AROMATIC_ATOMS_COUNT).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(AROMATIC_ATOMS_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -965,7 +1118,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(AROMATIC_BONDS_COUNT).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(AROMATIC_BONDS_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -983,7 +1136,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(ROTATABLE_BONDS_COUNT).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ROTATABLE_BONDS_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -1001,7 +1154,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(FMF).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FMF).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -1019,7 +1172,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(FRACTIONAL_CSP3).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FRACTIONAL_CSP3).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -1041,7 +1194,7 @@ public class DescriptorCalculator {
             // Create a copy of the molecule with explicit hydrogen atoms
             IAtomContainer moleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
             // Calculate XLogP using the molecule copy containing explicit hydrogen atoms
-            aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(HYBRIDIZATION_RATIO).calculate(moleculeWithExplicitH).getValue()).doubleValue();
+            aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(HYBRIDIZATION_RATIO).calculate(moleculeWithExplicitH).getValue()).doubleValue();
         } catch (Exception anException) {
             aVector[aStartIndex] = Float.NaN;
             DescriptorCalculator.LOGGER.log(
@@ -1068,7 +1221,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        DoubleArrayResult result = (DoubleArrayResult) getDescriptorToCdkObjectMap().get(KAPPA_SHAPE_INDICES).calculate(anAtomContainer).getValue();
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(KAPPA_SHAPE_INDICES).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 3; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
@@ -1089,7 +1242,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(PETITJEAN_NUMBER).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(PETITJEAN_NUMBER).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -1107,7 +1260,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(SPIRO_ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(SPIRO_ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -1125,7 +1278,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(V_ADJ_MAT).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(V_ADJ_MAT).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -1143,7 +1296,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        DoubleArrayResult result = (DoubleArrayResult) getDescriptorToCdkObjectMap().get(WEIGHTED_PATH).calculate(anAtomContainer).getValue();
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(WEIGHTED_PATH).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 5; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
@@ -1164,7 +1317,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(ZAGREB_INDEX).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(ZAGREB_INDEX).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -1182,7 +1335,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        IntegerArrayResult result = (IntegerArrayResult) getDescriptorToCdkObjectMap().get(CARBON_TYPES).calculate(anAtomContainer).getValue();
+        IntegerArrayResult result = (IntegerArrayResult) descriptorToCdkObjectMap.get(CARBON_TYPES).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 9; i++) {
             aVector[aStartIndex + i] = result.get(i);
         }
@@ -1207,7 +1360,7 @@ public class DescriptorCalculator {
             // Create a copy of the molecule with explicit hydrogen atoms
             IAtomContainer moleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
             // Calculate ALogP using the molecule copy containing explicit hydrogen atoms
-            DoubleArrayResult result = (DoubleArrayResult) getDescriptorToCdkObjectMap().get(A_LOG_P).calculate(moleculeWithExplicitH).getValue();
+            DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(A_LOG_P).calculate(moleculeWithExplicitH).getValue();
             aVector[aStartIndex] = (float) result.get(0);      // ALogP
             aVector[aStartIndex + 1] = (float) result.get(1);  // ALogP squared
             aVector[aStartIndex + 2] = (float) result.get(2);  // Molar Refractivity
@@ -1245,7 +1398,7 @@ public class DescriptorCalculator {
             // Create a copy of the molecule with explicit hydrogen atoms
             IAtomContainer moleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
             // Calculate XLogP using the molecule copy containing explicit hydrogen atoms
-            aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(X_LOG_P).calculate(moleculeWithExplicitH).getValue()).doubleValue();
+            aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(X_LOG_P).calculate(moleculeWithExplicitH).getValue()).doubleValue();
         } catch (Exception anException) {
             aVector[aStartIndex] = Float.NaN;
             DescriptorCalculator.LOGGER.log(
@@ -1272,7 +1425,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(JP_LOG_P).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(JP_LOG_P).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -1290,7 +1443,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(A_POL).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(A_POL).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -1308,7 +1461,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        DoubleArrayResult result = (DoubleArrayResult) getDescriptorToCdkObjectMap().get(AUTOCORRELATION_CHARGE).calculate(anAtomContainer).getValue();
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(AUTOCORRELATION_CHARGE).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 5; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
@@ -1329,7 +1482,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        DoubleArrayResult result = (DoubleArrayResult) getDescriptorToCdkObjectMap().get(AUTOCORRELATION_MASS).calculate(anAtomContainer).getValue();
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(AUTOCORRELATION_MASS).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 5; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
@@ -1350,7 +1503,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        DoubleArrayResult result = (DoubleArrayResult) getDescriptorToCdkObjectMap().get(AUTOCORRELATION_POLARIZABILITY).calculate(anAtomContainer).getValue();
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(AUTOCORRELATION_POLARIZABILITY).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 5; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
@@ -1371,7 +1524,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(FRAGMENT_COMPLEXITY).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FRAGMENT_COMPLEXITY).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -1389,7 +1542,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        DoubleArrayResult result = (DoubleArrayResult) getDescriptorToCdkObjectMap().get(CHI_CHAIN).calculate(anAtomContainer).getValue();
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_CHAIN).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 10; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
@@ -1410,7 +1563,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        DoubleArrayResult result = (DoubleArrayResult) getDescriptorToCdkObjectMap().get(CHI_CLUSTER).calculate(anAtomContainer).getValue();
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_CLUSTER).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 8; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
@@ -1431,7 +1584,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        DoubleArrayResult result = (DoubleArrayResult) getDescriptorToCdkObjectMap().get(CHI_PATH_CLUSTER).calculate(anAtomContainer).getValue();
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_PATH_CLUSTER).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 6; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
@@ -1452,7 +1605,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        DoubleArrayResult result = (DoubleArrayResult) getDescriptorToCdkObjectMap().get(CHI_PATH).calculate(anAtomContainer).getValue();
+        DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_PATH).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 16; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
@@ -1473,7 +1626,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(FRACTIONAL_PSA).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FRACTIONAL_PSA).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     /**
@@ -1491,7 +1644,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(LARGEST_PI_SYSTEM).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LARGEST_PI_SYSTEM).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -1509,7 +1662,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        IntegerArrayResult result = (IntegerArrayResult) getDescriptorToCdkObjectMap().get(SMALL_RING).calculate(anAtomContainer).getValue();
+        IntegerArrayResult result = (IntegerArrayResult) descriptorToCdkObjectMap.get(SMALL_RING).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 11; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
@@ -1530,7 +1683,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(BASIC_GROUP_COUNT).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BASIC_GROUP_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -1548,7 +1701,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(ACIDIC_GROUP_COUNT).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ACIDIC_GROUP_COUNT).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -1566,7 +1719,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        IntegerArrayResult aminoAcidCountResult = (IntegerArrayResult) getDescriptorToCdkObjectMap().get(AMINO_ACID_COUNT).calculate(anAtomContainer).getValue();
+        IntegerArrayResult aminoAcidCountResult = (IntegerArrayResult) descriptorToCdkObjectMap.get(AMINO_ACID_COUNT).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 20; i++) {
             aVector[aStartIndex + i] = (float) aminoAcidCountResult.get(i);
         }
@@ -1586,7 +1739,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        IntegerArrayResult result = (IntegerArrayResult) getDescriptorToCdkObjectMap().get(KIER_HALL_SMARTS).calculate(anAtomContainer).getValue();
+        IntegerArrayResult result = (IntegerArrayResult) descriptorToCdkObjectMap.get(KIER_HALL_SMARTS).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 79; i++) {
             aVector[aStartIndex + i] = (float) result.get(i);
         }
@@ -1607,7 +1760,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((IntegerResult) getDescriptorToCdkObjectMap().get(ECCENTRIC_CONNECTIVITY_INDEX).calculate(anAtomContainer).getValue()).intValue();
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ECCENTRIC_CONNECTIVITY_INDEX).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -1625,7 +1778,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        DoubleArrayResult tmpResult = (DoubleArrayResult) getDescriptorToCdkObjectMap().get(MDE).calculate(anAtomContainer).getValue();
+        DoubleArrayResult tmpResult = (DoubleArrayResult) descriptorToCdkObjectMap.get(MDE).calculate(anAtomContainer).getValue();
         for (int i = 0; i < 19; i++) {
             aVector[aStartIndex + i] = (float) tmpResult.get(i);
         }
@@ -1646,7 +1799,7 @@ public class DescriptorCalculator {
             float[] aVector,
             int aStartIndex
     ) {
-        aVector[aStartIndex] = (float) ((DoubleResult) getDescriptorToCdkObjectMap().get(VABC).calculate(anAtomContainer).getValue()).doubleValue();
+        aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(VABC).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
     // Add new descriptor information here!

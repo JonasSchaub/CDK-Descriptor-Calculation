@@ -27,6 +27,11 @@ package de.unijena.cheminf.clustering.desccalc;
 
 import org.openscience.cdk.aromaticity.Aromaticity;
 import org.openscience.cdk.aromaticity.ElectronDonation;
+import org.openscience.cdk.fingerprint.CircularFingerprinter;
+import org.openscience.cdk.fingerprint.IBitFingerprint;
+import org.openscience.cdk.fingerprint.IFingerprinter;
+import org.openscience.cdk.fingerprint.MACCSFingerprinter;
+import org.openscience.cdk.fingerprint.PubchemFingerprinter;
 import org.openscience.cdk.graph.Cycles;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -85,6 +90,7 @@ import org.openscience.cdk.qsar.result.DoubleResult;
 import org.openscience.cdk.qsar.result.IntegerArrayResult;
 import org.openscience.cdk.qsar.result.IntegerResult;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
+import org.openscience.cdk.tools.CDKHydrogenAdder;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import java.util.EnumMap;
@@ -133,11 +139,65 @@ public enum Descriptor {
      */
     ATOM_COUNT(true, true, 1),
     /**
-     * Atom count organic subset, counts the number of all organic atoms separately in the given molecule.
+     * Atom count C, counts the number of all carbon atoms separately in the given molecule.
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT_ORGANIC_SUBSET(true, true, 10),
+    ATOM_COUNT_C(true, true, 1),
+    /**
+     * Atom count H, counts the number of all hydrogen atoms separately in the given molecule.
+     *
+     * @see AtomCountDescriptor
+     */
+    ATOM_COUNT_H(true, true, 1),
+    /**
+     * Atom count N counts the number of all nitrogen atoms separately in the given molecule.
+     *
+     * @see AtomCountDescriptor
+     */
+    ATOM_COUNT_N(true, true, 1),
+    /**
+     * Atom count O, counts the number of all oxygen atoms separately in the given molecule.
+     *
+     * @see AtomCountDescriptor
+     */
+    ATOM_COUNT_O(true, true, 1),
+    /**
+     * Atom count S, counts the number of all sulfur atoms separately in the given molecule.
+     *
+     * @see AtomCountDescriptor
+     */
+    ATOM_COUNT_S(true, true, 1),
+    /**
+     * Atom count P, counts the number of all phosphorus atoms separately in the given molecule.
+     *
+     * @see AtomCountDescriptor
+     */
+    ATOM_COUNT_P(true, true, 1),
+    /**
+     * Atom count F, counts the number of all fluorine atoms separately in the given molecule.
+     *
+     * @see AtomCountDescriptor
+     */
+    ATOM_COUNT_F(true, true, 1),
+    /**
+     * Atom count Br, counts the number of all bromine atoms separately in the given molecule.
+     *
+     * @see AtomCountDescriptor
+     */
+    ATOM_COUNT_BR(true, true, 1),
+    /**
+     * Atom count Cl, counts the number of all chlorine atoms separately in the given molecule.
+     *
+     * @see AtomCountDescriptor
+     */
+    ATOM_COUNT_CL(true, true, 1),
+    /**
+     * Atom count I, counts the number of all iodine atoms separately in the given molecule.
+     *
+     * @see AtomCountDescriptor
+     */
+    ATOM_COUNT_I(true, true, 1),
     /**
      * Total bond count, counts the number of all bonds in a molecule, neglecting the order.
      * Double and triple bonds are counted as one bond.
@@ -147,14 +207,25 @@ public enum Descriptor {
      */
     BOND_COUNT_ALL(true, true, 1),
     /**
-     * Bond count specified, counts the number of bonds in a molecule with specified bond orders.
-     * Returns an array with counts for single, double and triple bonds.
-     * For aromatic bond counts use AROMATIC_BONDS_COUNT.
+     * Bond count single, counts the number of single bonds in a molecule.
      * No bonds to hydrogen atoms are counted.
      *
      * @see BondCountDescriptor
      */
-    BOND_COUNT_SPECIFIED(true, true, 3),
+    BOND_COUNT_SINGLE(true, true, 1),
+    /**
+     * Bond count double, counts the number of double bonds in a molecule.
+     * No bonds to hydrogen atoms are counted.
+     *
+     * @see BondCountDescriptor
+     */
+    BOND_COUNT_DOUBLE(true, true, 1),
+    /**
+     * Bond count triple, counts the number of triple bonds in a molecule.
+     *
+     * @see BondCountDescriptor
+     */
+    BOND_COUNT_TRIPLE(true, true, 1),
     /**
      * H bond acceptor count, counts hydrogen bond acceptors based on a simplified PHACIR scheme.
      * It includes: Oxygen atoms with formal charge ≤ 0 (excluding: Aromatic ether oxygens and oxygens adjacent to nitrogen)
@@ -612,7 +683,34 @@ public enum Descriptor {
      *
      * @see VABCDescriptor
      */
-    VABC(true, true, 1);
+    VABC(true, true, 1),
+    /**
+     * PubChem fingerprinter, generates a 881-bit binary fingerprint based on PubChem's substructure keys.
+     * This fingerprint encodes the presence or absence of specific substructural features
+     * and is useful for similarity searching and chemical space analysis.
+     *
+     * @see PubchemFingerprinter
+     */
+    PUBCHEM_FINGERPRINTER(true, true, 881),
+    /**
+     * Circular fingerprinter, generates a circular fingerprint (similar to ECFP) with a specified size.
+     *
+     * @see CircularFingerprinter
+     */
+    CIRCULAR_FINGERPRINTER_ECFP(true, true, 1024),
+    /**;
+     * Circular fingerprinter, generates an extended fingerprint (similar to FCFP) with a specified size.
+     *
+     * @see CircularFingerprinter
+     */
+    CIRCULAR_FINGERPRINTER_FCFP(true, true, 1024),
+    /**;
+     * MACCS fingerprinter, generates a 166-bit binary fingerprint based on the MACCS structural keys.
+     *
+     * @see MACCSFingerprinter
+     */
+    MACCS_FINGERPRINTER(true, true, 166);
+    //</editor-fold>
 
     // Add new descriptor information here!
 
@@ -691,6 +789,11 @@ public enum Descriptor {
      * EnumMap that maps a descriptor to an instance of its CDK descriptor class
      */
     private static final EnumMap<Descriptor, IMolecularDescriptor> descriptorToCdkObjectMap = new EnumMap<>(Descriptor.class);
+    /**
+     * EnumMap that maps a descriptor to an instance of its CDK fingerprinter class
+     */
+    private static final EnumMap<Descriptor, IFingerprinter> fingerprintToCdkObjectMap = new EnumMap<>(Descriptor.class);
+
     /*
      * Static initializer block to populate the descriptorToCdkObjectMap.
      */
@@ -705,8 +808,55 @@ public enum Descriptor {
             // ATOM_COUNT
             descriptorToCdkObjectMap.put(ATOM_COUNT, new AtomCountDescriptor());
 
-            // ATOM_COUNT_ORGANIC_SUBSET
-            descriptorToCdkObjectMap.put(ATOM_COUNT_ORGANIC_SUBSET, new AtomCountDescriptor());
+            // ATOM_COUNT_C
+            AtomCountDescriptor atomCountCDescriptor = new AtomCountDescriptor();
+            atomCountCDescriptor.setParameters(new Object[] {"C"}); // set carbon as the atom to count
+            descriptorToCdkObjectMap.put(ATOM_COUNT_C, atomCountCDescriptor);
+
+            // ATOM_COUNT_H
+            AtomCountDescriptor atomCountHDescriptor = new AtomCountDescriptor();
+            atomCountHDescriptor.setParameters(new Object[] {"H"}); // set hydrogen as the atom to count
+            descriptorToCdkObjectMap.put(ATOM_COUNT_H, atomCountHDescriptor);
+
+            // ATOM_COUNT_N
+            AtomCountDescriptor atomCountNDescriptor = new AtomCountDescriptor();
+            atomCountNDescriptor.setParameters(new Object[] {"N"}); // set nitrogen as the atom to count
+            descriptorToCdkObjectMap.put(ATOM_COUNT_N, atomCountNDescriptor);
+
+            // ATOM_COUNT_O
+            AtomCountDescriptor atomCountODescriptor = new AtomCountDescriptor();
+            atomCountODescriptor.setParameters(new Object[] {"O"}); // set oxygen as the atom to count
+            descriptorToCdkObjectMap.put(ATOM_COUNT_O, atomCountODescriptor);
+
+            // ATOM_COUNT_S
+            AtomCountDescriptor atomCountSDescriptor = new AtomCountDescriptor();
+            atomCountSDescriptor.setParameters(new Object[] {"S"}); // set sulfur as the atom to count
+            descriptorToCdkObjectMap.put(ATOM_COUNT_S, atomCountSDescriptor);
+
+            // ATOM_COUNT_P
+            AtomCountDescriptor atomCountPDescriptor = new AtomCountDescriptor();
+            atomCountPDescriptor.setParameters(new Object[] {"P"}); // set phosphorus as the atom to count
+            descriptorToCdkObjectMap.put(ATOM_COUNT_P, atomCountPDescriptor);
+
+            // ATOM_COUNT_F
+            AtomCountDescriptor atomCountFDescriptor = new AtomCountDescriptor();
+            atomCountFDescriptor.setParameters(new Object[] {"F"}); // set fluorine as the atom to count
+            descriptorToCdkObjectMap.put(ATOM_COUNT_F, atomCountFDescriptor);
+
+            // ATOM_COUNT_BR
+            AtomCountDescriptor atomCountBrDescriptor = new AtomCountDescriptor();
+            atomCountBrDescriptor.setParameters(new Object[] {"Br"}); // set bromine as the atom to count
+            descriptorToCdkObjectMap.put(ATOM_COUNT_BR, atomCountBrDescriptor);
+
+            // ATOM_COUNT_CL
+            AtomCountDescriptor atomCountClDescriptor = new AtomCountDescriptor();
+            atomCountClDescriptor.setParameters(new Object[] {"Cl"}); // set clorine as the atom to count
+            descriptorToCdkObjectMap.put(ATOM_COUNT_CL, atomCountClDescriptor);
+
+            // ATOM_COUNT_I
+            AtomCountDescriptor atomCountIDescriptor = new AtomCountDescriptor();
+            atomCountIDescriptor.setParameters(new Object[] {"I"}); // set iodine as the atom to count
+            descriptorToCdkObjectMap.put(ATOM_COUNT_I, atomCountIDescriptor);
 
             // H_BOND_ACCEPTOR_COUNT
             descriptorToCdkObjectMap.put(H_BOND_ACCEPTOR_COUNT, new HBondAcceptorCountDescriptor());
@@ -734,8 +884,20 @@ public enum Descriptor {
             // BOND_COUNT_ALL
             descriptorToCdkObjectMap.put(BOND_COUNT_ALL, new BondCountDescriptor());
 
-            // BOND_COUNT_SPECIFIED
-            descriptorToCdkObjectMap.put(BOND_COUNT_SPECIFIED, new BondCountDescriptor());
+            // BOND_COUNT_SINGLE
+            BondCountDescriptor bondCountSingleDescriptor = new BondCountDescriptor();
+            bondCountSingleDescriptor.setParameters(new Object[]{"s"});
+            descriptorToCdkObjectMap.put(BOND_COUNT_SINGLE, bondCountSingleDescriptor);
+
+            // BOND_COUNT_DOUBLE
+            BondCountDescriptor bondCountDoubleDescriptor = new BondCountDescriptor();
+            bondCountDoubleDescriptor.setParameters(new Object[]{"d"});
+            descriptorToCdkObjectMap.put(BOND_COUNT_DOUBLE, bondCountDoubleDescriptor);
+
+            // BOND_COUNT_TRIPLE
+            BondCountDescriptor bondCountTripleDescriptor = new BondCountDescriptor();
+            bondCountTripleDescriptor.setParameters(new Object[]{"t"});
+            descriptorToCdkObjectMap.put(BOND_COUNT_TRIPLE, bondCountTripleDescriptor);
 
             // B_POL
             descriptorToCdkObjectMap.put(B_POL, new BPolDescriptor());
@@ -854,6 +1016,18 @@ public enum Descriptor {
             // VABC
             descriptorToCdkObjectMap.put(VABC, new VABCDescriptor());
 
+            // PUBCHEM_FINGERPRINTER
+            fingerprintToCdkObjectMap.put(PUBCHEM_FINGERPRINTER, new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()));
+
+            // CIRCULAR_FINGERPRINTER_ECFP
+            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_ECFP, new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, 1024));
+
+            // CIRCULAR_FINGERPRINTER_FCFP
+            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_FCFP, new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, 1024));
+
+            // MACCS_FINGERPRINTER
+            fingerprintToCdkObjectMap.put(MACCS_FINGERPRINTER, new MACCSFingerprinter(SilentChemObjectBuilder.getInstance()));
+
             // Add new descriptor information here!
 
         } catch (Exception anException) {
@@ -883,19 +1057,30 @@ public enum Descriptor {
     }
 
     /**
+     * Returns the EnumMap that maps descriptors to their corresponding CDK fingerprinter objects.
+     *
+     * @return EnumMap with descriptor to CDK fingerprinter object mapping
+     */
+    static EnumMap<Descriptor, IFingerprinter> getFingerprintToCdkObjectMap() {
+        return fingerprintToCdkObjectMap;
+    }
+
+    /**
      * Returns specified available descriptors.
-     * Note: If both flags are false, an empty array is returned. If both flags are true, then all descriptors are returned.
+     * Note: If both speed flags are false, an empty array is returned. If both speed flags are true, then all descriptors are returned.
      *
      * @param isQuicklyCalculableDescriptorInclusion True: Quickly calculable descriptors are returned, false: Otherwise.
      * @param isSlowlyCalculableDescriptorInclusion True: Slowly calculable descriptors are returned, false: Otherwise.
      * @param isUnsafeDescriptorInclusion True: Unsafe descriptors are included in the result, false: Unsafe descriptors
-     *                                     are excluded from the result, this does not mean no NaN's can be produced.                                NaN's can be produced, false: Otherwise.
+     *                                     are excluded from the result, this does not mean no NaN's can be produced.
+     * @param isFingerprintAsDescriptorInclusion True: Fingerprint descriptors are included in the result, false: Fingerprint descriptors are excluded.
      * @return Specified descriptors
      */
     public static Descriptor[] getSpecifiedDescriptors(
             boolean isQuicklyCalculableDescriptorInclusion,
             boolean isSlowlyCalculableDescriptorInclusion,
-            boolean isUnsafeDescriptorInclusion
+            boolean isUnsafeDescriptorInclusion,
+            boolean isFingerprintAsDescriptorInclusion
     ) {
         if (!isQuicklyCalculableDescriptorInclusion && !isSlowlyCalculableDescriptorInclusion) {
             return new Descriptor[0];
@@ -919,6 +1104,11 @@ public enum Descriptor {
                 includeDescriptor = false;
             }
 
+            // Exclude fingerprint descriptors if not requested
+            if (includeDescriptor && isFingerprint(descriptor) && !isFingerprintAsDescriptorInclusion) {
+                includeDescriptor = false;
+            }
+
             if (includeDescriptor) {
                 result.add(descriptor);
             }
@@ -926,6 +1116,20 @@ public enum Descriptor {
 
         return result.toArray(new Descriptor[0]);
     }
+
+    /**
+     * Checks if a descriptor is a fingerprint descriptor.
+     *
+     * @param descriptor The descriptor to check
+     * @return true if the descriptor is a fingerprint, false otherwise
+     */
+    static boolean isFingerprint(Descriptor descriptor) {
+        return descriptor == PUBCHEM_FINGERPRINTER ||
+                descriptor == CIRCULAR_FINGERPRINTER_ECFP ||
+                descriptor == CIRCULAR_FINGERPRINTER_FCFP ||
+                descriptor == MACCS_FINGERPRINTER;
+    }
+
 
     /**
      * Returns sum of number of calculated components of an array of defined descriptors.
@@ -1693,8 +1897,35 @@ public enum Descriptor {
                 case ATOM_COUNT:
                     setAtomCountSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
-                case ATOM_COUNT_ORGANIC_SUBSET:
-                    setAtomCountOrganicSubsetSynchronized(anAtomContainer, aVector, aStartIndex);
+                case ATOM_COUNT_C:
+                    setAtomCountCSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_H:
+                    setAtomCountHSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_N:
+                    setAtomCountNSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_O:
+                    setAtomCountOSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_S:
+                    setAtomCountSSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_P:
+                    setAtomCountPSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_F:
+                    setAtomCountFSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_BR:
+                    setAtomCountBrSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_CL:
+                    setAtomCountClSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case ATOM_COUNT_I:
+                    setAtomCountISynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case H_BOND_ACCEPTOR_COUNT:
                     setHBondAcceptorCountSynchronized(anAtomContainer, aVector, aStartIndex);
@@ -1720,8 +1951,14 @@ public enum Descriptor {
                 case BOND_COUNT_ALL:
                     setBondCountAllSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
-                case BOND_COUNT_SPECIFIED:
-                    setBondCountSpecifiedSynchronized(anAtomContainer, aVector, aStartIndex);
+                case BOND_COUNT_SINGLE:
+                    setBondCountSingleSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case BOND_COUNT_DOUBLE:
+                    setBondCountDoubleSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case BOND_COUNT_TRIPLE:
+                    setBondCountTripleSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case B_POL:
                     setBPolSynchronized(anAtomContainer, aVector, aStartIndex);
@@ -1834,6 +2071,19 @@ public enum Descriptor {
                 case VABC:
                     setVABCSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
+                case PUBCHEM_FINGERPRINTER:
+                    setPubChemFingerprintSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP:
+                    setCircularFingerprintEcfpSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP:
+                    setCircularFingerprintFcfpSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case MACCS_FINGERPRINTER:
+                    setMaccsFingerprinterSynchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+
 
                 // Add new descriptor information here!
                 default:
@@ -1902,38 +2152,65 @@ public enum Descriptor {
                 case ATOM_COUNT:
                     aVector[aStartIndex] = (float) ((IntegerResult) (new AtomCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
                     break;
-                case ATOM_COUNT_ORGANIC_SUBSET:
-                    AtomCountDescriptor atomCountDesc = new AtomCountDescriptor();
+                case ATOM_COUNT_C:
+                    AtomCountDescriptor atomCountCDesc = new AtomCountDescriptor();
                     //set parameter to count carbon atoms
-                    atomCountDesc.setParameters(new Object[]{"C"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    atomCountCDesc.setParameters(new Object[]{"C"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountCDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_H:
+                    AtomCountDescriptor atomCountHDesc = new AtomCountDescriptor();
                     //set parameter to count hydrogen atoms
-                    atomCountDesc.setParameters(new Object[]{"H"});
-                    aVector[aStartIndex + 1] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    atomCountHDesc.setParameters(new Object[]{"H"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountHDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_N:
+                    AtomCountDescriptor atomCountNDesc = new AtomCountDescriptor();
                     //set parameter to count nitrogen atoms
-                    atomCountDesc.setParameters(new Object[]{"N"});
-                    aVector[aStartIndex + 2] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    atomCountNDesc.setParameters(new Object[]{"N"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountNDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_O:
+                    AtomCountDescriptor atomCountODesc = new AtomCountDescriptor();
                     //set parameter to count oxygen atoms
-                    atomCountDesc.setParameters(new Object[]{"O"});
-                    aVector[aStartIndex + 3] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    atomCountODesc.setParameters(new Object[]{"O"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountODesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_S:
+                    AtomCountDescriptor atomCountSDesc = new AtomCountDescriptor();
                     //set parameter to count sulfur atoms
-                    atomCountDesc.setParameters(new Object[]{"S"});
-                    aVector[aStartIndex + 4] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    atomCountSDesc.setParameters(new Object[]{"S"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountSDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_P:
+                    AtomCountDescriptor atomCountPDesc = new AtomCountDescriptor();
                     //set parameter to count phosphorus atoms
-                    atomCountDesc.setParameters(new Object[]{"P"});
-                    aVector[aStartIndex + 5] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    atomCountPDesc.setParameters(new Object[]{"P"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountPDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_F:
+                    AtomCountDescriptor atomCountFDesc = new AtomCountDescriptor();
                     //set parameter to count fluorine atoms
-                    atomCountDesc.setParameters(new Object[]{"F"});
-                    aVector[aStartIndex + 6] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    atomCountFDesc.setParameters(new Object[]{"F"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountFDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_BR:
+                    AtomCountDescriptor atomCountBrDesc = new AtomCountDescriptor();
                     //set parameter to count bromine atoms
-                    atomCountDesc.setParameters(new Object[]{"Br"});
-                    aVector[aStartIndex + 7] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    atomCountBrDesc.setParameters(new Object[]{"Br"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountBrDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_CL:
+                    AtomCountDescriptor atomCountClDesc = new AtomCountDescriptor();
                     //set parameter to count chlorine atoms
-                    atomCountDesc.setParameters(new Object[]{"Cl"});
-                    aVector[aStartIndex + 8] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    atomCountClDesc.setParameters(new Object[]{"Cl"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountClDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_I:
+                    AtomCountDescriptor atomCountIDesc = new AtomCountDescriptor();
                     //set parameter to count iodine atoms
-                    atomCountDesc.setParameters(new Object[]{"I"});
-                    aVector[aStartIndex + 9] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    atomCountIDesc.setParameters(new Object[]{"I"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountIDesc.calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case H_BOND_ACCEPTOR_COUNT:
                     aVector[aStartIndex] = (float) ((IntegerResult) (new HBondAcceptorCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
@@ -1965,17 +2242,23 @@ public enum Descriptor {
                 case BOND_COUNT_ALL:
                     aVector[aStartIndex] = (float) ((IntegerResult) (new BondCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
                     break;
-                case BOND_COUNT_SPECIFIED:
-                    BondCountDescriptor bondCountDesc = new BondCountDescriptor();
+                case BOND_COUNT_SINGLE:
+                    BondCountDescriptor bondCountSingleDesc = new BondCountDescriptor();
                     //set parameter to count single bonds
-                    bondCountDesc.setParameters(new Object[]{"s"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    bondCountSingleDesc.setParameters(new Object[]{"s"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) bondCountSingleDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case BOND_COUNT_DOUBLE:
+                    BondCountDescriptor bondCountDoubleDesc = new BondCountDescriptor();
                     //set parameter to count double bonds
-                    bondCountDesc.setParameters(new Object[]{"d"});
-                    aVector[aStartIndex + 1] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    bondCountDoubleDesc.setParameters(new Object[]{"d"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) bondCountDoubleDesc.calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case BOND_COUNT_TRIPLE:
+                    BondCountDescriptor bondCountTripleDesc = new BondCountDescriptor();
                     //set parameter to count triple bonds
-                    bondCountDesc.setParameters(new Object[]{"t"});
-                    aVector[aStartIndex + 2] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    bondCountTripleDesc.setParameters(new Object[]{"t"});
+                    aVector[aStartIndex] = (float) ((IntegerResult) bondCountTripleDesc.calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case B_POL:
                     aVector[aStartIndex] = (float) ((DoubleResult) (new BPolDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
@@ -2143,6 +2426,71 @@ public enum Descriptor {
                 case VABC:
                     aVector[aStartIndex] = (float) ((DoubleResult) (new VABCDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
+                case PUBCHEM_FINGERPRINTER:
+                    try {
+                        IFingerprinter fingerprinter = new PubchemFingerprinter(SilentChemObjectBuilder.getInstance());
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < PUBCHEM_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < PUBCHEM_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP:
+                    try {
+                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, 1024);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP:
+                    try {
+                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, 1024);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case MACCS_FINGERPRINTER:
+                    try {
+                        IFingerprinter fingerprinter = new MACCSFingerprinter(SilentChemObjectBuilder.getInstance());
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < MACCS_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < MACCS_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+
 
                 // Add new descriptor information here!
                 default:
@@ -2210,38 +2558,35 @@ public enum Descriptor {
                 case ATOM_COUNT:
                     aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
                     break;
-                case ATOM_COUNT_ORGANIC_SUBSET:
-                    AtomCountDescriptor atomCountDesc = (AtomCountDescriptor) descriptorToCdkObjectMap.get(ATOM_COUNT_ORGANIC_SUBSET);
-                    //set parameter to count carbon atoms
-                    atomCountDesc.setParameters(new Object[]{"C"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-                    //set parameter to count hydrogen atoms
-                    atomCountDesc.setParameters(new Object[]{"H"});
-                    aVector[aStartIndex + 1] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-                    //set parameter to count nitrogen atoms
-                    atomCountDesc.setParameters(new Object[]{"N"});
-                    aVector[aStartIndex + 2] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-                    //set parameter to count oxygen atoms
-                    atomCountDesc.setParameters(new Object[]{"O"});
-                    aVector[aStartIndex + 3] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-                    //set parameter to count sulfur atoms
-                    atomCountDesc.setParameters(new Object[]{"S"});
-                    aVector[aStartIndex + 4] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-                    //set parameter to count phosphorus atoms
-                    atomCountDesc.setParameters(new Object[]{"P"});
-                    aVector[aStartIndex + 5] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-                    //set parameter to count fluorine atoms
-                    atomCountDesc.setParameters(new Object[]{"F"});
-                    aVector[aStartIndex + 6] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-                    //set parameter to count bromine atoms
-                    atomCountDesc.setParameters(new Object[]{"Br"});
-                    aVector[aStartIndex + 7] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-                    //set parameter to count chlorine atoms
-                    atomCountDesc.setParameters(new Object[]{"Cl"});
-                    aVector[aStartIndex + 8] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-                    //set parameter to count iodine atoms
-                    atomCountDesc.setParameters(new Object[]{"I"});
-                    aVector[aStartIndex + 9] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                case ATOM_COUNT_C:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_C).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_H:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_H).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_N:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_N).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_O:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_O).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_S:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_S).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_P:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_P).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_F:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_F).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_BR:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_BR).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_CL:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_CL).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_I:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_I).calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case H_BOND_ACCEPTOR_COUNT:
                     aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(H_BOND_ACCEPTOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
@@ -2270,17 +2615,14 @@ public enum Descriptor {
                 case BOND_COUNT_ALL:
                     aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_ALL).calculate(anAtomContainer).getValue()).intValue();
                     break;
-                case BOND_COUNT_SPECIFIED:
-                    // Single bonds (s)
-                    BondCountDescriptor bondCountDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED);
-                    bondCountDesc.setParameters(new Object[]{"s"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
-                    // Double bonds (d)
-                    bondCountDesc.setParameters(new Object[]{"d"});
-                    aVector[aStartIndex + 1] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
-                    // Triple bonds (t)
-                    bondCountDesc.setParameters(new Object[]{"t"});
-                    aVector[aStartIndex + 2] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                case BOND_COUNT_SINGLE:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_SINGLE).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case BOND_COUNT_DOUBLE:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_DOUBLE).calculate(anAtomContainer).getValue()).intValue();
+                    break;
+                case BOND_COUNT_TRIPLE:
+                    aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_TRIPLE).calculate(anAtomContainer).getValue()).intValue();
                     break;
                 case B_POL:
                     aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(B_POL).calculate(anAtomContainer).getValue()).doubleValue();
@@ -2441,6 +2783,70 @@ public enum Descriptor {
                 case VABC:
                     aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(VABC).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
+                case PUBCHEM_FINGERPRINTER:
+                    try {
+                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(PUBCHEM_FINGERPRINTER);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < PUBCHEM_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < PUBCHEM_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP:
+                    try {
+                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_ECFP);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP:
+                    try {
+                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_FCFP);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case MACCS_FINGERPRINTER:
+                    try {
+                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(MACCS_FINGERPRINTER);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < MACCS_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < MACCS_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
 
                 // Add new descriptor information here!
                 default:
@@ -2555,7 +2961,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets atom count for organic subset (C, H, N, O, S, P, F, Br, Cl, I).
+     * Sets atom count for carbon.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2563,55 +2969,165 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setAtomCountOrganicSubsetSynchronized(
+    private static synchronized void setAtomCountCSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
     ) {
-        try {
-            AtomCountDescriptor atomCountDesc = (AtomCountDescriptor) descriptorToCdkObjectMap.get(ATOM_COUNT_ORGANIC_SUBSET);
-            //set parameter to count carbon atoms
-            atomCountDesc.setParameters(new Object[]{"C"});
-            aVector[aStartIndex] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count hydrogen atoms
-            atomCountDesc.setParameters(new Object[]{"H"});
-            aVector[aStartIndex + 1] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count nitrogen atoms
-            atomCountDesc.setParameters(new Object[]{"N"});
-            aVector[aStartIndex + 2] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count oxygen atoms
-            atomCountDesc.setParameters(new Object[]{"O"});
-            aVector[aStartIndex + 3] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count sulfur atoms
-            atomCountDesc.setParameters(new Object[]{"S"});
-            aVector[aStartIndex + 4] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count phosphorus atoms
-            atomCountDesc.setParameters(new Object[]{"P"});
-            aVector[aStartIndex + 5] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count fluorine atoms
-            atomCountDesc.setParameters(new Object[]{"F"});
-            aVector[aStartIndex + 6] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count bromine atoms
-            atomCountDesc.setParameters(new Object[]{"Br"});
-            aVector[aStartIndex + 7] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count chlorine atoms
-            atomCountDesc.setParameters(new Object[]{"Cl"});
-            aVector[aStartIndex + 8] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            //set parameter to count iodine atoms
-            atomCountDesc.setParameters(new Object[]{"I"});
-            aVector[aStartIndex + 9] = (float) ((IntegerResult) atomCountDesc.calculate(anAtomContainer).getValue()).intValue();
-        } catch (Exception e) {
-            for (int i = 0; i < 10; i++) {
-                aVector[aStartIndex + i] = Float.NaN;
-            }
-            Descriptor.LOGGER.log(
-                    Level.WARNING,
-                    "Descriptor.setAtomCountOrganicSubsetSynchronized: An exception occurred while calculating atom counts for molecule index "
-                            + aStartIndex
-                            + ".",
-                    e
-            );
-        }
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_C).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for hydrogen.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAtomCountHSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_H).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for nitrogen.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAtomCountNSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_N).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for oxygen.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAtomCountOSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_O).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for sulfur.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAtomCountSSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_S).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for phosphorus.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAtomCountPSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_P).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for fluorine.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAtomCountFSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_F).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for bromine.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAtomCountBrSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_BR).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for chlorine.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAtomCountClSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_CL).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets atom count for iodine.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setAtomCountISynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_I).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -2754,7 +3270,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets specific bond counts (single, double, triple).
+     * Sets specific single bond count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -2762,34 +3278,46 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setBondCountSpecifiedSynchronized(
+    private static synchronized void setBondCountSingleSynchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
     ) {
-        try {
-            // Single bonds (s)
-            BondCountDescriptor bondCountDesc = (BondCountDescriptor)descriptorToCdkObjectMap.get(BOND_COUNT_SPECIFIED);
-            bondCountDesc.setParameters(new Object[]{"s"});
-            aVector[aStartIndex] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            // Double bonds (d)
-            bondCountDesc.setParameters(new Object[]{"d"});
-            aVector[aStartIndex + 1] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
-            // Triple bonds (t)
-            bondCountDesc.setParameters(new Object[]{"t"});
-            aVector[aStartIndex + 2] = (float) ((IntegerResult) bondCountDesc.calculate(anAtomContainer).getValue()).intValue();
-        } catch (Exception e) {
-            for (int i = 0; i < 3; i++) {
-                aVector[aStartIndex + i] = Float.NaN;
-            }
-            Descriptor.LOGGER.log(
-                    Level.WARNING,
-                    "Descriptor.setBondCountSpecifiedSynchronized: An exception occurred while calculating bond counts for molecule index "
-                            + aStartIndex
-                            + ".",
-                    e
-            );
-        }
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_SINGLE).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets specific double bond count.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setBondCountDoubleSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_DOUBLE).calculate(anAtomContainer).getValue()).intValue();
+    }
+
+    /**
+     * Sets specific triple bond count.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setBondCountTripleSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_TRIPLE).calculate(anAtomContainer).getValue()).intValue();
     }
 
     /**
@@ -3508,7 +4036,145 @@ public enum Descriptor {
         aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(VABC).calculate(anAtomContainer).getValue()).doubleValue();
     }
 
+    /**
+     * Sets PubChem fingerprint values.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setPubChemFingerprintSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        try {
+            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(PUBCHEM_FINGERPRINTER);
+            IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+            float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+            for (int i = 0; i < PUBCHEM_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = fingerprintArray[i];
+            }
+        } catch (Exception anException) {
+            for (int i = 0; i < PUBCHEM_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = Float.NaN;
+            }
+            LOGGER.log(Level.WARNING, anException.toString(), anException);
+        }
+    }
+
+    /**
+     * Sets Circular Fingerprint ECFP  values.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setCircularFingerprintEcfpSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        try {
+            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_ECFP);
+            IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+            float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = fingerprintArray[i];
+            }
+        } catch (Exception anException) {
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = Float.NaN;
+            }
+            LOGGER.log(Level.WARNING, anException.toString(), anException);
+        }
+    }
+
+    /**
+     * Sets Circular Fingerprint FCFP fingerprint values.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setCircularFingerprintFcfpSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        try {
+            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_FCFP);
+            IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+            float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = fingerprintArray[i];
+            }
+        } catch (Exception anException) {
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = Float.NaN;
+            }
+            LOGGER.log(Level.WARNING, anException.toString(), anException);
+        }
+    }
+
+    /**
+     * Sets Maccs Fingerprinter fingerprint values.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setMaccsFingerprinterSynchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        try {
+            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(MACCS_FINGERPRINTER);
+            IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+            float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+            for (int i = 0; i < MACCS_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = fingerprintArray[i];
+            }
+        } catch (Exception anException) {
+            for (int i = 0; i < MACCS_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = Float.NaN;
+            }
+            LOGGER.log(Level.WARNING, anException.toString(), anException);
+        }
+    }
+
     // Add new descriptor information here!
+
+    /**
+     * Converts an IBitFingerprint to a float array.
+     *
+     * @param bitFingerprint The bit fingerprint to convert
+     * @return Float array with 1.0f for set bits and 0.0f for unset bits
+     */
+    private static float[] convertBitFingerprintToFloatArray(IBitFingerprint bitFingerprint) {
+        int size = (int) bitFingerprint.size();
+        float[] floatArray = new float[size];
+
+        for (int i = 0; i < size; i++) {
+            floatArray[i] = bitFingerprint.get(i) ? 1.0f : 0.0f;
+        }
+
+        return floatArray;
+    }
+
     //</editor-fold>
     //<editor-fold desc="Public static molecule preparation methods">
     /**
@@ -3643,6 +4309,8 @@ public enum Descriptor {
             Aromaticity.clear(aMolecule);
             Cycles.markRingAtomsAndBonds(aMolecule);
             Aromaticity.apply(anAromaticityModel, aMolecule);
+            CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(aMolecule.getBuilder());
+            adder.addImplicitHydrogens(aMolecule);
         } catch (Exception anException) {
             throw new Exception("Failed to detect aromaticity: " + anException.getMessage(), anException);
         }
