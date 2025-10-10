@@ -785,6 +785,7 @@ public enum Descriptor {
      */
     private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());
     //</editor-fold>
+
     // <editor-fold desc="CDK descriptor and fingerprinter mappings and static initializer block">
     /**
      * EnumMap that maps a descriptor to an instance of its CDK descriptor class
@@ -1049,6 +1050,17 @@ public enum Descriptor {
     }
 
     /**
+     * Returns all available fingerprint descriptors.
+     *
+     * @return All available fingerprint descriptors
+     */
+    public static Descriptor[] getAllFingerprints() {
+        return java.util.Arrays.stream(values())
+                .filter(Descriptor::isFingerprint)
+                .toArray(Descriptor[]::new);
+    }
+
+    /**
      * Returns specified available descriptors.
      * Note: If both speed flags are false, an empty array is returned. If both speed flags are true, then all descriptors are returned.
      *
@@ -1188,8 +1200,7 @@ public enum Descriptor {
      * beginning with aStartIndex by (optional) parallelization of molecules. If parallel computation is used, the atom
      * containers (molecules) are distributed onto parallel thread, one for each molecule, and they all access shared
      * descriptor instances.
-     *
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
+     * Note: Fingerprint descriptors are not supported.
      *
      * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
      * @param anAtomContainerArray Array of molecules. Note: anAtomContainerArray[i] corresponds to aMatrix[i] data
@@ -1219,94 +1230,94 @@ public enum Descriptor {
         if (aDescriptors == null || aDescriptors.length == 0) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aDescriptors is null or has length 0."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aDescriptors is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aDescriptor is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aDescriptor is null or has length 0.");
         }
         for (Descriptor tmpDescriptor : aDescriptors) {
             if (tmpDescriptor == null) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A descriptor in aDescriptors is null."
+                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: A descriptor in aDescriptors is null."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A descriptor in aDescriptors is null.");
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: A descriptor in aDescriptors is null.");
             }
 
             if (isFingerprint(tmpDescriptor)) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: Fingerprint descriptors are not supported."
+                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: Fingerprint descriptors are not supported."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: Fingerprint descriptors are not supported.");
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: Fingerprint descriptors are not supported.");
             }
         }
         if (anAtomContainerArray == null || anAtomContainerArray.length == 0) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: anAtomContainerArray is null or has length 0."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: anAtomContainerArray is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: anAtomContainerArray is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: anAtomContainerArray is null or has length 0.");
         }
         for (IAtomContainer tmpMolecule : anAtomContainerArray) {
             if (tmpMolecule == null || tmpMolecule.isEmpty()) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A molecule in anAtomContainerArray is null or empty."
+                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: A molecule in anAtomContainerArray is null or empty."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A molecule in anAtomContainerArray is null or empty.");
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: A molecule in anAtomContainerArray is null or empty.");
             }
         }
         if (aMatrix == null || aMatrix.length == 0) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix is null or has length 0."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aMatrix is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aMatrix is null or has length 0.");
         }
         if (aMatrix.length != anAtomContainerArray.length) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix and anAtomContainerArray must have the same length."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aMatrix and anAtomContainerArray must have the same length."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aMatrix and anAtomContainerArray must have the same length.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aMatrix and anAtomContainerArray must have the same length.");
         }
         for (float[] tmpVector : aMatrix) {
             if (tmpVector == null || tmpVector.length == 0) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A vector is null or has length 0."
+                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: A vector is null or has length 0."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: A vector is null or has length 0.");
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: A vector is null or has length 0.");
             }
             if (aStartIndex >= tmpVector.length) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal."
+                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aStartIndex is illegal."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal.");
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aStartIndex is illegal.");
             }
             try {
                 if (aStartIndex + Descriptor.getNumberOfComponents(aDescriptors) > tmpVector.length) {
                     Descriptor.LOGGER.log(
                             Level.SEVERE,
-                            "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal."
+                            "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aStartIndex is illegal."
                     );
-                    throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal.");
+                    throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aStartIndex is illegal.");
                 }
             } catch (Exception anException) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal.", anException
+                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aStartIndex is illegal.", anException
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aStartIndex is illegal.", anException);
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aStartIndex is illegal.", anException);
             }
         }
         if (aNanPositions == null) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aNaNPositions is null."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aNaNPositions is null."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelization: aNaNPositions is null.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: aNaNPositions is null.");
         }
         //</editor-fold>
 
@@ -1337,7 +1348,7 @@ public enum Descriptor {
                                     tmpIsDescriptorCalculations[i] = false;
                                     Descriptor.LOGGER.log(
                                             Level.WARNING,
-                                            "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationUnsafe: One descriptor calculation caused an exception, molecule index: "
+                                            "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: One descriptor calculation caused an exception, molecule index: "
                                                     + i
                                                     + ".",
                                             anException
@@ -1354,7 +1365,7 @@ public enum Descriptor {
                 } catch (Exception anException) {
                     Descriptor.LOGGER.log(
                             Level.WARNING,
-                            "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationUnsafe: Global exception occurred in descriptor calculation: ",
+                            "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: Global exception occurred in descriptor calculation: ",
                             anException
                     );
                     return false;
@@ -1371,7 +1382,7 @@ public enum Descriptor {
         } catch (Exception anException) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationUnsafe: An exception occurred: This should never happen.", anException
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: An exception occurred: This should never happen.", anException
             );
             throw anException;
         }
@@ -1413,86 +1424,86 @@ public enum Descriptor {
         if (aDescriptors == null || aDescriptors.length == 0) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aDescriptors is null or has length 0."
+                "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aDescriptors is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aDescriptor is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aDescriptor is null or has length 0.");
         }
         for (Descriptor tmpDescriptor : aDescriptors) {
             if (tmpDescriptor == null) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: A descriptor in aDescriptors is null."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: A descriptor in aDescriptors is null."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: A descriptor in aDescriptors is null.");
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: A descriptor in aDescriptors is null.");
             }
         }
         if (anAtomContainerArray == null || anAtomContainerArray.length == 0) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: anAtomContainerArray is null or has length 0."
+                "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: anAtomContainerArray is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: anAtomContainerArray is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: anAtomContainerArray is null or has length 0.");
         }
         for (IAtomContainer tmpMolecule : anAtomContainerArray) {
             if (tmpMolecule == null || tmpMolecule.isEmpty()) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: A molecule in anAtomContainerArray is null or empty."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: A molecule in anAtomContainerArray is null or empty."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: A molecule in anAtomContainerArray is null or empty.");
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: A molecule in anAtomContainerArray is null or empty.");
             }
         }
         if (aMatrix == null || aMatrix.length == 0) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aMatrix is null or has length 0."
+                "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aMatrix is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aMatrix is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aMatrix is null or has length 0.");
         }
         if (aMatrix.length != anAtomContainerArray.length) {
             Descriptor.LOGGER.log(
                 Level.SEVERE,
-                "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aMatrix and anAtomContainerArray must have the same length."
+                "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aMatrix and anAtomContainerArray must have the same length."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aMatrix and anAtomContainerArray must have the same length.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aMatrix and anAtomContainerArray must have the same length.");
         }
         for (float[] tmpVector : aMatrix) {
             if (tmpVector == null || tmpVector.length == 0) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: A vector is null or has length 0."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: A vector is null or has length 0."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: A vector is null or has length 0.");
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: A vector is null or has length 0.");
             }
             if (aStartIndex >= tmpVector.length) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aStartIndex is illegal."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal.");
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aStartIndex is illegal.");
             }
             try {
                 if (aStartIndex + Descriptor.getNumberOfComponents(aDescriptors) > tmpVector.length) {
                     Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal."
+                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aStartIndex is illegal."
                     );
-                    throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal.");
+                    throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aStartIndex is illegal.");
                 }
             } catch (Exception anException) {
                 Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal.", anException
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aStartIndex is illegal.", anException
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aStartIndex is illegal.", anException);
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aStartIndex is illegal.", anException);
             }
         }
         if (aNanPositions == null) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aNaNPositions is null."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aNaNPositions is null."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationSynchronized: aNaNPositions is null.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized: aNaNPositions is null.");
         }
         //</editor-fold>
 
@@ -1599,86 +1610,86 @@ public enum Descriptor {
         if (aDescriptors == null || aDescriptors.length == 0) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aDescriptors is null or has length 0."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aDescriptors is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aDescriptor is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aDescriptor is null or has length 0.");
         }
         for (Descriptor tmpDescriptor : aDescriptors) {
             if (tmpDescriptor == null) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: A descriptor in aDescriptors is null."
+                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: A descriptor in aDescriptors is null."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: A descriptor in aDescriptors is null.");
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: A descriptor in aDescriptors is null.");
             }
         }
         if (anAtomContainerArray == null || anAtomContainerArray.length == 0) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: anAtomContainerArray is null or has length 0."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: anAtomContainerArray is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: anAtomContainerArray is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: anAtomContainerArray is null or has length 0.");
         }
         for (IAtomContainer tmpMolecule : anAtomContainerArray) {
             if (tmpMolecule == null || tmpMolecule.isEmpty()) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: A molecule in anAtomContainerArray is null or empty."
+                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: A molecule in anAtomContainerArray is null or empty."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: A molecule in anAtomContainerArray is null or empty.");
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: A molecule in anAtomContainerArray is null or empty.");
             }
         }
         if (aMatrix == null || aMatrix.length == 0) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aMatrix is null or has length 0."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aMatrix is null or has length 0."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aMatrix is null or has length 0.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aMatrix is null or has length 0.");
         }
         if (aMatrix.length != anAtomContainerArray.length) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aMatrix and anAtomContainerArray must have the same length."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aMatrix and anAtomContainerArray must have the same length."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aMatrix and anAtomContainerArray must have the same length.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aMatrix and anAtomContainerArray must have the same length.");
         }
         for (float[] tmpVector : aMatrix) {
             if (tmpVector == null || tmpVector.length == 0) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: A vector is null or has length 0."
+                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: A vector is null or has length 0."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: A vector is null or has length 0.");
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: A vector is null or has length 0.");
             }
             if (aStartIndex >= tmpVector.length) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal."
+                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aStartIndex is illegal."
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal.");
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aStartIndex is illegal.");
             }
             try {
                 if (aStartIndex + Descriptor.getNumberOfComponents(aDescriptors) > tmpVector.length) {
                     Descriptor.LOGGER.log(
                             Level.SEVERE,
-                            "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal."
+                            "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aStartIndex is illegal."
                     );
-                    throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal.");
+                    throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aStartIndex is illegal.");
                 }
             } catch (Exception anException) {
                 Descriptor.LOGGER.log(
                         Level.SEVERE,
-                        "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal.", anException
+                        "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aStartIndex is illegal.", anException
                 );
-                throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aStartIndex is illegal.", anException);
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aStartIndex is illegal.", anException);
             }
         }
         if (aNanPositions == null) {
             Descriptor.LOGGER.log(
                     Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aNaNPositions is null."
+                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aNaNPositions is null."
             );
-            throw new IllegalArgumentException("Descriptor.setCalculatedDescriptorComponentsByMoleculeParallelizationNew: aNaNPositions is null.");
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: aNaNPositions is null.");
         }
         //</editor-fold>
 
@@ -3394,7 +3405,7 @@ public enum Descriptor {
      * @param descriptor The descriptor to check
      * @return true if the descriptor is a fingerprint, false otherwise
      */
-    private static boolean isFingerprint(Descriptor descriptor) {
+    static boolean isFingerprint(Descriptor descriptor) {
         return descriptor == PUBCHEM_FINGERPRINTER ||
                 descriptor == CIRCULAR_FINGERPRINTER_ECFP ||
                 descriptor == CIRCULAR_FINGERPRINTER_FCFP ||

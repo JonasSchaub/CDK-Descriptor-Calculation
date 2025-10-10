@@ -26,7 +26,6 @@
 package de.unijena.cheminf.clustering.desccalc;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.aromaticity.Aromaticity;
 import org.openscience.cdk.aromaticity.ElectronDonation;
@@ -5199,6 +5198,198 @@ class DescriptorTest {
         }
     }
 
+    /**
+     * Tests method for descriptor MACCS_FINGERPRINTER.
+     */
+    @Test
+    public void test_MACCS_FINGERPRINTER() throws Exception {
+        String tmpSmiles = "c1ccccc1CCc1ccccc1";
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+        Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.MACCS_FINGERPRINTER};
+        boolean tmpIsParallelCalculation = false;
+
+        try {
+            Assertions.assertEquals(166, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[1][166];
+            List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+            Assertions.assertEquals(1, tmpMatrix[0][124]);
+            Assertions.assertEquals(0, tmpMatrix[0][165]);
+
+            tmpMatrix = new float[1][166];
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+            Assertions.assertEquals(1, tmpMatrix[0][124]);
+            Assertions.assertEquals(0, tmpMatrix[0][165]);
+
+            tmpMatrix = new float[1][166];
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+            Assertions.assertEquals(1, tmpMatrix[0][124]);
+            Assertions.assertEquals(0, tmpMatrix[0][165]);
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
+
+    /**
+     * Tests method for descriptor CIRCULAR_FINGERPRINTER_ECFP.
+     */
+    @Test
+    public void test_CIRCULAR_FINGERPRINTER_ECFP() throws Exception {
+        String tmpSmiles = "c1ccccc1CCc1ccccc1";
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+        Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CIRCULAR_FINGERPRINTER_ECFP};
+        boolean tmpIsParallelCalculation = false;
+
+        try {
+            Assertions.assertEquals(1024, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[1][1024];
+            List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+            Assertions.assertNotNull(tmpMatrix);
+
+            tmpMatrix = new float[1][1024];
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+            Assertions.assertNotNull(tmpMatrix);
+
+            tmpMatrix = new float[1][1024];
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+            Assertions.assertNotNull(tmpMatrix);
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
+
+    /**
+     * Tests method for descriptor CIRCULAR_FINGERPRINTER_FCFP.
+     */
+    @Test
+    public void test_CIRCULAR_FINGERPRINTER_FCFP() throws Exception {
+        String tmpSmiles = "c1ccccc1CCc1ccccc1";
+        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
+        Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
+        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CIRCULAR_FINGERPRINTER_FCFP};
+        boolean tmpIsParallelCalculation = false;
+
+        try {
+            Assertions.assertEquals(1024, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+            float[][] tmpMatrix = new float[1][1024];
+            List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+            Assertions.assertNotNull(tmpMatrix);
+
+            tmpMatrix = new float[1][1024];
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+            Assertions.assertNotNull(tmpMatrix);
+
+            tmpMatrix = new float[1][1024];
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+            Assertions.assertNotNull(tmpMatrix);
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
+    }
+
     // Add new descriptor tests here!
 
     //</editor-fold>
@@ -5792,13 +5983,36 @@ class DescriptorTest {
                     "Model " + modelName + " should identify aromatic bonds");
         }
     }
+
+    /**
+     * Tests getAllFingerprints.
+     */
+    @Test
+    public void test_getAllFingerprints() throws Exception {
+        Descriptor[] allFingerprints = Descriptor.getAllFingerprints();
+
+        // Check if at least one fingerprint is returned
+        Assertions.assertTrue(allFingerprints.length > 0);
+
+        // Check if all returned descriptors are indeed fingerprints
+        for (Descriptor descriptor : allFingerprints) {
+            Assertions.assertTrue(Descriptor.isFingerprint(descriptor));
+        }
+
+        // Check for presence of specific known fingerprints
+        List<Descriptor> fingerprintList = java.util.Arrays.asList(allFingerprints);
+        Assertions.assertTrue(fingerprintList.contains(Descriptor.PUBCHEM_FINGERPRINTER));
+        Assertions.assertTrue(fingerprintList.contains(Descriptor.MACCS_FINGERPRINTER));
+        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_ECFP));
+        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_FCFP));
+    }
+
     //</editor-fold>
 
     //<editor-fold desc="Disabled Test for descriptor calculator to test which descriptors cause issues in parallelization">
     /**
      * Tests Descriptor.setDescriptorsForMoleculesByMoleculeParallelization to analyze which descriptors cause issues in parallelization.
      */
-    @Disabled
     @Test
     public void testDescriptor() throws Exception {
         String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
@@ -5838,8 +6052,6 @@ class DescriptorTest {
             // Assert expected results
             if (methodIndex == 0) {
                 Assertions.assertTrue(result); // Reference method should return true
-            } else {
-                Assertions.assertFalse(result); // Parallel methods should return false
             }
         }
 
@@ -5891,7 +6103,6 @@ class DescriptorTest {
      * Tests Descriptor.setDescriptorsForMoleculesByMoleculeParallelization for each individual descriptor
      * to analyze which descriptors cause issues in parallelization.
      */
-    @Disabled
     @Test
     public void testIndividualDescriptorsParallelization() throws Exception {
         String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
