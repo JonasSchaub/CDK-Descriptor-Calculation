@@ -95,6 +95,7 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import java.util.EnumMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -1022,7 +1023,7 @@ public enum Descriptor {
             fingerprintToCdkObjectMap.put(PUBCHEM_FINGERPRINTER, new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()));
 
             // CIRCULAR_FINGERPRINTER_ECFP
-            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_ECFP, new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, 1024));
+            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_ECFP, new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, 1024));
 
             // CIRCULAR_FINGERPRINTER_FCFP
             fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_FCFP, new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, 1024));
@@ -1194,6 +1195,209 @@ public enum Descriptor {
             throw new Exception("Failed to detect aromaticity: " + anException.getMessage(), anException);
         }
     }
+
+    /**
+     * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
+     * beginning with aStartIndex by (optional) parallelization of molecule batches.
+     * Note: Fingerprint descriptors are not supported.
+     *
+     * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
+     * @param anAtomContainerArray Array of molecules. Note: anAtomContainerArray[i] corresponds to aMatrix[i] data
+     *                              vector, i.e. the molecules define the rows of the matrix (IS NOT CHANGED)
+     * @param aMatrix Matrix of component vectors of molecules. Note: Data vector aMatrix[i] corresponds to molecule
+     *               anAtomContainerArray[i]. (MAY BE CHANGED)
+     * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
+     *                    column to start filling with descriptors
+     * @param aBatchSize Number of molecules to process in each batch
+     * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
+     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
+     *                      Use Collections.synchronizedList() to avoid race conditions.
+     * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
+     * calculation is NaN
+     * @throws IllegalArgumentException Thrown if an argument is illegal
+     * @throws Exception Thrown if fatal error occurs (this should never happen)
+     */
+    public static boolean setDescriptorsForMoleculesByBatchParallelization(
+            Descriptor[] aDescriptors,
+            IAtomContainer[] anAtomContainerArray,
+            float[][] aMatrix,
+            int aStartIndex,
+            int aBatchSize,
+            boolean anIsParallelCalculation,
+            List<int[]> aNanPositions
+    ) throws IllegalArgumentException, Exception {
+        //<editor-fold desc="Checks">
+        if (aDescriptors == null || aDescriptors.length == 0) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setDescriptorsForMoleculesByBatchParallelization: aDescriptors is null or has length 0."
+            );
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByBatchParallelization: aDescriptor is null or has length 0.");
+        }
+        for (Descriptor tmpDescriptor : aDescriptors) {
+            if (tmpDescriptor == null) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.setDescriptorsForMoleculesByBatchParallelization: A descriptor in aDescriptors is null."
+                );
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByBatchParallelization: A single descriptor in aDescriptors is null.");
+            }
+            if (isFingerprint(tmpDescriptor)) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.setDescriptorsForMoleculesByBatchParallelization: Fingerprint descriptors are not supported."
+                );
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByBatchParallelization: Fingerprint descriptors are not supported.");
+            }
+        }
+        if (anAtomContainerArray == null || anAtomContainerArray.length == 0) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setDescriptorsForMoleculesByBatchParallelization: anAtomContainerArray is null or has length 0."
+            );
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByBatchParallelization: anAtomContainerArray is null or has length 0.");
+        }
+        for (IAtomContainer tmpMolecule : anAtomContainerArray) {
+            if (tmpMolecule == null || tmpMolecule.isEmpty()) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.setDescriptorsForMoleculesByBatchParallelization: A molecule in anAtomContainerArray is null or empty."
+                );
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByBatchParallelization: A single molecule in anAtomContainerArray is null or empty.");
+            }
+        }
+        if (aMatrix == null || aMatrix.length == 0) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setDescriptorsForMoleculesByBatchParallelization: aMatrix is null or has length 0."
+            );
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByBatchParallelization: aMatrix is null or has length 0.");
+        }
+        if (aMatrix.length != anAtomContainerArray.length) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setDescriptorsForMoleculesByBatchParallelization: aMatrix and anAtomContainerArray must have the same length."
+            );
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByBatchParallelization: aMatrix and anAtomContainerArray must have the same length.");
+        }
+        for (float[] tmpVector : aMatrix) {
+            if (tmpVector == null || tmpVector.length == 0) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.setDescriptorsForMoleculesByBatchParallelization: A vector in aMatrix is null or has length 0."
+                );
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByBatchParallelization: A single vector in aMatrix is null or has length 0.");
+            }
+            if (aStartIndex >= tmpVector.length) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.setDescriptorsForMoleculesByBatchParallelization: aStartIndex is greater than or equal to vector length."
+                );
+                throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByBatchParallelization: aStartIndex is greater than or equal to vector length.");
+            }
+            try {
+                int tmpNumberOfComponents = Descriptor.getNumberOfComponents(aDescriptors);
+                if (aStartIndex + tmpNumberOfComponents > tmpVector.length) {
+                    Descriptor.LOGGER.log(
+                            Level.SEVERE,
+                            "Descriptor.setDescriptorsForMoleculesByBatchParallelization: Not enough space in vector for descriptors."
+                    );
+                    throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByBatchParallelization: Not enough space in vector for descriptors.");
+                }
+            } catch (Exception anException) {
+                Descriptor.LOGGER.log(
+                        Level.SEVERE,
+                        "Descriptor.setDescriptorsForMoleculesByBatchParallelization: An exception occurred while calculating number of components.",
+                        anException
+                );
+                throw new Exception("Descriptor.setDescriptorsForMoleculesByBatchParallelization: An exception occurred while calculating number of components.", anException);
+            }
+        }
+        if (aBatchSize <= 0) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setDescriptorsForMoleculesByBatchParallelization: aBatchSize must be greater than 0."
+            );
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByBatchParallelization: aBatchSize must be greater than 0.");
+        }
+        if (aNanPositions == null) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setDescriptorsForMoleculesByBatchParallelization: aNaNPositions is null."
+            );
+            throw new IllegalArgumentException("Descriptor.setDescriptorsForMoleculesByBatchParallelization: aNaNPositions is null.");
+        }
+        //</editor-fold>
+
+        try {
+            int tmpNumberOfMolecules = anAtomContainerArray.length;
+            int tmpNumberOfBatches = (int) Math.ceil((double) tmpNumberOfMolecules / aBatchSize);
+
+            int[] tmpStartIndices = new int[aDescriptors.length];
+            for (int i = 0; i < aDescriptors.length; i++) {
+                tmpStartIndices[i] = aStartIndex;
+                aStartIndex += aDescriptors[i].getDescriptorComponentNumber();
+            }
+
+            AtomicBoolean tmpHasNaN = new AtomicBoolean(false);
+
+            if (anIsParallelCalculation) {
+                try {
+                    IntStream.range(0, tmpNumberOfBatches).parallel().forEach(batchIndex -> {
+                        int tmpBatchStart = batchIndex * aBatchSize;
+                        int tmpBatchEnd = Math.min(tmpBatchStart + aBatchSize, tmpNumberOfMolecules);
+
+                        for (int i = tmpBatchStart; i < tmpBatchEnd; i++) {
+                            try {
+                                boolean tmpSuccess = Descriptor.setDescriptorsForSingleMolecule(
+                                        aDescriptors,
+                                        anAtomContainerArray[i],
+                                        aMatrix[i],
+                                        tmpStartIndices,
+                                        i,
+                                        aNanPositions
+                                );
+                                if (!tmpSuccess) {
+                                    tmpHasNaN.set(true);
+                                }
+                            } catch (Exception anException) {
+                                tmpHasNaN.set(true);
+                                Descriptor.LOGGER.log(
+                                        Level.WARNING,
+                                        "Descriptor.setDescriptorsForMoleculesByBatchParallelization: Exception in batch " + batchIndex + ", molecule index: " + i,
+                                        anException
+                                );
+                            }
+                        }
+                    });
+                } catch (Exception anException) {
+                    Descriptor.LOGGER.log(
+                            Level.WARNING,
+                            "Descriptor.setDescriptorsForMoleculesByBatchParallelization: Global exception occurred in descriptor calculation.",
+                            anException
+                    );
+                    return false;
+                }
+            } else {
+                for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                    if (!Descriptor.setDescriptorsForSingleMolecule(aDescriptors, anAtomContainerArray[i], aMatrix[i], tmpStartIndices, i, aNanPositions)) {
+                        tmpHasNaN.set(true);
+                    }
+                }
+            }
+
+            return !tmpHasNaN.get();
+        } catch (Exception anException) {
+            Descriptor.LOGGER.log(
+                    Level.SEVERE,
+                    "Descriptor.setDescriptorsForMoleculesByBatchParallelization: Fatal error occurred.",
+                    anException
+            );
+            throw new Exception("Descriptor.setDescriptorsForMoleculesByBatchParallelization: An exception occurred.", anException);
+        }
+    }
+
 
     /**
      * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
@@ -2936,7 +3140,7 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_ECFP:
                     try {
-                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, 1024);
+                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, 1024);
                         IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
                         float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
 
