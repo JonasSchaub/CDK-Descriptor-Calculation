@@ -5271,13 +5271,13 @@ class DescriptorTest {
         Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CIRCULAR_FINGERPRINTER_ECFP};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CIRCULAR_FINGERPRINTER_ECFP_0,Descriptor.CIRCULAR_FINGERPRINTER_ECFP_2, Descriptor.CIRCULAR_FINGERPRINTER_ECFP_4, Descriptor.CIRCULAR_FINGERPRINTER_ECFP_6};
         boolean tmpIsParallelCalculation = false;
 
         try {
-            Assertions.assertEquals(1024, Descriptor.getNumberOfComponents(tmpDescriptors));
+            Assertions.assertEquals(1024 * 4, Descriptor.getNumberOfComponents(tmpDescriptors));
 
-            float[][] tmpMatrix = new float[1][1024];
+            float[][] tmpMatrix = new float[1][1024 * 4];
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
@@ -5291,7 +5291,7 @@ class DescriptorTest {
             );
             Assertions.assertNotNull(tmpMatrix);
 
-            tmpMatrix = new float[1][1024];
+            tmpMatrix = new float[1][1024 * 4];
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
@@ -5305,7 +5305,7 @@ class DescriptorTest {
             );
             Assertions.assertNotNull(tmpMatrix);
 
-            tmpMatrix = new float[1][1024];
+            tmpMatrix = new float[1][1024 * 4];
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
@@ -5334,13 +5334,13 @@ class DescriptorTest {
         Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CIRCULAR_FINGERPRINTER_FCFP};
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CIRCULAR_FINGERPRINTER_FCFP_0, Descriptor.CIRCULAR_FINGERPRINTER_FCFP_2, Descriptor.CIRCULAR_FINGERPRINTER_FCFP_4, Descriptor.CIRCULAR_FINGERPRINTER_FCFP_6};
         boolean tmpIsParallelCalculation = false;
 
         try {
-            Assertions.assertEquals(1024, Descriptor.getNumberOfComponents(tmpDescriptors));
+            Assertions.assertEquals(4 * 1024, Descriptor.getNumberOfComponents(tmpDescriptors));
 
-            float[][] tmpMatrix = new float[1][1024];
+            float[][] tmpMatrix = new float[1][4 * 1024];
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
@@ -5354,7 +5354,7 @@ class DescriptorTest {
             );
             Assertions.assertNotNull(tmpMatrix);
 
-            tmpMatrix = new float[1][1024];
+            tmpMatrix = new float[1][4 * 1024];
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
@@ -5368,7 +5368,7 @@ class DescriptorTest {
             );
             Assertions.assertNotNull(tmpMatrix);
 
-            tmpMatrix = new float[1][1024];
+            tmpMatrix = new float[1][4 * 1024];
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
@@ -6244,8 +6244,14 @@ class DescriptorTest {
         List<Descriptor> fingerprintList = java.util.Arrays.asList(allFingerprints);
         Assertions.assertTrue(fingerprintList.contains(Descriptor.PUBCHEM_FINGERPRINTER));
         Assertions.assertTrue(fingerprintList.contains(Descriptor.MACCS_FINGERPRINTER));
-        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_ECFP));
-        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_FCFP));
+        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_0));
+        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_FCFP_0));
+        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_2));
+        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_FCFP_2));
+        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_4));
+        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_FCFP_4));
+        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_6));
+        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_FCFP_6));
     }
 
     //</editor-fold>

@@ -695,18 +695,54 @@ public enum Descriptor {
      */
     PUBCHEM_FINGERPRINTER(true, true, 881),
     /**
-     * Circular fingerprinter, generates a circular fingerprint (similar to ECFP) with a specified size.
+     * Circular fingerprinter, generates an extended-connectivity fingerprint with a path diameter of 0.
      *
      * @see CircularFingerprinter
      */
-    CIRCULAR_FINGERPRINTER_ECFP(true, true, 1024),
-    /**;
-     * Circular fingerprinter, generates an extended fingerprint (similar to FCFP) with a specified size.
+    CIRCULAR_FINGERPRINTER_ECFP_0(true, true, 1024),
+    /**
+     * Circular fingerprinter, generates a functional class version of an extended-connectivity fingerprint with a path diameter of 0.
      *
      * @see CircularFingerprinter
      */
-    CIRCULAR_FINGERPRINTER_FCFP(true, true, 1024),
-    /**;
+    CIRCULAR_FINGERPRINTER_FCFP_0(true, true, 1024),
+    /**
+     * Circular fingerprinter, generates an extended-connectivity fingerprint with a path diameter of 2.
+     *
+     * @see CircularFingerprinter
+     */
+    CIRCULAR_FINGERPRINTER_ECFP_2(true, true, 1024),
+    /**
+     * Circular fingerprinter, generates a functional class version of an extended-connectivity fingerprint with a path diameter of 2.
+     *
+     * @see CircularFingerprinter
+     */
+    CIRCULAR_FINGERPRINTER_FCFP_2(true, true, 1024),
+    /**
+     * Circular fingerprinter, generates an extended-connectivity fingerprint with a path diameter of 4.
+     *
+     * @see CircularFingerprinter
+     */
+    CIRCULAR_FINGERPRINTER_ECFP_4(true, true, 1024),
+    /**
+     * Circular fingerprinter, generates a functional class version of an extended-connectivity fingerprint with a path diameter of 4.
+     *
+     * @see CircularFingerprinter
+     */
+    CIRCULAR_FINGERPRINTER_FCFP_4(true, true, 1024),
+    /**
+     * Circular fingerprinter, generates an extended-connectivity fingerprint with a path diameter of 6.
+     *
+     * @see CircularFingerprinter
+     */
+    CIRCULAR_FINGERPRINTER_ECFP_6(true, true, 1024),
+    /**
+     * Circular fingerprinter, generates a functional class version of an extended-connectivity fingerprint with a path diameter of 6.
+     *
+     * @see CircularFingerprinter
+     */
+    CIRCULAR_FINGERPRINTER_FCFP_6(true, true, 1024),
+    /**
      * MACCS fingerprinter, generates a 166-bit binary fingerprint based on the MACCS structural keys.
      *
      * @see MACCSFingerprinter
@@ -1022,11 +1058,29 @@ public enum Descriptor {
             // PUBCHEM_FINGERPRINTER
             fingerprintToCdkObjectMap.put(PUBCHEM_FINGERPRINTER, new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()));
 
-            // CIRCULAR_FINGERPRINTER_ECFP
-            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_ECFP, new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, 1024));
+            // CIRCULAR_FINGERPRINTER_ECFP_0
+            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_ECFP_0, new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, 1024));
 
-            // CIRCULAR_FINGERPRINTER_FCFP
-            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_FCFP, new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, 1024));
+            // CIRCULAR_FINGERPRINTER_FCFP_0
+            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_FCFP_0, new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, 1024));
+
+            // CIRCULAR_FINGERPRINTER_ECFP_2
+            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_ECFP_2, new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, 1024));
+
+            // CIRCULAR_FINGERPRINTER_FCFP_2
+            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_FCFP_2, new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, 1024));
+
+            // CIRCULAR_FINGERPRINTER_ECFP_4
+            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_ECFP_4, new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, 1024));
+
+            // CIRCULAR_FINGERPRINTER_FCFP_4
+            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_FCFP_4, new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, 1024));
+
+            // CIRCULAR_FINGERPRINTER_ECFP_6
+            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_ECFP_6, new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, 1024));
+
+            // CIRCULAR_FINGERPRINTER_FCFP_6
+            fingerprintToCdkObjectMap.put(CIRCULAR_FINGERPRINTER_FCFP_6, new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, 1024));
 
             // MACCS_FINGERPRINTER
             fingerprintToCdkObjectMap.put(MACCS_FINGERPRINTER, new MACCSFingerprinter(SilentChemObjectBuilder.getInstance()));
@@ -2770,11 +2824,29 @@ public enum Descriptor {
                 case PUBCHEM_FINGERPRINTER:
                     setPubChemFingerprintSynchronized(anAtomContainer, aVector, aStartIndex);
                     break;
-                case CIRCULAR_FINGERPRINTER_ECFP:
-                    setCircularFingerprintEcfpSynchronized(anAtomContainer, aVector, aStartIndex);
+                case CIRCULAR_FINGERPRINTER_ECFP_0:
+                    setCircularFingerprintEcfp0Synchronized(anAtomContainer, aVector, aStartIndex);
                     break;
-                case CIRCULAR_FINGERPRINTER_FCFP:
-                    setCircularFingerprintFcfpSynchronized(anAtomContainer, aVector, aStartIndex);
+                case CIRCULAR_FINGERPRINTER_FCFP_0:
+                    setCircularFingerprintFcfp0Synchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP_2:
+                    setCircularFingerprintEcfp2Synchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP_2:
+                    setCircularFingerprintFcfp2Synchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP_4:
+                    setCircularFingerprintEcfp4Synchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP_4:
+                    setCircularFingerprintFcfp4Synchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP_6:
+                    setCircularFingerprintEcfp6Synchronized(anAtomContainer, aVector, aStartIndex);
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP_6:
+                    setCircularFingerprintFcfp6Synchronized(anAtomContainer, aVector, aStartIndex);
                     break;
                 case MACCS_FINGERPRINTER:
                     setMaccsFingerprinterSynchronized(anAtomContainer, aVector, aStartIndex);
@@ -3138,33 +3210,129 @@ public enum Descriptor {
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
                     }
                     break;
-                case CIRCULAR_FINGERPRINTER_ECFP:
+                case CIRCULAR_FINGERPRINTER_ECFP_0:
                     try {
-                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, 1024);
+                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, 1024);
                         IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
                         float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
 
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_0.getDescriptorComponentNumber(); i++) {
                             aVector[aStartIndex + i] = fingerprintArray[i];
                         }
                     } catch (Exception anException) {
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_0.getDescriptorComponentNumber(); i++) {
                             aVector[aStartIndex + i] = Float.NaN;
                         }
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
                     }
                     break;
-                case CIRCULAR_FINGERPRINTER_FCFP:
+                case CIRCULAR_FINGERPRINTER_FCFP_0:
+                    try {
+                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, 1024);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_0.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_0.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP_2:
+                    try {
+                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, 1024);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_2.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_2.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP_2:
+                    try {
+                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, 1024);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_2.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_2.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP_4:
+                    try {
+                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, 1024);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_4.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_4.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP_4:
                     try {
                         IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, 1024);
                         IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
                         float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
 
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_4.getDescriptorComponentNumber(); i++) {
                             aVector[aStartIndex + i] = fingerprintArray[i];
                         }
                     } catch (Exception anException) {
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_4.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP_6:
+                    try {
+                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, 1024);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_6.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_6.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP_6:
+                    try {
+                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, 1024);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_6.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_6.getDescriptorComponentNumber(); i++) {
                             aVector[aStartIndex + i] = Float.NaN;
                         }
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
@@ -3495,33 +3663,129 @@ public enum Descriptor {
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
                     }
                     break;
-                case CIRCULAR_FINGERPRINTER_ECFP:
+                case CIRCULAR_FINGERPRINTER_ECFP_0:
                     try {
-                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_ECFP);
+                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_ECFP_0);
                         IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
                         float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
 
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_0.getDescriptorComponentNumber(); i++) {
                             aVector[aStartIndex + i] = fingerprintArray[i];
                         }
                     } catch (Exception anException) {
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_0.getDescriptorComponentNumber(); i++) {
                             aVector[aStartIndex + i] = Float.NaN;
                         }
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
                     }
                     break;
-                case CIRCULAR_FINGERPRINTER_FCFP:
+                case CIRCULAR_FINGERPRINTER_FCFP_0:
                     try {
-                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_FCFP);
+                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_FCFP_0);
                         IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
                         float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
 
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_0.getDescriptorComponentNumber(); i++) {
                             aVector[aStartIndex + i] = fingerprintArray[i];
                         }
                     } catch (Exception anException) {
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_0.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP_2:
+                    try {
+                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_ECFP_2);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_2.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_2.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP_2:
+                    try {
+                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_FCFP_2);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_2.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_2.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP_4:
+                    try {
+                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_ECFP_4);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_4.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_4.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP_4:
+                    try {
+                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_FCFP_4);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_4.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_4.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP_6:
+                    try {
+                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_ECFP_6);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_6.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_6.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = Float.NaN;
+                        }
+                        LOGGER.log(Level.WARNING, anException.toString(), anException);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP_6:
+                    try {
+                        IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_FCFP_6);
+                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_6.getDescriptorComponentNumber(); i++) {
+                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        }
+                    } catch (Exception anException) {
+                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_6.getDescriptorComponentNumber(); i++) {
                             aVector[aStartIndex + i] = Float.NaN;
                         }
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
@@ -3611,8 +3875,14 @@ public enum Descriptor {
      */
     static boolean isFingerprint(Descriptor descriptor) {
         return descriptor == PUBCHEM_FINGERPRINTER ||
-                descriptor == CIRCULAR_FINGERPRINTER_ECFP ||
-                descriptor == CIRCULAR_FINGERPRINTER_FCFP ||
+                descriptor == CIRCULAR_FINGERPRINTER_ECFP_0 ||
+                descriptor == CIRCULAR_FINGERPRINTER_FCFP_0 ||
+                descriptor == CIRCULAR_FINGERPRINTER_ECFP_2 ||
+                descriptor == CIRCULAR_FINGERPRINTER_FCFP_2 ||
+                descriptor == CIRCULAR_FINGERPRINTER_ECFP_4 ||
+                descriptor == CIRCULAR_FINGERPRINTER_FCFP_4 ||
+                descriptor == CIRCULAR_FINGERPRINTER_ECFP_6 ||
+                descriptor == CIRCULAR_FINGERPRINTER_FCFP_6 ||
                 descriptor == MACCS_FINGERPRINTER;
     }
 
@@ -6092,7 +6362,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets Circular Fingerprint ECFP  values.
+     * Sets Circular Fingerprint ECFP values with a path diameter of 0.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -6100,21 +6370,21 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setCircularFingerprintEcfpSynchronized(
+    private static synchronized void setCircularFingerprintEcfp0Synchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
     ) {
         try {
-            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_ECFP);
+            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_ECFP_0);
             IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
             float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
 
-            for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP.getDescriptorComponentNumber(); i++) {
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_0.getDescriptorComponentNumber(); i++) {
                 aVector[aStartIndex + i] = fingerprintArray[i];
             }
         } catch (Exception anException) {
-            for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP.getDescriptorComponentNumber(); i++) {
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_0.getDescriptorComponentNumber(); i++) {
                 aVector[aStartIndex + i] = Float.NaN;
             }
             LOGGER.log(Level.WARNING, anException.toString(), anException);
@@ -6122,7 +6392,7 @@ public enum Descriptor {
     }
 
     /**
-     * Sets Circular Fingerprint FCFP fingerprint values.
+     * Sets Circular Fingerprint FCFP fingerprint values with a path diameter of 0.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
      *
@@ -6130,21 +6400,198 @@ public enum Descriptor {
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private static synchronized void setCircularFingerprintFcfpSynchronized(
+    private static synchronized void setCircularFingerprintFcfp0Synchronized(
             IAtomContainer anAtomContainer,
             float[] aVector,
             int aStartIndex
     ) {
         try {
-            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_FCFP);
+            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_FCFP_0);
             IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
             float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
 
-            for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP.getDescriptorComponentNumber(); i++) {
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_0.getDescriptorComponentNumber(); i++) {
                 aVector[aStartIndex + i] = fingerprintArray[i];
             }
         } catch (Exception anException) {
-            for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP.getDescriptorComponentNumber(); i++) {
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_0.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = Float.NaN;
+            }
+            LOGGER.log(Level.WARNING, anException.toString(), anException);
+        }
+    }
+    /**
+     * Sets Circular Fingerprint ECFP values with a path diameter of 2.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setCircularFingerprintEcfp2Synchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        try {
+            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_ECFP_2);
+            IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+            float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_2.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = fingerprintArray[i];
+            }
+        } catch (Exception anException) {
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_2.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = Float.NaN;
+            }
+            LOGGER.log(Level.WARNING, anException.toString(), anException);
+        }
+    }
+
+    /**
+     * Sets Circular Fingerprint FCFP fingerprint values with a path diameter of 2.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setCircularFingerprintFcfp2Synchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        try {
+            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_FCFP_2);
+            IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+            float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_2.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = fingerprintArray[i];
+            }
+        } catch (Exception anException) {
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_2.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = Float.NaN;
+            }
+            LOGGER.log(Level.WARNING, anException.toString(), anException);
+        }
+    }
+    /**
+     * Sets Circular Fingerprint ECFP values with a path diameter of 4.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setCircularFingerprintEcfp4Synchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        try {
+            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_ECFP_4);
+            IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+            float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_4.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = fingerprintArray[i];
+            }
+        } catch (Exception anException) {
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_4.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = Float.NaN;
+            }
+            LOGGER.log(Level.WARNING, anException.toString(), anException);
+        }
+    }
+
+    /**
+     * Sets Circular Fingerprint FCFP fingerprint values with a path diameter of 4.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setCircularFingerprintFcfp4Synchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        try {
+            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_FCFP_4);
+            IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+            float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_4.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = fingerprintArray[i];
+            }
+        } catch (Exception anException) {
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_4.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = Float.NaN;
+            }
+            LOGGER.log(Level.WARNING, anException.toString(), anException);
+        }
+    }
+    /**
+     * Sets Circular Fingerprint ECFP values with a path diameter of 6.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setCircularFingerprintEcfp6Synchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        try {
+            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_ECFP_6);
+            IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+            float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_6.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = fingerprintArray[i];
+            }
+        } catch (Exception anException) {
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_6.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = Float.NaN;
+            }
+            LOGGER.log(Level.WARNING, anException.toString(), anException);
+        }
+    }
+
+    /**
+     * Sets Circular Fingerprint FCFP fingerprint values with a path diameter of 6.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     * Note: Method has to be synchronized due to missing thread-safety of the CDK calculation
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    private static synchronized void setCircularFingerprintFcfp6Synchronized(
+            IAtomContainer anAtomContainer,
+            float[] aVector,
+            int aStartIndex
+    ) {
+        try {
+            IFingerprinter fingerprinter = fingerprintToCdkObjectMap.get(CIRCULAR_FINGERPRINTER_FCFP_6);
+            IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+            float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
+
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_6.getDescriptorComponentNumber(); i++) {
+                aVector[aStartIndex + i] = fingerprintArray[i];
+            }
+        } catch (Exception anException) {
+            for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_6.getDescriptorComponentNumber(); i++) {
                 aVector[aStartIndex + i] = Float.NaN;
             }
             LOGGER.log(Level.WARNING, anException.toString(), anException);
