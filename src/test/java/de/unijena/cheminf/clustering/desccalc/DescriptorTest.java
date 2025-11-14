@@ -5656,11 +5656,13 @@ class DescriptorTest {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         int tmpNumberOfMolecules = 1000;
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
+        String[] tmpMoleculeStringsArray = new String[tmpNumberOfMolecules];
 
         for (int i = 0; i < tmpNumberOfMolecules; i++) {
             IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
             Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
             tmpMoleculesArray[i] = tmpMolecule;
+            tmpMoleculeStringsArray[i] = tmpSmiles;
         }
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = Descriptor.getSpecifiedDescriptors(true, true, true, false);
@@ -5870,6 +5872,50 @@ class DescriptorTest {
                 }
             }
 
+            tmpMatrixSequential = new float[tmpNumberOfMolecules][];
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
+            }
+            tmpIsParallelCalculation = false;
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculeStringsByBatchParallelization(
+                            tmpDescriptors,
+                            tmpMoleculeStringsArray,
+                            tmpMatrixSequential,
+                            tmpStartIndex,
+                            100,
+                            null,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+
+            tmpMatrixParallel = new float[tmpNumberOfMolecules][];
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
+            }
+            tmpIsParallelCalculation = true;
+            aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculeStringsByBatchParallelization(
+                            tmpDescriptors,
+                            tmpMoleculeStringsArray,
+                            tmpMatrixParallel,
+                            tmpStartIndex,
+                            100,
+                            null,
+                            tmpIsParallelCalculation,
+                            aNanPositionsParallel
+                    )
+            );
+
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                for (int j = 0; j < tmpNumberOfComponents; j++) {
+                    Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
+                }
+            }
+
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -5966,11 +6012,13 @@ class DescriptorTest {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         int tmpNumberOfMolecules = 1000;
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
+        String[] tmpMoleculeStringsArray = new String[tmpNumberOfMolecules];
 
         for (int i = 0; i < tmpNumberOfMolecules; i++) {
             IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
             Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
             tmpMoleculesArray[i] = tmpMolecule;
+            tmpMoleculeStringsArray[i] = tmpSmiles;
         }
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = Descriptor.getSpecifiedDescriptors(true, true, true, false);
@@ -6060,12 +6108,31 @@ class DescriptorTest {
                     )
             );
 
+            float[][] tmpMatrix6 = new float[tmpNumberOfMolecules][];
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                tmpMatrix6[i] = new float[tmpNumberOfComponents];
+            }
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculeStringsByBatchParallelization(
+                            tmpDescriptors,
+                            tmpMoleculeStringsArray,
+                            tmpMatrix6,
+                            tmpStartIndex,
+                            100,
+                            null,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+
             for (int i = 0; i < tmpNumberOfMolecules; i++) {
                 for (int j = 0; j < tmpNumberOfComponents; j++) {
                     Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix2[i][j]);
                     Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix3[i][j]);
                     Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix4[i][j]);
                     Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix5[i][j]);
+                    Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix6[i][j]);
                 }
             }
 
