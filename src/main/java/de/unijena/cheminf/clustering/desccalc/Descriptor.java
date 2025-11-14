@@ -1518,7 +1518,8 @@ public enum Descriptor {
      * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
      *                    column to start filling with descriptors
      * @param aBatchSize Number of molecules to process in each batch
-     * @param anElectronDonationModel An Aromaticity model that is applied to every molecule, default Aromaticity.Model.Daylight.
+     * @param anElectronDonationModel An Aromaticity model that is applied to every molecule. NOTE: Can be null, then
+     *                                Aromaticity.Model.Daylight is used as default.
      * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
@@ -1528,7 +1529,7 @@ public enum Descriptor {
      * @throws IllegalArgumentException Thrown if an argument is illegal
      * @throws Exception Thrown if fatal error occurs (this should never happen)
      */
-    public static boolean setDescriptorsForMoleculeStringsByBatchParallelization(
+    public static boolean setDescriptorsForMoleculeSmilesStringsByBatchParallelization(
             Descriptor[] aDescriptors,
             String[] aMoleculeSmilesStringArray,
             float[][] aMatrix,
@@ -1709,7 +1710,6 @@ public enum Descriptor {
             throw new Exception("Descriptor.setDescriptorsForMoleculeStringsByBatchParallelization: An exception occurred.", anException);
         }
     }
-
 
     /**
      * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
@@ -1922,7 +1922,6 @@ public enum Descriptor {
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
-     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      * calculation is NaN
      * @throws IllegalArgumentException Thrown if an argument is illegal
@@ -2108,7 +2107,6 @@ public enum Descriptor {
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
-     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      * calculation is NaN
      * @throws IllegalArgumentException Thrown if an argument is illegal
@@ -2281,8 +2279,6 @@ public enum Descriptor {
      * beginning with aStartIndex by (optional) parallelization of descriptor calculations. If parallel computation is
      * used, the descriptor instances are distributed onto parallel thread, one for each descriptor, and they all access shared
      * atom container (molecule) instances.
-     * Note: Parallelization of descriptor calculation is fastest (under memory constraints) since new descriptor instances for every calculation
-     * or synchronized descriptor calculation are avoided.
      *
      * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
      * @param anAtomContainerArray Array of molecules. Note: anAtomContainerArray[i] corresponds to aMatrix[i] data
@@ -2295,7 +2291,6 @@ public enum Descriptor {
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
-     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      * calculation is NaN
      * @throws IllegalArgumentException Thrown if an argument is illegal
@@ -2515,6 +2510,8 @@ public enum Descriptor {
      * @param aStartIndices Start indices in aVector to be filled with calculated components of descriptors
      * @param aMoleculeIndex Index of the current molecule being processed
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @param anElectronDonationModel An Aromaticity model that is applied to every molecule. NOTE: Can be null, then
+     * Aromaticity.Model.Daylight is used as default.
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      * @throws Exception Thrown if fatal error occurs (this should never happen)
@@ -2564,7 +2561,6 @@ public enum Descriptor {
      * @param aStartIndices Start indices in aVector to be filled with calculated components of descriptors
      * @param aMoleculeIndex Index of the current molecule being processed
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
-     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      * @throws Exception Thrown if fatal error occurs (this should never happen)
@@ -2606,7 +2602,6 @@ public enum Descriptor {
      * @param aStartIndices Start indices in aVector to be filled with calculated components of descriptor
      * @param aMoleculeIndex Index of the current molecule being processed
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
-     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      * @throws Exception Thrown if fatal error occurs (this should never happen)
@@ -2639,8 +2634,6 @@ public enum Descriptor {
     /**
      * Sets calculated descriptor components in aMatrix (that corresponds to anAtomContainerArray, a row in the data matrix)
      * beginning with aStartIndex.
-     * Note: Fast implementation without any new descriptor instances or locks/synchronization; used in parallelization
-     * over descriptors (one thread per descriptor).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param aDescriptor Descriptor to be calculated (IS NOT CHANGED)
@@ -2650,7 +2643,6 @@ public enum Descriptor {
      *               anAtomContainerArray[i]. (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
-     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      * @throws Exception Thrown if fatal error occurs (this should never happen)
@@ -2681,8 +2673,6 @@ public enum Descriptor {
 
     /**
      * Sets component values of aDescriptor for anAtomContainer in aVector beginning with aStartIndex.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param aDescriptor Descriptor to be calculated (IS NOT CHANGED)
@@ -2928,7 +2918,6 @@ public enum Descriptor {
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @param aMoleculeIndex Index of the current molecule being processed (row index in data matrix)
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
-     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      */
@@ -3198,7 +3187,6 @@ public enum Descriptor {
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @param aMoleculeIndex Index of the current molecule being processed
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
-     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      */
@@ -3701,7 +3689,6 @@ public enum Descriptor {
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @param aMoleculeIndex Index of the current molecule being processed
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
-     *                      Can be null if no NaN values should be tracked.
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
      */
@@ -4315,8 +4302,6 @@ public enum Descriptor {
     //<editor-fold desc="Private static descriptor calculation methods">
     /**
      * Sets molecular weight.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
@@ -4333,8 +4318,6 @@ public enum Descriptor {
 
     /**
      * Sets Wiener number(s).
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
@@ -4353,8 +4336,6 @@ public enum Descriptor {
 
     /**
      * Sets atom count.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
@@ -4371,8 +4352,6 @@ public enum Descriptor {
 
     /**
      * Sets atom count for carbon.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
@@ -4389,8 +4368,6 @@ public enum Descriptor {
 
     /**
      * Sets atom count for hydrogen.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
@@ -4407,8 +4384,6 @@ public enum Descriptor {
 
     /**
      * Sets atom count for nitrogen.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      *
@@ -4426,8 +4401,6 @@ public enum Descriptor {
 
     /**
      * Sets atom count for oxygen.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
@@ -4444,8 +4417,6 @@ public enum Descriptor {
 
     /**
      * Sets atom count for sulfur.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
@@ -4462,8 +4433,6 @@ public enum Descriptor {
 
     /**
      * Sets atom count for phosphorus.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
@@ -4480,8 +4449,6 @@ public enum Descriptor {
 
     /**
      * Sets atom count for fluoride.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
@@ -4498,8 +4465,6 @@ public enum Descriptor {
 
     /**
      * Sets atom count for bromide.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
@@ -4516,8 +4481,6 @@ public enum Descriptor {
 
     /**
      * Sets atom count for cloride.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
@@ -4534,8 +4497,6 @@ public enum Descriptor {
 
     /**
      * Sets atom count for iodine.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
@@ -4553,8 +4514,6 @@ public enum Descriptor {
     /**
      * Sets hydrogen bond acceptor count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4571,8 +4530,6 @@ public enum Descriptor {
     /**
      * Sets hydrogen bond donor count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4589,8 +4546,6 @@ public enum Descriptor {
     /**
      * Sets the topological polar surface area (TPSA).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4607,8 +4562,6 @@ public enum Descriptor {
     /**
      * Sets largest chain size.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4625,8 +4578,6 @@ public enum Descriptor {
     /**
      * Sets longest aliphatic chain size.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4660,8 +4611,6 @@ public enum Descriptor {
     /**
      * Sets BCUT descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4681,8 +4630,6 @@ public enum Descriptor {
     /**
      * Sets bond count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4699,8 +4646,6 @@ public enum Descriptor {
     /**
      * Sets specific single bond count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4717,8 +4662,6 @@ public enum Descriptor {
     /**
      * Sets specific double bond count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4752,8 +4695,6 @@ public enum Descriptor {
     /**
      * Sets bond polarizability value.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4770,8 +4711,6 @@ public enum Descriptor {
     /**
      * Sets Lipinski's Rule of Five violations count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4788,8 +4727,6 @@ public enum Descriptor {
     /**
      * Sets the number of aromatic atoms.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4806,8 +4743,6 @@ public enum Descriptor {
     /**
      * Sets the number of aromatic bonds.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4824,8 +4759,6 @@ public enum Descriptor {
     /**
      * Sets rotatable bonds count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4842,8 +4775,6 @@ public enum Descriptor {
     /**
      * Sets the FMF (Framework Match Fraction) value.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4860,8 +4791,6 @@ public enum Descriptor {
     /**
      * Sets the FractionalCSP3 value (fraction of sp3 hybridized carbon atoms).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4878,8 +4807,6 @@ public enum Descriptor {
     /**
      * Sets hybridization ratio (sp3 carbons to sp2 carbons).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4909,8 +4836,6 @@ public enum Descriptor {
     /**
      * Sets Kappa shape indices.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4930,8 +4855,6 @@ public enum Descriptor {
     /**
      * Sets Petitjean number value.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4948,8 +4871,6 @@ public enum Descriptor {
     /**
      * Sets spiro atom count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4966,8 +4887,6 @@ public enum Descriptor {
     /**
      * Sets the vertex adjacency information (magnitude).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -4984,8 +4903,6 @@ public enum Descriptor {
     /**
      * Sets weighted path descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5005,8 +4922,6 @@ public enum Descriptor {
     /**
      * Sets Zagreb index value.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5023,8 +4938,6 @@ public enum Descriptor {
     /**
      * Sets carbon types descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5044,8 +4957,6 @@ public enum Descriptor {
     /**
      * Sets ALogP values (Ghose-Crippen LogP, ALogP squared and molar refractivity).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5081,8 +4992,6 @@ public enum Descriptor {
     /**
      * Sets XLogP value (prediction of logP based on the atom-type method).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      * Note: XLogP requires explicit hydrogens for correct calculation
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
@@ -5113,8 +5022,6 @@ public enum Descriptor {
     /**
      * Sets JP LogP value (octanol-water partition coefficient based on JPlogP method).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5131,8 +5038,6 @@ public enum Descriptor {
     /**
      * Sets APol value (sum of the atomic polarizabilities).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5149,8 +5054,6 @@ public enum Descriptor {
     /**
      * Sets AutocorrelationDescriptorCharge values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5170,8 +5073,6 @@ public enum Descriptor {
     /**
      * Sets AutocorrelationDescriptorMass values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5191,8 +5092,6 @@ public enum Descriptor {
     /**
      * Sets AutocorrelationDescriptorPolarizability values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5212,8 +5111,6 @@ public enum Descriptor {
     /**
      * Sets fragment complexity value.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5230,8 +5127,6 @@ public enum Descriptor {
     /**
      * Sets ChiChain descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5251,8 +5146,6 @@ public enum Descriptor {
     /**
      * Sets ChiCluster descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5272,8 +5165,6 @@ public enum Descriptor {
     /**
      * Sets ChiPathCluster descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5293,8 +5184,6 @@ public enum Descriptor {
     /**
      * Sets ChiPath descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5314,8 +5203,6 @@ public enum Descriptor {
     /**
      * Sets FractionalPSA descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      *  @param anAtomContainer Molecule (IS NOT CHANGED)
      *  @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5332,8 +5219,6 @@ public enum Descriptor {
     /**
      * Sets LargestPiSystem descriptor value.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5350,8 +5235,6 @@ public enum Descriptor {
     /**
      * Sets SmallRing descriptor values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5371,8 +5254,6 @@ public enum Descriptor {
     /**
      * Sets basic group count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5389,8 +5270,6 @@ public enum Descriptor {
     /**
      * Sets acidic group count.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5407,8 +5286,6 @@ public enum Descriptor {
     /**
      * Sets amino acid count values.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5427,8 +5304,6 @@ public enum Descriptor {
     /**
      * Sets Kier-Hall SMARTS descriptor values (79 functional group counts).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5448,8 +5323,6 @@ public enum Descriptor {
     /**
      * Sets the EccentricConnectivityIndex descriptor value in aVector beginning with aStartIndex.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector to be filled with descriptor value (MAY BE CHANGED)
@@ -5466,8 +5339,6 @@ public enum Descriptor {
     /**
      * Sets MDE descriptor values (molecular distance edge between atoms of specific types).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
@@ -5487,8 +5358,6 @@ public enum Descriptor {
     /**
      * Sets VABC value (volume descriptor based on atom contributions).
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
-     * WARNING: This method is NOT thread-safe and accesses shared CDK descriptor instances without synchronization.
-     * Use only in single-threaded contexts or when thread safety is ensured externally.
      *
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)

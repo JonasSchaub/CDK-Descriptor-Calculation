@@ -5879,7 +5879,7 @@ class DescriptorTest {
             tmpIsParallelCalculation = false;
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculeStringsByBatchParallelization(
+                    Descriptor.setDescriptorsForMoleculeSmilesStringsByBatchParallelization(
                             tmpDescriptors,
                             tmpMoleculeStringsArray,
                             tmpMatrixSequential,
@@ -5898,7 +5898,7 @@ class DescriptorTest {
             tmpIsParallelCalculation = true;
             aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculeStringsByBatchParallelization(
+                    Descriptor.setDescriptorsForMoleculeSmilesStringsByBatchParallelization(
                             tmpDescriptors,
                             tmpMoleculeStringsArray,
                             tmpMatrixParallel,
@@ -6114,7 +6114,7 @@ class DescriptorTest {
             }
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculeStringsByBatchParallelization(
+                    Descriptor.setDescriptorsForMoleculeSmilesStringsByBatchParallelization(
                             tmpDescriptors,
                             tmpMoleculeStringsArray,
                             tmpMatrix6,
