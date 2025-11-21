@@ -6304,7 +6304,7 @@ class DescriptorTest {
 
         // Check if all returned descriptors are indeed fingerprints
         for (Descriptor descriptor : allFingerprints) {
-            Assertions.assertTrue(Descriptor.isFingerprint(descriptor));
+            Assertions.assertTrue(descriptor.isFingerprint());
         }
 
         // Check for presence of specific known fingerprints
