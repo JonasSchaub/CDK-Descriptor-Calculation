@@ -876,6 +876,14 @@ public enum Descriptor {
     private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());
     //</editor-fold>
 
+    // <editor-fold desc="SMILES parser">
+    /**
+     * SMILES Parser for SMILES String batch processing
+     */
+    private static final SmilesParser SMILES_PARSER = new SmilesParser(SilentChemObjectBuilder.getInstance());
+    //</editor-fold>
+
+
     // <editor-fold desc="CDK descriptor and fingerprinter mappings and static initializer block">
     /**
      * EnumMap that maps a descriptor to an instance of its CDK descriptor class
@@ -2526,8 +2534,7 @@ public enum Descriptor {
             List<int[]> aNanPositions
     ) throws Exception {
         try {
-            SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-            IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(aMoleculeSmilesString);
+            IAtomContainer tmpMolecule = Descriptor.SMILES_PARSER.parseSmiles(aMoleculeSmilesString);
             if (anElectronDonationModel == null) {
                 Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
             } else {

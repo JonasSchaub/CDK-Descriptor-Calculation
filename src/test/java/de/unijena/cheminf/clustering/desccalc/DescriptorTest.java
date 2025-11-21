@@ -60,7 +60,7 @@ class DescriptorTest {
      * Test method for descriptor MOLECULAR_WEIGHT.
      */
     @Test
-    public void test_MOLECULAR_WEIGHT() throws Exception {
+    void test_MOLECULAR_WEIGHT() throws Exception {
         // Acetic acid
         String tmpSmiles = "CC(=O)O"; //Acetic Acid CID: 176
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
@@ -151,7 +151,7 @@ class DescriptorTest {
      * Tests method for descriptor WIENER_NUMBER.
      */
     @Test
-    public void test_WIENER_NUMBER() throws Exception {
+    void test_WIENER_NUMBER() throws Exception {
         // Acetic acid
         String tmpSmiles = "CC(=O)O"; //Acetic Acid CID: 176
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
@@ -246,7 +246,7 @@ class DescriptorTest {
      * Tests method for descriptor ATOM_COUNT.
      */
     @Test
-    public void test_ATOM_COUNT() throws Exception {
+    void test_ATOM_COUNT() throws Exception {
         // Acetic acid
         String tmpSmiles = "CC(=O)O"; //Acetic Acid CID: 176
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
@@ -338,7 +338,7 @@ class DescriptorTest {
      * Tests method for the organic subset of individual atom counts (C, H, N, O, S, P, F, Br, Cl, I) in a complex molecule.
      */
     @Test
-    public void test_ATOM_COUNT_ORGANIC_SUBSET() throws Exception {
+    void test_ATOM_COUNT_ORGANIC_SUBSET() throws Exception {
         String tmpSmiles = "CC1=CC2=C(C=C1C)N(C=N2)C3C(C(C(O3)CO)OP(=O)([O-])OC(C)CNC(=O)CCC4(C(C5C6(C(C(C(=N6)C(=C7C(C(C(=N7)C=C8C(C(C(=N8)C(=C4[N-]5)C)CCC(=O)N)(C)C)CCC(=O)N)(C)CC(=O)N)C)CCC(=O)N)(C)CC(=O)N)C)CC(=O)N)C)O.[Co+3]"; // Cobalamin CID: 74413906
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -475,7 +475,7 @@ class DescriptorTest {
      * Tests method for descriptor H_BOND_ACCEPTOR_COUNT.
      */
     @Test
-    public void test_H_BOND_ACCEPTOR_COUNT() throws Exception {
+    void test_H_BOND_ACCEPTOR_COUNT() throws Exception {
         // Acetic acid
         String tmpSmiles1 = "CC(=O)O"; //Acetic Acid CID: 176
         String tmpSmiles2 = "O=N(=O)c1cccc2cn[nH]c12"; // 7-Nitroindole CID: 1893
@@ -594,7 +594,7 @@ class DescriptorTest {
      * Tests method for descriptor H_BOND_DONOR_COUNT.
      */
     @Test
-    public void test_H_BOND_DONOR_COUNT() throws Exception {
+    void test_H_BOND_DONOR_COUNT() throws Exception {
         String tmpSmiles1 = "CC(=O)O"; //Acetic Acid CID: 176
         String tmpSmiles2 = "Oc1ccccc1"; // Phenol CID: 996
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
@@ -709,7 +709,7 @@ class DescriptorTest {
      * Tests method for descriptor TPSA.
      */
     @Test
-    public void test_TPSA() throws Exception {
+    void test_TPSA() throws Exception {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         // Preparation of the first molecule
         String tmpSmiles1 = "C=NC(CC#N)N(C)C"; // Not known in the PubChem database, but a valid SMILES
@@ -827,7 +827,7 @@ class DescriptorTest {
      * Tests method for descriptor LARGEST_CHAIN.
      */
     @Test
-    public void test_LARGEST_CHAIN() throws Exception {
+    void test_LARGEST_CHAIN() throws Exception {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         // Preparation of the first molecule
         String tmpSmiles1 = "C=CC=Cc1ccccc1"; // 1-Phenylbutadiene CID: 137048
@@ -944,7 +944,7 @@ class DescriptorTest {
      * Tests method for descriptor LONGEST_ALIPHATIC_CHAIN.
      */
     @Test
-    public void test_LONGEST_ALIPHATIC_CHAIN() throws Exception {
+    void test_LONGEST_ALIPHATIC_CHAIN() throws Exception {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         // Preparation of the first molecule
         String tmpSmiles1 = "CCCCc1ccccc1"; // Butylbenzene CID: 7705
@@ -1061,7 +1061,7 @@ class DescriptorTest {
      * Tests method for descriptor MANNHOLD_LOGP.
      */
     @Test
-    public void test_MANNHOLD_LOGP() throws Exception {
+    void test_MANNHOLD_LOGP() throws Exception {
         String tmpSmiles = "C"; // Methane CID: 297
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -1151,7 +1151,7 @@ class DescriptorTest {
      * Tests method for descriptor BCUT.
      */
     @Test
-    public void test_BCUT() throws Exception {
+    void test_BCUT() throws Exception {
         String tmpSmiles = "CC(=O)N"; // Acetamide CID: 178
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -1260,7 +1260,7 @@ class DescriptorTest {
      * Tests method for descriptor BOND_COUNT_ALL.
      */
     @Test
-    public void test_BOND_COUNT_ALL() throws Exception {
+    void test_BOND_COUNT_ALL() throws Exception {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         // Preparation of the first molecule
         String tmpSmiles1 = "CCO"; // Ethanol CID: 702
@@ -1365,7 +1365,7 @@ class DescriptorTest {
      * Tests method for descriptors BOND_COUNT_SINGLE, BOND_COUNT_DOUBLE, and BOND_COUNT_TRIPLE.
      */
     @Test
-    public void test_BOND_COUNT_SPECIFIED() throws Exception {
+    void test_BOND_COUNT_SPECIFIED() throws Exception {
         String tmpSmiles = "C=CC#N"; // Acrylonitrile CID: 7855
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -1467,7 +1467,7 @@ class DescriptorTest {
      * Tests method for descriptor B_POL.
      */
     @Test
-    public void test_B_POL() throws Exception {
+    void test_B_POL() throws Exception {
         String tmpSmiles = "O=C(O)CC"; // Propionic acid CID: 1032
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -1556,7 +1556,7 @@ class DescriptorTest {
      * Tests method for descriptor RULE_OF_FIVE.
      */
     @Test
-    public void test_RULE_OF_FIVE() throws Exception {
+    void test_RULE_OF_FIVE() throws Exception {
         String tmpSmiles = "CCCC(OCC)OCC(c1cccc2ccccc12)C4CCC(CCCO)C(CC3CNCNC3)C4"; // Not known in the PubChem database, but a valid SMILES
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         ElectronDonation[] models = {
@@ -1662,7 +1662,7 @@ class DescriptorTest {
      * Tests method for descriptor AROMATIC_ATOMS_COUNT.
      */
     @Test
-    public void test_AROMATIC_ATOMS_COUNT() throws Exception {
+    void test_AROMATIC_ATOMS_COUNT() throws Exception {
         String tmpSmiles = "c1ccccc1"; // Benzene CID: 241
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         // Array of all available electron donation models
@@ -1769,7 +1769,7 @@ class DescriptorTest {
      * Tests method for descriptor AROMATIC_BONDS_COUNT with benzene.
      */
     @Test
-    public void test_AROMATIC_BONDS_COUNT() throws Exception {
+    void test_AROMATIC_BONDS_COUNT() throws Exception {
         String tmpSmiles = "c1ccccc1"; // Benzene CID: 241
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         ElectronDonation[] models = {
@@ -1875,7 +1875,7 @@ class DescriptorTest {
      * Tests method for descriptor ROTATABLE_BONDS_COUNT.
      */
     @Test
-    public void test_ROTATABLE_BONDS_COUNT() throws Exception {
+    void test_ROTATABLE_BONDS_COUNT() throws Exception {
         String tmpSmiles = "CCNC(=O)CC(C)C"; // N-ethyl-3-methylbutanamide CID: 528605
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -1965,7 +1965,7 @@ class DescriptorTest {
      * Tests method for descriptor FMF.
      */
     @Test
-    public void test_FMF() throws Exception {
+    void test_FMF() throws Exception {
         String tmpSmiles = "Clc1cc(cc(Cl)c1N)C(O)CNC(C)(C)C"; // Clenbuterol CID: 2783
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -2054,7 +2054,7 @@ class DescriptorTest {
      * Tests method for descriptor FRACTIONAL_CSP3.
      */
     @Test
-    public void test_FRACTIONAL_CSP3() throws Exception {
+    void test_FRACTIONAL_CSP3() throws Exception {
         String tmpSmiles = "CC1=CC=CC(C)=N1"; // 2,6-Dimethylpyridine CID: 7937
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -2143,7 +2143,7 @@ class DescriptorTest {
      * Tests method for descriptor HYBRIDIZATION_RATIO.
      */
     @Test
-    public void test_HYBRIDIZATION_RATIO() throws Exception {
+    void test_HYBRIDIZATION_RATIO() throws Exception {
         String tmpSmiles = "CCC"; // Propane CID: 6334
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -2233,7 +2233,7 @@ class DescriptorTest {
      * Tests method for descriptor KAPPA_SHAPE_INDICES.
      */
     @Test
-    public void test_KAPPA_SHAPE_INDICES() throws Exception {
+    void test_KAPPA_SHAPE_INDICES() throws Exception {
         String tmpSmiles = "O=C(O)CC"; // Propionic acid CID: 1032
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -2330,7 +2330,7 @@ class DescriptorTest {
      * Tests method for descriptor PETITJEAN_NUMBER.
      */
     @Test
-    public void test_PETITJEAN_NUMBER() throws Exception {
+    void test_PETITJEAN_NUMBER() throws Exception {
         String tmpSmiles = "O=C(O)CC"; // Propionic acid CID: 1032
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -2419,7 +2419,7 @@ class DescriptorTest {
      * Tests method for descriptor SPIRO_ATOM_COUNT.
      */
     @Test
-    public void test_SPIRO_ATOM_COUNT() throws Exception {
+    void test_SPIRO_ATOM_COUNT() throws Exception {
         String tmpSmiles = "C1CCC2(CC1)CC=C1C=CC=CC1=C2"; // Not known in the PubChem database, but a valid SMILES
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -2509,7 +2509,7 @@ class DescriptorTest {
      * Tests method for descriptor V_ADJ_MAT.
      */
     @Test
-    public void test_V_ADJ_MAT() throws Exception {
+    void test_V_ADJ_MAT() throws Exception {
         String tmpSmiles = "C1CCC2CCCCC2C1"; // Decalin CID: 7044
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -2598,7 +2598,7 @@ class DescriptorTest {
      * Tests method for descriptor WEIGHTED_PATH.
      */
     @Test
-    public void test_WEIGHTED_PATH() throws Exception {
+    void test_WEIGHTED_PATH() throws Exception {
         String tmpSmiles = "CCCC"; // Butane CID: 7843
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -2703,7 +2703,7 @@ class DescriptorTest {
      * Tests method for descriptor ZAGREB_INDEX.
      */
     @Test
-    public void test_ZAGREB_INDEX() throws Exception {
+    void test_ZAGREB_INDEX() throws Exception {
         String tmpSmiles = "O=C(O)CC"; // Propionic acid CID: 1032
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -2792,7 +2792,7 @@ class DescriptorTest {
      * Tests method for descriptor CARBON_TYPES.
      */
     @Test
-    public void test_CARBON_TYPES() throws Exception {
+    void test_CARBON_TYPES() throws Exception {
         String tmpSmiles = "CCCC"; // Butane CID: 7843
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -2914,7 +2914,7 @@ class DescriptorTest {
      * Tests method for descriptor A_LOG_P.
      */
     @Test
-    public void test_A_LOG_P() throws Exception {
+    void test_A_LOG_P() throws Exception {
         String tmpSmiles = "CCCCl"; // 1-Chloropropane CID: 10899
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -3012,7 +3012,7 @@ class DescriptorTest {
      * Tests method for descriptor X_LOG_P.
      */
     @Test
-    public void test_X_LOG_P() throws Exception {
+    void test_X_LOG_P() throws Exception {
         String tmpSmiles = "O=C(O)C(N)CCCN"; // 2,5-Diaminopentanoic Acid CID: 389
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         ElectronDonation[] models = {
@@ -3117,7 +3117,7 @@ class DescriptorTest {
      * Tests method for descriptor JP_LOG_P.
      */
     @Test
-    public void test_JP_LOG_P() throws Exception {
+    void test_JP_LOG_P() throws Exception {
         String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -3206,7 +3206,7 @@ class DescriptorTest {
      * Tests method for descriptor A_POL.
      */
     @Test
-    public void test_A_POL() throws Exception {
+    void test_A_POL() throws Exception {
         String tmpSmiles = "O=C(O)CC"; // Propionic acid CID: 1032
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -3295,7 +3295,7 @@ class DescriptorTest {
      * Tests method for descriptor AUTOCORRELATION_CHARGE.
      */
     @Test
-    public void test_AUTOCORRELATION_CHARGE() throws Exception {
+    void test_AUTOCORRELATION_CHARGE() throws Exception {
         String tmpSmiles = "Clc1ccccc1"; // Chlorobenzene CID: 7964
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -3399,7 +3399,7 @@ class DescriptorTest {
      * Tests method for descriptor AUTOCORRELATION_MASS.
      */
     @Test
-    public void test_AUTOCORRELATION_MASS() throws Exception {
+    void test_AUTOCORRELATION_MASS() throws Exception {
         String tmpSmiles = "Clc1ccccc1"; // Chlorobenzene CID: 7964
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -3505,7 +3505,7 @@ class DescriptorTest {
      * Result can be printed to see if descriptor calculates values.
      */
     @Test
-    public void test_AUTOCORRELATION_POLARIZABILITY() throws Exception {
+    void test_AUTOCORRELATION_POLARIZABILITY() throws Exception {
         String tmpSmiles = "Clc1ccccc1"; // Chlorobenzene CID: 7964
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -3595,7 +3595,7 @@ class DescriptorTest {
      * Tests method for descriptor FRAGMENT_COMPLEXITY.
      */
     @Test
-    public void test_FRAGMENT_COMPLEXITY() throws Exception {
+    void test_FRAGMENT_COMPLEXITY() throws Exception {
         String tmpSmiles = "c1ccc(CCc2ccccc2)cc1"; // 1,2-Diphenylethane CID: 7647
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -3684,7 +3684,7 @@ class DescriptorTest {
      * Tests method for descriptor CHI_CHAIN.
      */
     @Test
-    public void test_CHI_CHAIN() throws Exception {
+    void test_CHI_CHAIN() throws Exception {
         String tmpSmiles = "CC1OC1"; // Propylene oxide CID: 6378
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -3801,7 +3801,7 @@ class DescriptorTest {
      * Tests method for descriptor CHI_CLUSTER.
      */
     @Test
-    public void test_CHI_CLUSTER() throws Exception {
+    void test_CHI_CLUSTER() throws Exception {
         String tmpSmiles = "CC1OC1"; // Propylene oxide CID: 6378
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -3918,7 +3918,7 @@ class DescriptorTest {
      * Tests method for descriptor CHI_PATH_CLUSTER.
      */
     @Test
-    public void test_CHI_PATH_CLUSTER() throws Exception {
+    void test_CHI_PATH_CLUSTER() throws Exception {
         String tmpSmiles = "C1=C(Cl)C=CC=C1(Cl)"; // 1,3-Dichlorobenzene CID: 10943
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -4027,7 +4027,7 @@ class DescriptorTest {
      * Tests method for descriptor CHI_PATH.
      */
     @Test
-    public void test_CHI_PATH() throws Exception {
+    void test_CHI_PATH() throws Exception {
         String tmpSmiles = "CC1OC1"; // Propylene oxide CID: 6378
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -4153,7 +4153,7 @@ class DescriptorTest {
      * Expected results were calculated by TPSADescriptor / MolecularWeightDescriptor.
      */
     @Test
-    public void test_FRACTIONAL_PSA() throws Exception {
+    void test_FRACTIONAL_PSA() throws Exception {
         String tmpSmiles = "O=C(O)c1ccncc1"; // Isonicotinic Acid CID: 5922
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -4243,7 +4243,7 @@ class DescriptorTest {
      * Tests method for descriptor LARGEST_PI_SYSTEM.
      */
     @Test
-    public void test_LARGEST_PI_SYSTEM() throws Exception {
+    void test_LARGEST_PI_SYSTEM() throws Exception {
         String tmpSmiles = "C=CC=CCc2ccc(Cc1ccncc1C=C)cc2"; // Not known in the PubChem database, but a valid SMILES
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -4332,7 +4332,7 @@ class DescriptorTest {
      * Tests method for descriptor SMALL_RING.
      */
     @Test
-    public void test_SMALL_RING() throws Exception {
+    void test_SMALL_RING() throws Exception {
         String tmpSmiles = "O=C1c2ccccc2C(=O)c2cc3cc4ccccc4cc3cc21"; // 5,14-Pentacenedione CID: 10686237
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
 
@@ -4453,7 +4453,7 @@ class DescriptorTest {
      * Tests method for descriptor BASIC_GROUP_COUNT.
      */
     @Test
-    public void test_BASIC_GROUP_COUNT() throws Exception {
+    void test_BASIC_GROUP_COUNT() throws Exception {
         String tmpSmiles = "NC"; // Methylamine CID: 6329
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -4541,7 +4541,7 @@ class DescriptorTest {
      * Tests method for descriptor ACIDIC_GROUP_COUNT.
      */
     @Test
-    public void test_ACIDIC_GROUP_COUNT() throws Exception {
+    void test_ACIDIC_GROUP_COUNT() throws Exception {
         String tmpSmiles = "CC(=O)O"; // Acetic acid CID: 176
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -4629,7 +4629,7 @@ class DescriptorTest {
      * Tests method for descriptor AMINO_ACID_COUNT.
      */
     @Test
-    public void test_AMINO_ACID_COUNT() throws Exception {
+    void test_AMINO_ACID_COUNT() throws Exception {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         // Preparation of the first molecule
         String tmpSmiles1 = "N[C@@]([H])([C@]([H])(O)C)C(=O)N[C@@]([H])([C@]([H])(O)C)C(=O)O"; // L-threonyl-L-threonine CID: 11321969
@@ -4735,7 +4735,7 @@ class DescriptorTest {
      * Tests method for descriptor KIER_HALL_SMARTS.
      */
     @Test
-    public void test_KIER_HALL_SMARTS() throws Exception {
+    void test_KIER_HALL_SMARTS() throws Exception {
         String tmpSmiles = "c1c(CN)cc(CCNC)cc1C(CO)CC(=O)CCOCCCO"; // Not known in the PubChem database, but a valid SMILES
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -4839,7 +4839,7 @@ class DescriptorTest {
      * Tests method for descriptor ECCENTRIC_CONNECTIVITY_INDEX.
      */
     @Test
-    public void test_ECCENTRIC_CONNECTIVITY_INDEX() throws Exception {
+    void test_ECCENTRIC_CONNECTIVITY_INDEX() throws Exception {
         String tmpSmiles = "C[C@H]1CC[C@H]2[C@@H](C)C(=O)O[C@@H]3O[C@@]4(C)CC[C@@H]1[C@]32OO4"; // (1R,4S,5S,8S,9R,12S,13R)-1,5,9-trimethyl-11,14,15,16-tetraoxatetracyclo[10.3.1.04,13.08,13]hexadecan-10-one CID: 98047509
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -4927,7 +4927,7 @@ class DescriptorTest {
      * Tests method for descriptor MDE.
      */
     @Test
-    public void test_MDE() throws Exception {
+    void test_MDE() throws Exception {
         String tmpSmiles = "COOC(C)(CO)OOC"; // Not known in the PubChem database, but a valid SMILES
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -5024,7 +5024,7 @@ class DescriptorTest {
      * Tests method for descriptor VABC.
      */
     @Test
-    public void test_VABC() throws Exception {
+    void test_VABC() throws Exception {
         String tmpSmiles = "COc2ccc1[nH]c(nc1c2)S(=O)Cc3ncc(C)c(OC)c3C"; // Prilosec CID: 4594
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -5114,7 +5114,7 @@ class DescriptorTest {
      * Tests PubChem fingerprint functionality.
      */
     @Test
-    public void test_PUBCHEM_FINGERPRINT() throws Exception {
+    void test_PUBCHEM_FINGERPRINT() throws Exception {
         String tmpSmiles = "C1=CC=C(C=C1)C[N+]2=C(C=C(C=C2C=CC3=CC=CC=C3)C4=CC=CC=C4)C5=CC=CC=C5"; // 1-Benzyl-2,4-diphenyl-6-(2-phenylethenyl)pyridin-1-ium CID: 3828524
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -5198,7 +5198,7 @@ class DescriptorTest {
      * Tests method for descriptor MACCS_FINGERPRINTER.
      */
     @Test
-    public void test_MACCS_FINGERPRINTER() throws Exception {
+    void test_MACCS_FINGERPRINTER() throws Exception {
         String tmpSmiles = "c1ccccc1CCc1ccccc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -5264,7 +5264,7 @@ class DescriptorTest {
      * Tests method for descriptor CIRCULAR_FINGERPRINTER_ECFP.
      */
     @Test
-    public void test_CIRCULAR_FINGERPRINTER_ECFP() throws Exception {
+    void test_CIRCULAR_FINGERPRINTER_ECFP() throws Exception {
         String tmpSmiles = "c1ccccc1CCc1ccccc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -5327,7 +5327,7 @@ class DescriptorTest {
      * Tests method for descriptor CIRCULAR_FINGERPRINTER_FCFP.
      */
     @Test
-    public void test_CIRCULAR_FINGERPRINTER_FCFP() throws Exception {
+    void test_CIRCULAR_FINGERPRINTER_FCFP() throws Exception {
         String tmpSmiles = "c1ccccc1CCc1ccccc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -5395,7 +5395,7 @@ class DescriptorTest {
      * Tests combined descriptors.
      */
     @Test
-    public void test_CombinedDescriptorsSequential() throws Exception {
+    void test_CombinedDescriptorsSequential() throws Exception {
         // Acetic acid
         String tmpSmiles = "CC(=O)O"; // Acetic acid CID: 176
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
@@ -5505,7 +5505,7 @@ class DescriptorTest {
      * Tests parallelization.
      */
     @Test
-    public void test_Parallelization() throws Exception {
+    void test_Parallelization() throws Exception {
         String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         int tmpNumberOfMolecules = 1000;
@@ -5651,7 +5651,7 @@ class DescriptorTest {
      * Tests parallelization without fingerprints.
      */
     @Test
-    public void test_Parallelization_without_Fingerprints() throws Exception {
+    void test_Parallelization_without_Fingerprints() throws Exception {
         String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         int tmpNumberOfMolecules = 1000;
@@ -5925,7 +5925,7 @@ class DescriptorTest {
      * Tests integrity.
      */
     @Test
-    public void test_Integrity() throws Exception {
+    void test_Integrity() throws Exception {
         String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         int tmpNumberOfMolecules = 1000;
@@ -6007,7 +6007,7 @@ class DescriptorTest {
      * Tests integrity without Fingerprints because Descriptor.setDescriptorsForMoleculesByMoleculeParallelization does not support the calculation of Fingerprints.
      */
     @Test
-    public void test_Integrity_without_Fingerprints() throws Exception {
+    void test_Integrity_without_Fingerprints() throws Exception {
         String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         int tmpNumberOfMolecules = 1000;
@@ -6147,7 +6147,7 @@ class DescriptorTest {
      * Tests createMoleculeWithExplicitHydrogens.
      */
     @Test
-    public void testCreateMoleculeWithExplicitHydrogens() throws Exception {
+    void testCreateMoleculeWithExplicitHydrogens() throws Exception {
         // Create a simple molecule (methane) with implicit hydrogen atoms
         String methanSmiles = "C";
         SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
@@ -6199,7 +6199,7 @@ class DescriptorTest {
      * Tests the copyMolecule method.
      */
     @Test
-    public void testCopyMolecule() throws Exception {
+    void testCopyMolecule() throws Exception {
         // Create a test molecule (benzene)
         String benzeneSmiles = "c1ccccc1";
         SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
@@ -6234,7 +6234,7 @@ class DescriptorTest {
      * Tests setAromaticity.
      */
     @Test
-    public void testSetAromaticity() throws Exception {
+    void testSetAromaticity() throws Exception {
         // Test molecule: Benzene
         String benzeneSmiles = "c1ccccc1";
         SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
@@ -6296,7 +6296,7 @@ class DescriptorTest {
      * Tests getAllFingerprints.
      */
     @Test
-    public void test_getAllFingerprints() throws Exception {
+    void test_getAllFingerprints() throws Exception {
         Descriptor[] allFingerprints = Descriptor.getAllFingerprints();
 
         // Check if at least one fingerprint is returned
