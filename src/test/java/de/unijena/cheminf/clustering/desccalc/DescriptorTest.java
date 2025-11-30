@@ -29,22 +29,17 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.aromaticity.Aromaticity;
 import org.openscience.cdk.aromaticity.ElectronDonation;
-import org.openscience.cdk.fingerprint.IFingerprinter;
 import org.openscience.cdk.fingerprint.PubchemFingerprinter;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IBond;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
-import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Test class for Descriptor class.
@@ -69,8 +64,8 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.MOLECULAR_WEIGHT};
         boolean tmpIsParallelCalculation = false;
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
+        double epsilon = 0.01; // tolerance range
+
 
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -90,7 +85,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(60.05, tmpMatrix[0][0], epsilon);
 
             tmpMatrix = new float[][]
                     {
@@ -107,7 +102,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(60.05, tmpMatrix[0][0], epsilon);
 
             tmpMatrix = new float[][]
                     {
@@ -124,8 +119,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
-
+            Assertions.assertEquals(60.05, tmpMatrix[0][0], epsilon);
             tmpMatrix = new float[][]
                     {
                             {0f}
@@ -141,7 +135,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(60.05, tmpMatrix[0][0], epsilon);
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -160,8 +154,6 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.WIENER_NUMBER};
         boolean tmpIsParallelCalculation = false;
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         try {
             Assertions.assertEquals(2, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -181,8 +173,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1])); // there are no atoms that are 3 bonds apart
+            Assertions.assertEquals(9.0, tmpMatrix[0][0]); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
+            Assertions.assertEquals(0.0, tmpMatrix[0][1]); // there are no atoms that are 3 bonds apart
 
             tmpMatrix = new float[][]
                     {
@@ -199,8 +191,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1])); // there are no atoms that are 3 bonds apart
+            Assertions.assertEquals(9.0, tmpMatrix[0][0]); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
+            Assertions.assertEquals(0.0, tmpMatrix[0][1]); // there are no atoms that are 3 bonds apart
 
             tmpMatrix = new float[][]
                     {
@@ -217,8 +209,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1])); // there are no atoms that are 3 bonds apart
+            Assertions.assertEquals(9.0, tmpMatrix[0][0]); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
+            Assertions.assertEquals(0.0, tmpMatrix[0][1]); // there are no atoms that are 3 bonds apart
 
             tmpMatrix = new float[][]
                     {
@@ -235,8 +227,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("9", tmpFormat.format(tmpMatrix[0][0])); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1])); // there are no atoms that are 3 bonds apart
+            Assertions.assertEquals(9.0, tmpMatrix[0][0]); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
+            Assertions.assertEquals(0.0, tmpMatrix[0][1]); // there are no atoms that are 3 bonds apart
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -255,8 +247,6 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ATOM_COUNT};
         boolean tmpIsParallelCalculation = false;
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -277,7 +267,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("8", tmpFormat.format(tmpMatrix[0][0])); // Acetic acid has 8 atoms
+            Assertions.assertEquals(8.0, tmpMatrix[0][0]); // Acetic acid has 8 atoms
 
             tmpMatrix = new float[][]
                     {
@@ -294,7 +284,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("8", tmpFormat.format(tmpMatrix[0][0])); // Acetic acid has 8 atoms
+            Assertions.assertEquals(8.0, tmpMatrix[0][0]); // Acetic acid has 8 atoms
 
             tmpMatrix = new float[][]
                     {
@@ -311,7 +301,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("8", tmpFormat.format(tmpMatrix[0][0])); // Acetic acid has 8 atoms
+            Assertions.assertEquals(8.0, tmpMatrix[0][0]); // Acetic acid has 8 atoms
 
             tmpMatrix = new float[][]
                     {
@@ -328,7 +318,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("8", tmpFormat.format(tmpMatrix[0][0])); // Acetic acid has 8 atoms
+            Assertions.assertEquals(8.0, tmpMatrix[0][0]); // Acetic acid has 8 atoms
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -492,8 +482,6 @@ class DescriptorTest {
                 Aromaticity.Model.OpenSmiles
                 //Aromaticity.Model.PiBonds
         };
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         for (ElectronDonation model : models) {
             // Parse fresh molecule for each model for the first molecule
@@ -528,8 +516,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(2, tmpMatrix[0][0]);
+                Assertions.assertEquals(1, tmpMatrix[1][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -546,8 +534,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(2, tmpMatrix[0][0]);
+                Assertions.assertEquals(1, tmpMatrix[1][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -564,8 +552,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(2, tmpMatrix[0][0]);
+                Assertions.assertEquals(1, tmpMatrix[1][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -582,8 +570,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(2, tmpMatrix[0][0]);
+                Assertions.assertEquals(1, tmpMatrix[1][0]);
             } catch (Exception anException) {
                 Assertions.fail();
             }
@@ -607,8 +595,6 @@ class DescriptorTest {
                 Aromaticity.Model.OpenSmiles,
                 Aromaticity.Model.PiBonds
         };
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         for (ElectronDonation model : models) {
             // Parse fresh molecule for each model for the first molecule
@@ -643,8 +629,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Acetic acid has 1 hydrogen bond donor
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[1][0])); // Phenol has 1 hydrogen bond donor
+                Assertions.assertEquals(1, tmpMatrix[0][0]); // Acetic acid has 1 hydrogen bond donor
+                Assertions.assertEquals(1, tmpMatrix[1][0]); // Phenol has 1 hydrogen bond donor
 
                 tmpMatrix = new float[][]
                         {
@@ -661,8 +647,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Acetic acid has 1 hydrogen bond donor
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[1][0])); // Phenol has 1 hydrogen bond donor
+                Assertions.assertEquals(1, tmpMatrix[0][0]); // Acetic acid has 1 hydrogen bond donor
+                Assertions.assertEquals(1, tmpMatrix[1][0]); // Phenol has 1 hydrogen bond donor
 
                 tmpMatrix = new float[][]
                         {
@@ -679,8 +665,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Acetic acid has 1 hydrogen bond donor
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[1][0])); // Phenol has 1 hydrogen bond donor
+                Assertions.assertEquals(1, tmpMatrix[0][0]); // Acetic acid has 1 hydrogen bond donor
+                Assertions.assertEquals(1, tmpMatrix[1][0]); // Phenol has 1 hydrogen bond donor
 
                 tmpMatrix = new float[][]
                         {
@@ -697,8 +683,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Acetic acid has 1 hydrogen bond donor
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[1][0])); // Phenol has 1 hydrogen bond donor
+                Assertions.assertEquals(1, tmpMatrix[0][0]); // Acetic acid has 1 hydrogen bond donor
+                Assertions.assertEquals(1, tmpMatrix[1][0]); // Phenol has 1 hydrogen bond donor
             } catch (Exception anException) {
                 Assertions.fail();
             }
@@ -725,8 +711,6 @@ class DescriptorTest {
                 Aromaticity.Model.OpenSmiles,
                 Aromaticity.Model.PiBonds
         };
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
 
         for (ElectronDonation model : models) {
             // Parse fresh molecule for each model for the first molecule
@@ -742,6 +726,8 @@ class DescriptorTest {
             int tmpStartIndex = 0;
             Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.TPSA};
             boolean tmpIsParallelCalculation = false;
+
+            double epsilon = 0.01; //tolerance range
 
             try {
                 Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -761,8 +747,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("39.39", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("45.82", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(39.39, tmpMatrix[0][0], epsilon);
+                Assertions.assertEquals(45.82, tmpMatrix[1][0], epsilon);
 
                 tmpMatrix = new float[][]
                         {
@@ -779,8 +765,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("39.39", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("45.82", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(39.39, tmpMatrix[0][0], epsilon);
+                Assertions.assertEquals(45.82, tmpMatrix[1][0], epsilon);
 
                 tmpMatrix = new float[][]
                         {
@@ -797,8 +783,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("39.39", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("45.82", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(39.39, tmpMatrix[0][0], epsilon);
+                Assertions.assertEquals(45.82, tmpMatrix[1][0], epsilon);
 
                 tmpMatrix = new float[][]
                         {
@@ -815,8 +801,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("39.39", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("45.82", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(39.39, tmpMatrix[0][0], epsilon);
+                Assertions.assertEquals(45.82, tmpMatrix[1][0], epsilon);
             } catch (Exception anException) {
                 Assertions.fail();
             }
@@ -842,8 +828,6 @@ class DescriptorTest {
                 Aromaticity.Model.OpenSmiles,
                 Aromaticity.Model.PiBonds
         };
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         for (ElectronDonation model : models) {
             // Parse fresh molecule for each model for the first molecule
@@ -878,8 +862,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(4, tmpMatrix[0][0]);
+                Assertions.assertEquals(5, tmpMatrix[1][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -896,8 +880,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(4, tmpMatrix[0][0]);
+                Assertions.assertEquals(5, tmpMatrix[1][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -914,8 +898,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(4, tmpMatrix[0][0]);
+                Assertions.assertEquals(5, tmpMatrix[1][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -932,8 +916,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(4, tmpMatrix[0][0]);
+                Assertions.assertEquals(5, tmpMatrix[1][0]);
             } catch (Exception anException) {
                 Assertions.fail();
             }
@@ -959,8 +943,6 @@ class DescriptorTest {
                 Aromaticity.Model.OpenSmiles,
                 Aromaticity.Model.PiBonds
         };
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         for (ElectronDonation model : models) {
             // Parse fresh molecule for each model for the first molecule
@@ -995,8 +977,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(4, tmpMatrix[0][0]);
+                Assertions.assertEquals(4, tmpMatrix[1][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -1013,8 +995,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(4, tmpMatrix[0][0]);
+                Assertions.assertEquals(4, tmpMatrix[1][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -1031,8 +1013,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(4, tmpMatrix[0][0]);
+                Assertions.assertEquals(4, tmpMatrix[1][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -1049,8 +1031,8 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[1][0]));
+                Assertions.assertEquals(4, tmpMatrix[0][0]);
+                Assertions.assertEquals(4, tmpMatrix[1][0]);
             } catch (Exception anException) {
                 Assertions.fail();
             }
@@ -1069,8 +1051,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.MANNHOLD_LOGP};
         boolean tmpIsParallelCalculation = false;
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
+        double epsilon = 0.01; //tolerance range
 
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -1090,7 +1071,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1.57", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(1.57, tmpMatrix[0][0], epsilon);
 
             tmpMatrix = new float[][]
                     {
@@ -1107,7 +1088,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1.57", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(1.57, tmpMatrix[0][0], epsilon);
 
             tmpMatrix = new float[][]
                     {
@@ -1124,7 +1105,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1.57", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(1.57, tmpMatrix[0][0], epsilon);
 
             tmpMatrix = new float[][]
                     {
@@ -1141,7 +1122,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1.57", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(1.57, tmpMatrix[0][0], epsilon);
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -1275,8 +1256,6 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BOND_COUNT_ALL};
         boolean tmpIsParallelCalculation = false;
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -1296,9 +1275,9 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[1][0]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[2][0]));
+            Assertions.assertEquals(2, tmpMatrix[0][0]);
+            Assertions.assertEquals(2, tmpMatrix[1][0]);
+            Assertions.assertEquals(2, tmpMatrix[2][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -1315,9 +1294,9 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[1][0]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[2][0]));
+            Assertions.assertEquals(2, tmpMatrix[0][0]);
+            Assertions.assertEquals(2, tmpMatrix[1][0]);
+            Assertions.assertEquals(2, tmpMatrix[2][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -1334,9 +1313,9 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[1][0]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[2][0]));
+            Assertions.assertEquals(2, tmpMatrix[0][0]);
+            Assertions.assertEquals(2, tmpMatrix[1][0]);
+            Assertions.assertEquals(2, tmpMatrix[2][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -1353,9 +1332,9 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][0]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[1][0]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[2][0]));
+            Assertions.assertEquals(2, tmpMatrix[0][0]);
+            Assertions.assertEquals(2, tmpMatrix[1][0]);
+            Assertions.assertEquals(2, tmpMatrix[2][0]);
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -1377,8 +1356,6 @@ class DescriptorTest {
                 Descriptor.BOND_COUNT_TRIPLE
         };
         boolean tmpIsParallelCalculation = false;
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         try {
             Assertions.assertEquals(3, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -1398,9 +1375,9 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Single bonds
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][1])); // Double bonds
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][2])); // Triple bonds
+            Assertions.assertEquals(1, tmpMatrix[0][0]); // Single bonds
+            Assertions.assertEquals(1, tmpMatrix[0][1]); // Double bonds
+            Assertions.assertEquals(1, tmpMatrix[0][2]); // Triple bonds
 
             tmpMatrix = new float[][]
                     {
@@ -1417,9 +1394,9 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Single bonds
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][1])); // Double bonds
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][2])); // Triple bonds
+            Assertions.assertEquals(1, tmpMatrix[0][0]); // Single bonds
+            Assertions.assertEquals(1, tmpMatrix[0][1]); // Double bonds
+            Assertions.assertEquals(1, tmpMatrix[0][2]); // Triple bonds
 
             tmpMatrix = new float[][]
                     {
@@ -1436,9 +1413,9 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Single bonds
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][1])); // Double bonds
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][2])); // Triple bonds
+            Assertions.assertEquals(1, tmpMatrix[0][0]); // Single bonds
+            Assertions.assertEquals(1, tmpMatrix[0][1]); // Double bonds
+            Assertions.assertEquals(1, tmpMatrix[0][2]); // Triple bonds
 
             tmpMatrix = new float[][]
                     {
@@ -1455,9 +1432,9 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0])); // Single bonds
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][1])); // Double bonds
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][2])); // Triple bonds
+            Assertions.assertEquals(1, tmpMatrix[0][0]); // Single bonds
+            Assertions.assertEquals(1, tmpMatrix[0][1]); // Double bonds
+            Assertions.assertEquals(1, tmpMatrix[0][2]); // Triple bonds
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -1568,8 +1545,6 @@ class DescriptorTest {
                 Aromaticity.Model.OpenSmiles,
                 Aromaticity.Model.PiBonds
         };
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         for (ElectronDonation model : models) {
             // Parse fresh molecule for each model
@@ -1600,7 +1575,7 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("3", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals(3, tmpMatrix[0][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -1617,7 +1592,7 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("3", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals(3, tmpMatrix[0][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -1634,7 +1609,7 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("3", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals(3, tmpMatrix[0][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -1651,7 +1626,7 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("3", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals(3, tmpMatrix[0][0]);
             } catch (Exception anException) {
                 Assertions.fail();
             }
@@ -1675,8 +1650,6 @@ class DescriptorTest {
                 Aromaticity.Model.OpenSmiles,
                 Aromaticity.Model.PiBonds
         };
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         for (ElectronDonation model : models) {
             // Parse fresh molecule for each model
@@ -1707,7 +1680,7 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals(6, tmpMatrix[0][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -1724,7 +1697,7 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals(6, tmpMatrix[0][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -1741,7 +1714,7 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals(6, tmpMatrix[0][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -1758,7 +1731,7 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals(6, tmpMatrix[0][0]);
             } catch (Exception anException) {
                 Assertions.fail("Failed with model " + model.getClass().getSimpleName() + ": " + anException.getMessage());
             }
@@ -1781,8 +1754,6 @@ class DescriptorTest {
                 Aromaticity.Model.OpenSmiles,
                 Aromaticity.Model.PiBonds
         };
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         for (ElectronDonation model : models) {
             // Parse fresh molecule for each model
@@ -1813,7 +1784,7 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals(6, tmpMatrix[0][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -1830,7 +1801,7 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals(6, tmpMatrix[0][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -1847,7 +1818,7 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals(6, tmpMatrix[0][0]);
 
                 tmpMatrix = new float[][]
                         {
@@ -1864,7 +1835,7 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("6", tmpFormat.format(tmpMatrix[0][0]));
+                Assertions.assertEquals(6, tmpMatrix[0][0]);
             } catch (Exception anException) {
                 Assertions.fail();
             }
@@ -1883,8 +1854,6 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ROTATABLE_BONDS_COUNT};
         boolean tmpIsParallelCalculation = false;
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -1904,7 +1873,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(4, tmpMatrix[0][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -1921,7 +1890,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(4, tmpMatrix[0][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -1938,7 +1907,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(4, tmpMatrix[0][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -1955,7 +1924,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("4", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(4, tmpMatrix[0][0]);
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -2151,8 +2120,6 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.HYBRIDIZATION_RATIO};
         boolean tmpIsParallelCalculation = false;
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
 
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -2172,7 +2139,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1.00", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(1.00, tmpMatrix[0][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -2189,7 +2156,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1.00", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(1.00, tmpMatrix[0][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -2206,7 +2173,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1.00", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(1.00, tmpMatrix[0][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -2223,7 +2190,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1.00", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(1.00, tmpMatrix[0][0]);
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -2427,8 +2394,6 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.SPIRO_ATOM_COUNT};
         boolean tmpIsParallelCalculation = false;
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         try {
             Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -2448,7 +2413,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(1, tmpMatrix[0][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -2465,7 +2430,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(1, tmpMatrix[0][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -2482,7 +2447,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(1, tmpMatrix[0][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -2499,7 +2464,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][0]));
+            Assertions.assertEquals(1, tmpMatrix[0][0]);
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -2800,8 +2765,6 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CARBON_TYPES};
         boolean tmpIsParallelCalculation = false;
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
 
         try {
             Assertions.assertEquals(9, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -2821,15 +2784,15 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][0]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][2]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][3]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][4]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][5]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][6]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][7]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][8]));
+            Assertions.assertEquals(0, tmpMatrix[0][0]);
+            Assertions.assertEquals(0, tmpMatrix[0][1]);
+            Assertions.assertEquals(0, tmpMatrix[0][2]);
+            Assertions.assertEquals(0, tmpMatrix[0][3]);
+            Assertions.assertEquals(0, tmpMatrix[0][4]);
+            Assertions.assertEquals(2, tmpMatrix[0][5]);
+            Assertions.assertEquals(2, tmpMatrix[0][6]);
+            Assertions.assertEquals(0, tmpMatrix[0][7]);
+            Assertions.assertEquals(0, tmpMatrix[0][8]);
 
             tmpMatrix = new float[][]
                     {
@@ -2846,15 +2809,15 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][0]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][2]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][3]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][4]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][5]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][6]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][7]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][8]));
+            Assertions.assertEquals(0, tmpMatrix[0][0]);
+            Assertions.assertEquals(0, tmpMatrix[0][1]);
+            Assertions.assertEquals(0, tmpMatrix[0][2]);
+            Assertions.assertEquals(0, tmpMatrix[0][3]);
+            Assertions.assertEquals(0, tmpMatrix[0][4]);
+            Assertions.assertEquals(2, tmpMatrix[0][5]);
+            Assertions.assertEquals(2, tmpMatrix[0][6]);
+            Assertions.assertEquals(0, tmpMatrix[0][7]);
+            Assertions.assertEquals(0, tmpMatrix[0][8]);
 
             tmpMatrix = new float[][]
                     {
@@ -2871,15 +2834,15 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][0]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][2]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][3]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][4]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][5]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][6]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][7]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][8]));
+            Assertions.assertEquals(0, tmpMatrix[0][0]);
+            Assertions.assertEquals(0, tmpMatrix[0][1]);
+            Assertions.assertEquals(0, tmpMatrix[0][2]);
+            Assertions.assertEquals(0, tmpMatrix[0][3]);
+            Assertions.assertEquals(0, tmpMatrix[0][4]);
+            Assertions.assertEquals(2, tmpMatrix[0][5]);
+            Assertions.assertEquals(2, tmpMatrix[0][6]);
+            Assertions.assertEquals(0, tmpMatrix[0][7]);
+            Assertions.assertEquals(0, tmpMatrix[0][8]);
 
             tmpMatrix = new float[][]
                     {
@@ -2896,15 +2859,15 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][0]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][1]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][2]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][3]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][4]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][5]));
-            Assertions.assertEquals("2", tmpFormat.format(tmpMatrix[0][6]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][7]));
-            Assertions.assertEquals("0", tmpFormat.format(tmpMatrix[0][8]));
+            Assertions.assertEquals(0, tmpMatrix[0][0]);
+            Assertions.assertEquals(0, tmpMatrix[0][1]);
+            Assertions.assertEquals(0, tmpMatrix[0][2]);
+            Assertions.assertEquals(0, tmpMatrix[0][3]);
+            Assertions.assertEquals(0, tmpMatrix[0][4]);
+            Assertions.assertEquals(2, tmpMatrix[0][5]);
+            Assertions.assertEquals(2, tmpMatrix[0][6]);
+            Assertions.assertEquals(0, tmpMatrix[0][7]);
+            Assertions.assertEquals(0, tmpMatrix[0][8]);
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -2922,8 +2885,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[] {Descriptor.A_LOG_P};
         boolean tmpIsParallelCalculation = false;
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0.000", tmpSymbols);
+        double epsilon = 0.001; //tolerance range
 
         try {
             Assertions.assertEquals(3, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -2943,9 +2905,9 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1.719", tmpFormat.format(tmpMatrix[0][0]));
-            Assertions.assertEquals("2.955", tmpFormat.format(tmpMatrix[0][1]));
-            Assertions.assertEquals("20.584", tmpFormat.format(tmpMatrix[0][2]));
+            Assertions.assertEquals(1.719, tmpMatrix[0][0], epsilon);
+            Assertions.assertEquals(2.955, tmpMatrix[0][1], epsilon);
+            Assertions.assertEquals(20.584, tmpMatrix[0][2], epsilon);
 
             tmpMatrix = new float[][]
                     {
@@ -2962,9 +2924,9 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1.719", tmpFormat.format(tmpMatrix[0][0]));
-            Assertions.assertEquals("2.955", tmpFormat.format(tmpMatrix[0][1]));
-            Assertions.assertEquals("20.584", tmpFormat.format(tmpMatrix[0][2]));
+            Assertions.assertEquals(1.719, tmpMatrix[0][0], epsilon);
+            Assertions.assertEquals(2.955, tmpMatrix[0][1], epsilon);
+            Assertions.assertEquals(20.584, tmpMatrix[0][2], epsilon);
 
             tmpMatrix = new float[][]
                     {
@@ -2981,9 +2943,9 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1.719", tmpFormat.format(tmpMatrix[0][0]));
-            Assertions.assertEquals("2.955", tmpFormat.format(tmpMatrix[0][1]));
-            Assertions.assertEquals("20.584", tmpFormat.format(tmpMatrix[0][2]));
+            Assertions.assertEquals(1.719, tmpMatrix[0][0], epsilon);
+            Assertions.assertEquals(2.955, tmpMatrix[0][1], epsilon);
+            Assertions.assertEquals(20.584, tmpMatrix[0][2], epsilon);
 
             tmpMatrix = new float[][]
                     {
@@ -3000,9 +2962,9 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals("1.719", tmpFormat.format(tmpMatrix[0][0]));
-            Assertions.assertEquals("2.955", tmpFormat.format(tmpMatrix[0][1]));
-            Assertions.assertEquals("20.584", tmpFormat.format(tmpMatrix[0][2]));
+            Assertions.assertEquals(1.719, tmpMatrix[0][0], epsilon);
+            Assertions.assertEquals(2.955, tmpMatrix[0][1], epsilon);
+            Assertions.assertEquals(20.584, tmpMatrix[0][2], epsilon);
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -3532,8 +3494,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            //System.out.println("Synchronized calculation results:");
-            //System.out.println(Arrays.toString(tmpMatrix[0]));
+            System.out.println("Synchronized calculation results:");
+            System.out.println(Arrays.toString(tmpMatrix[0]));
 
             tmpMatrix = new float[][]
                     {
@@ -3550,8 +3512,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            //System.out.println("New calculation results:");
-            //System.out.println(Arrays.toString(tmpMatrix[0]));
+            System.out.println("New calculation results:");
+            System.out.println(Arrays.toString(tmpMatrix[0]));
 
             tmpMatrix = new float[][]
                     {
@@ -3584,8 +3546,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            //System.out.println("Descriptor parallelization results:");
-            //System.out.println(Arrays.toString(tmpMatrix[0]));
+            System.out.println("Descriptor parallelization results:");
+            System.out.println(Arrays.toString(tmpMatrix[0]));
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -4346,9 +4308,6 @@ class DescriptorTest {
                 Aromaticity.Model.PiBonds
         };
 
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0", tmpSymbols);
-
         for (ElectronDonation model : models) {
             // Parse fresh molecule for each model
             IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -4379,10 +4338,10 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][1]));
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][2]));
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][3]));
+                Assertions.assertEquals(5, tmpMatrix[0][0]);
+                Assertions.assertEquals(5, tmpMatrix[0][1]);
+                Assertions.assertEquals(1, tmpMatrix[0][2]);
+                Assertions.assertEquals(1, tmpMatrix[0][3]);
 
                 tmpMatrix = new float[][]
                         {
@@ -4399,10 +4358,10 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][1]));
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][2]));
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][3]));
+                Assertions.assertEquals(5, tmpMatrix[0][0]);
+                Assertions.assertEquals(5, tmpMatrix[0][1]);
+                Assertions.assertEquals(1, tmpMatrix[0][2]);
+                Assertions.assertEquals(1, tmpMatrix[0][3]);
 
                 tmpMatrix = new float[][]
                         {
@@ -4419,10 +4378,10 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][1]));
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][2]));
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][3]));
+                Assertions.assertEquals(5, tmpMatrix[0][0]);
+                Assertions.assertEquals(5, tmpMatrix[0][1]);
+                Assertions.assertEquals(1, tmpMatrix[0][2]);
+                Assertions.assertEquals(1, tmpMatrix[0][3]);
 
                 tmpMatrix = new float[][]
                         {
@@ -4439,10 +4398,10 @@ class DescriptorTest {
                                 aNanPositions
                         )
                 );
-                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("5", tmpFormat.format(tmpMatrix[0][1]));
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][2]));
-                Assertions.assertEquals("1", tmpFormat.format(tmpMatrix[0][3]));
+                Assertions.assertEquals(5, tmpMatrix[0][0]);
+                Assertions.assertEquals(5, tmpMatrix[0][1]);
+                Assertions.assertEquals(1, tmpMatrix[0][2]);
+                Assertions.assertEquals(1, tmpMatrix[0][3]);
             } catch (Exception anException) {
                 Assertions.fail();
             }
@@ -5124,7 +5083,6 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.PUBCHEM_FINGERPRINTER};
         boolean tmpIsParallelCalculation = false;
         // Verify that expected bits are set (convert reference fingerprint to expected values)
-        IFingerprinter printer = new PubchemFingerprinter(SilentChemObjectBuilder.getInstance());
         BitSet ref = PubchemFingerprinter
                 .decode("AAADceB+AAAAAAAAAAAAAAAAAAAAAAAAAAA8YMGCAAAAAAAB1AAAHAAAAAAADAjBHgQwgJMMEACgAyRiRACCgCAhAiAI2CA4ZJgIIOLAkZGEIAhggADIyAcQgMAOgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==");
 
@@ -5388,116 +5346,6 @@ class DescriptorTest {
 
     // Add new descriptor tests here!
 
-    //</editor-fold>
-
-    //<editor-fold desc="Combined descriptor tests">
-    /**
-     * Tests combined descriptors.
-     */
-    @Test
-    void test_CombinedDescriptorsSequential() throws Exception {
-        // Acetic acid
-        String tmpSmiles = "CC(=O)O"; // Acetic acid CID: 176
-        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        ElectronDonation[] models = {
-                Aromaticity.Model.Daylight,
-                Aromaticity.Model.CDK_2x,
-                Aromaticity.Model.CDK_1x,
-                Aromaticity.Model.CDK_AtomTypes,
-                Aromaticity.Model.Mdl,
-                Aromaticity.Model.OpenSmiles,
-                Aromaticity.Model.PiBonds
-        };
-        DecimalFormatSymbols tmpSymbols = new DecimalFormatSymbols(Locale.US);
-        DecimalFormat tmpFormat = new DecimalFormat("0.00", tmpSymbols);
-
-        for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model
-            IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-            // Apply aromaticity with the current model
-            Descriptor.setAromaticity(tmpMolecule, model);
-
-            IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
-            int tmpStartIndex = 0;
-            // Add new descriptor tests here!
-            Descriptor[] tmpDescriptors =
-                    new Descriptor[]
-                            {
-                                    Descriptor.MOLECULAR_WEIGHT,
-                                    Descriptor.WIENER_NUMBER,
-                                    Descriptor.ATOM_COUNT,
-                                    Descriptor.H_BOND_ACCEPTOR_COUNT,
-                                    Descriptor.H_BOND_DONOR_COUNT
-                            };
-            boolean tmpIsParallelCalculation = false;
-
-            try {
-                Assertions.assertEquals(6, Descriptor.getNumberOfComponents(tmpDescriptors));
-
-                float[][] tmpMatrix = new float[1][];
-                tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
-                List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0])); //molecular weight
-                Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[0][1])); //wiener path number
-                Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[0][2])); //wiener polarity number
-                Assertions.assertEquals("8.00", tmpFormat.format(tmpMatrix[0][3])); //atom count
-                Assertions.assertEquals("2.00", tmpFormat.format(tmpMatrix[0][4])); //H-bond acceptor count
-                Assertions.assertEquals("1.00", tmpFormat.format(tmpMatrix[0][5])); //H-bond donor count
-
-                tmpMatrix = new float[1][];
-                tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[0][1]));
-                Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[0][2]));
-                Assertions.assertEquals("8.00", tmpFormat.format(tmpMatrix[0][3]));
-                Assertions.assertEquals("2.00", tmpFormat.format(tmpMatrix[0][4]));
-                Assertions.assertEquals("1.00", tmpFormat.format(tmpMatrix[0][5]));
-
-                tmpMatrix = new float[1][];
-                tmpMatrix[0] = new float[Descriptor.getNumberOfComponents(tmpDescriptors)];
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals("60.05", tmpFormat.format(tmpMatrix[0][0]));
-                Assertions.assertEquals("9.00", tmpFormat.format(tmpMatrix[0][1]));
-                Assertions.assertEquals("0.00", tmpFormat.format(tmpMatrix[0][2]));
-                Assertions.assertEquals("8.00", tmpFormat.format(tmpMatrix[0][3]));
-                Assertions.assertEquals("2.00", tmpFormat.format(tmpMatrix[0][4]));
-                Assertions.assertEquals("1.00", tmpFormat.format(tmpMatrix[0][5]));
-            } catch (Exception anException) {
-                Assertions.fail();
-            }
-        }
-    }
     //</editor-fold>
 
     //<editor-fold desc="Tests with all implemented descriptors">
@@ -6231,72 +6079,10 @@ class DescriptorTest {
     }
 
     /**
-     * Tests setAromaticity.
-     */
-    @Test
-    void testSetAromaticity() throws Exception {
-        // Test molecule: Benzene
-        String benzeneSmiles = "c1ccccc1";
-        SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        IAtomContainer benzene = smilesParser.parseSmiles(benzeneSmiles);
-
-        // Aromaticity models
-        ElectronDonation[] models = {
-                Aromaticity.Model.Daylight,
-                Aromaticity.Model.CDK_2x,
-                Aromaticity.Model.CDK_1x,
-                Aromaticity.Model.CDK_AtomTypes,
-                Aromaticity.Model.Mdl,
-                Aromaticity.Model.OpenSmiles,
-                Aromaticity.Model.PiBonds
-        };
-
-        for (ElectronDonation model : models) {
-            // Fresh molecule for each test
-            IAtomContainer testMolecule = benzene.clone();
-
-            // Critical step: Perceive atom types and configure atoms
-            AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(testMolecule);
-
-            // Reset aromaticity flags
-            Aromaticity.clear(testMolecule);
-
-            // Set aromaticity using the current model
-            // Note: This test still uses the old Descriptor.setAromaticity which takes ElectronDonation
-            // It might need updating if Descriptor.setAromaticity now expects Aromaticity.Model
-            Descriptor.setAromaticity(testMolecule, model);
-
-            // Check if aromatic elements are present
-            boolean hasAromaticAtoms = false;
-            boolean hasAromaticBonds = false;
-
-            for (IAtom atom : testMolecule.atoms()) {
-                if (atom.isAromatic()) {
-                    hasAromaticAtoms = true;
-                    break;
-                }
-            }
-
-            for (IBond bond : testMolecule.bonds()) {
-                if (bond.isAromatic()) {
-                    hasAromaticBonds = true;
-                    break;
-                }
-            }
-
-            String modelName = model.getClass().getSimpleName();
-            Assertions.assertTrue(hasAromaticAtoms,
-                    "Model " + modelName + " should identify aromatic atoms");
-            Assertions.assertTrue(hasAromaticBonds,
-                    "Model " + modelName + " should identify aromatic bonds");
-        }
-    }
-
-    /**
      * Tests getAllFingerprints.
      */
     @Test
-    void test_getAllFingerprints() throws Exception {
+    void test_getAllFingerprints() {
         Descriptor[] allFingerprints = Descriptor.getAllFingerprints();
 
         // Check if at least one fingerprint is returned
