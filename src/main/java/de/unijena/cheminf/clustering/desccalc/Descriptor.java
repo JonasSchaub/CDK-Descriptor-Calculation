@@ -3389,7 +3389,6 @@ public enum Descriptor {
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
-     * TODO: Update Fingerprinter
      */
     private static boolean setDescriptorNew(
             Descriptor aDescriptor,
@@ -3957,7 +3956,7 @@ public enum Descriptor {
      * @throws IllegalArgumentException If the input molecule is empty
      * @throws CloneNotSupportedException If the molecule cannot be properly copied
      */
-    static IAtomContainer copyMolecule(IAtomContainer aMolecule)
+    protected static IAtomContainer copyMolecule(IAtomContainer aMolecule)
             throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
         //<editor-fold desc="Checks">
         if (aMolecule == null) {
@@ -4024,7 +4023,7 @@ public enum Descriptor {
      * @throws IllegalArgumentException If the input molecule is empty
      * @throws CloneNotSupportedException If the molecule cannot be properly processed
      */
-    static IAtomContainer createMoleculeWithExplicitHydrogens(
+    protected static IAtomContainer createMoleculeWithExplicitHydrogens(
             IAtomContainer aMolecule
     ) throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
         //<editor-fold desc="Checks">

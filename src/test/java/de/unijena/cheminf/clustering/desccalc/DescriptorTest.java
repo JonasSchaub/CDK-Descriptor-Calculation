@@ -5247,7 +5247,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertNotNull(tmpMatrix);
+            Assertions.assertEquals(0, aNanPositions.size());
 
             tmpMatrix = new float[1][1024 * 4];
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
@@ -5261,7 +5261,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertNotNull(tmpMatrix);
+            Assertions.assertEquals(0, aNanPositions.size());
 
             tmpMatrix = new float[1][1024 * 4];
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
@@ -5275,7 +5275,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertNotNull(tmpMatrix);
+            Assertions.assertEquals(0, aNanPositions.size());
         } catch (Exception anException) {
             Assertions.fail();
         }
@@ -5310,7 +5310,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertNotNull(tmpMatrix);
+            Assertions.assertEquals(0, aNanPositions.size());
 
             tmpMatrix = new float[1][4 * 1024];
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
@@ -5324,7 +5324,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertNotNull(tmpMatrix);
+            Assertions.assertEquals(0, aNanPositions.size());
 
             tmpMatrix = new float[1][4 * 1024];
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
@@ -5338,7 +5338,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertNotNull(tmpMatrix);
+            Assertions.assertEquals(0, aNanPositions.size());
         } catch (Exception anException) {
             Assertions.fail();
         }
