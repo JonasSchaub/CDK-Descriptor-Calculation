@@ -178,7 +178,7 @@ public enum Descriptor {
      *
      * @see WeightDescriptor
      */
-    MOLECULAR_WEIGHT(true, true, false, 1) {
+    MOLECULAR_WEIGHT(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(MOLECULAR_WEIGHT).calculate(anAtomContainer).getValue()).doubleValue();
@@ -192,7 +192,7 @@ public enum Descriptor {
      *
      * @see WienerNumbersDescriptor
      */
-    WIENER_NUMBER(true, true, false, 2) {
+    WIENER_NUMBER(true, true, false, false, 2) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(WIENER_NUMBER).calculate(anAtomContainer).getValue();
@@ -206,7 +206,7 @@ public enum Descriptor {
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT(true, true, false, 1) {
+    ATOM_COUNT(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
@@ -217,7 +217,7 @@ public enum Descriptor {
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT_C(true, true, false, 1) {
+    ATOM_COUNT_C(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_C).calculate(anAtomContainer).getValue()).intValue();
@@ -228,7 +228,7 @@ public enum Descriptor {
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT_H(true, true, false, 1) {
+    ATOM_COUNT_H(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_H).calculate(anAtomContainer).getValue()).intValue();
@@ -239,7 +239,7 @@ public enum Descriptor {
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT_N(true, true, false, 1) {
+    ATOM_COUNT_N(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_N).calculate(anAtomContainer).getValue()).intValue();
@@ -250,7 +250,7 @@ public enum Descriptor {
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT_O(true, true, false, 1) {
+    ATOM_COUNT_O(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_O).calculate(anAtomContainer).getValue()).intValue();
@@ -261,7 +261,7 @@ public enum Descriptor {
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT_S(true, true, false, 1) {
+    ATOM_COUNT_S(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_S).calculate(anAtomContainer).getValue()).intValue();
@@ -272,7 +272,7 @@ public enum Descriptor {
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT_P(true, true, false, 1) {
+    ATOM_COUNT_P(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_P).calculate(anAtomContainer).getValue()).intValue();
@@ -283,7 +283,7 @@ public enum Descriptor {
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT_F(true, true, false, 1) {
+    ATOM_COUNT_F(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_F).calculate(anAtomContainer).getValue()).intValue();
@@ -294,7 +294,7 @@ public enum Descriptor {
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT_BR(true, true, false, 1) {
+    ATOM_COUNT_BR(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_BR).calculate(anAtomContainer).getValue()).intValue();
@@ -305,7 +305,7 @@ public enum Descriptor {
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT_CL(true, true, false, 1) {
+    ATOM_COUNT_CL(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_CL).calculate(anAtomContainer).getValue()).intValue();
@@ -316,7 +316,7 @@ public enum Descriptor {
      *
      * @see AtomCountDescriptor
      */
-    ATOM_COUNT_I(true, true, false, 1) {
+    ATOM_COUNT_I(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ATOM_COUNT_I).calculate(anAtomContainer).getValue()).intValue();
@@ -329,7 +329,7 @@ public enum Descriptor {
      *
      * @see BondCountDescriptor
      */
-    BOND_COUNT_ALL(true, true, false, 1) {
+    BOND_COUNT_ALL(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_ALL).calculate(anAtomContainer).getValue()).intValue();
@@ -341,7 +341,7 @@ public enum Descriptor {
      *
      * @see BondCountDescriptor
      */
-    BOND_COUNT_SINGLE(true, true, false, 1) {
+    BOND_COUNT_SINGLE(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_SINGLE).calculate(anAtomContainer).getValue()).intValue();
@@ -353,7 +353,7 @@ public enum Descriptor {
      *
      * @see BondCountDescriptor
      */
-    BOND_COUNT_DOUBLE(true, true, false, 1) {
+    BOND_COUNT_DOUBLE(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_DOUBLE).calculate(anAtomContainer).getValue()).intValue();
@@ -364,7 +364,7 @@ public enum Descriptor {
      *
      * @see BondCountDescriptor
      */
-    BOND_COUNT_TRIPLE(true, true, false, 1) {
+    BOND_COUNT_TRIPLE(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BOND_COUNT_TRIPLE).calculate(anAtomContainer).getValue()).intValue();
@@ -377,7 +377,7 @@ public enum Descriptor {
      *
      * @see HBondAcceptorCountDescriptor
      */
-    H_BOND_ACCEPTOR_COUNT(true, true, false, 1) {
+    H_BOND_ACCEPTOR_COUNT(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(H_BOND_ACCEPTOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
@@ -389,7 +389,7 @@ public enum Descriptor {
      *
      * @see HBondDonorCountDescriptor
      */
-    H_BOND_DONOR_COUNT(true, true, false, 1) {
+    H_BOND_DONOR_COUNT(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(H_BOND_DONOR_COUNT).calculate(anAtomContainer).getValue()).intValue();
@@ -401,7 +401,7 @@ public enum Descriptor {
      *
      * @see AromaticAtomsCountDescriptor
      */
-    AROMATIC_ATOMS_COUNT(true, true, false, 1) {
+    AROMATIC_ATOMS_COUNT(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(AROMATIC_ATOMS_COUNT).calculate(anAtomContainer).getValue()).intValue();
@@ -413,7 +413,7 @@ public enum Descriptor {
      *
      * @see AromaticBondsCountDescriptor
      */
-    AROMATIC_BONDS_COUNT(true, true, false, 1) {
+    AROMATIC_BONDS_COUNT(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(AROMATIC_BONDS_COUNT).calculate(anAtomContainer).getValue()).intValue();
@@ -426,7 +426,7 @@ public enum Descriptor {
      *
      * @see RotatableBondsCountDescriptor
      */
-    ROTATABLE_BONDS_COUNT(true, true, false, 1) {
+    ROTATABLE_BONDS_COUNT(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ROTATABLE_BONDS_COUNT).calculate(anAtomContainer).getValue()).intValue();
@@ -437,7 +437,7 @@ public enum Descriptor {
      *
      * @see BasicGroupCountDescriptor
      */
-    BASIC_GROUP_COUNT(true, true, false, 1) {
+    BASIC_GROUP_COUNT(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(BASIC_GROUP_COUNT).calculate(anAtomContainer).getValue()).intValue();
@@ -448,7 +448,7 @@ public enum Descriptor {
      *
      * @see AcidicGroupCountDescriptor
      */
-    ACIDIC_GROUP_COUNT(true, true, false, 1) {
+    ACIDIC_GROUP_COUNT(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ACIDIC_GROUP_COUNT).calculate(anAtomContainer).getValue()).intValue();
@@ -462,7 +462,7 @@ public enum Descriptor {
      *
      * @see TPSADescriptor
      */
-    TPSA(true, true, false, 1) {
+    TPSA(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(TPSA).calculate(anAtomContainer).getValue()).doubleValue();
@@ -474,7 +474,7 @@ public enum Descriptor {
      *
      * @see LargestChainDescriptor
      */
-    LARGEST_CHAIN(true, true, false, 1) {
+    LARGEST_CHAIN(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LARGEST_CHAIN).calculate(anAtomContainer).getValue()).intValue();
@@ -487,7 +487,7 @@ public enum Descriptor {
      *
      * @see LongestAliphaticChainDescriptor
      */
-    LONGEST_ALIPHATIC_CHAIN(true, true, false, 1) {
+    LONGEST_ALIPHATIC_CHAIN(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LONGEST_ALIPHATIC_CHAIN).calculate(anAtomContainer).getValue()).intValue();
@@ -505,7 +505,7 @@ public enum Descriptor {
      *
      * @see BCUTDescriptor
      */
-    BCUT(true, false, false, 6) {
+    BCUT(true, false, false, false, 6) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(BCUT).calculate(anAtomContainer).getValue();
@@ -523,7 +523,7 @@ public enum Descriptor {
      *
      * @see BPolDescriptor
      */
-    B_POL(true, true, false, 1) {
+    B_POL(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(B_POL).calculate(anAtomContainer).getValue()).doubleValue();
@@ -535,7 +535,7 @@ public enum Descriptor {
      *
      * @see RuleOfFiveDescriptor
      */
-    RULE_OF_FIVE(true, true, false, 1) {
+    RULE_OF_FIVE(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(RULE_OF_FIVE).calculate(anAtomContainer).getValue()).intValue();
@@ -549,7 +549,7 @@ public enum Descriptor {
      *
      * @see FMFDescriptor
      */
-    FMF(true, true, false, 1) {
+    FMF(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FMF).calculate(anAtomContainer).getValue()).doubleValue();
@@ -563,7 +563,7 @@ public enum Descriptor {
      *
      * @see FractionalCSP3Descriptor
      */
-    FRACTIONAL_CSP3(true, true, false, 1) {
+    FRACTIONAL_CSP3(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FRACTIONAL_CSP3).calculate(anAtomContainer).getValue()).doubleValue();
@@ -577,16 +577,10 @@ public enum Descriptor {
      *
      * @see HybridizationRatioDescriptor
      */
-    HYBRIDIZATION_RATIO(true, true, false, 1) {
+    HYBRIDIZATION_RATIO(true, true, false, true, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
-            try {
-                IAtomContainer moleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
-                aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(HYBRIDIZATION_RATIO).calculate(moleculeWithExplicitH).getValue()).doubleValue();
-            } catch (CloneNotSupportedException anException) {
-                aVector[aStartIndex] = Float.NaN;
-                LOGGER.log(Level.WARNING, "HYBRIDIZATION_RATIO calculation failed", anException);
-            }
+            aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(HYBRIDIZATION_RATIO).calculate(anAtomContainer).getValue()).doubleValue();
         }
     },
     /**
@@ -599,7 +593,7 @@ public enum Descriptor {
      *
      * @see KappaShapeIndicesDescriptor
      */
-    KAPPA_SHAPE_INDICES(true, true, false, 3) {
+    KAPPA_SHAPE_INDICES(true, true, false, true, 3) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(KAPPA_SHAPE_INDICES).calculate(anAtomContainer).getValue();
@@ -615,7 +609,7 @@ public enum Descriptor {
      *
      * @see PetitjeanNumberDescriptor
      */
-    PETITJEAN_NUMBER(true, true, false, 1) {
+    PETITJEAN_NUMBER(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(PETITJEAN_NUMBER).calculate(anAtomContainer).getValue()).doubleValue();
@@ -626,7 +620,7 @@ public enum Descriptor {
      *
      * @see SpiroAtomCountDescriptor
      */
-    SPIRO_ATOM_COUNT(true, true, false, 1) {
+    SPIRO_ATOM_COUNT(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(SPIRO_ATOM_COUNT).calculate(anAtomContainer).getValue()).intValue();
@@ -640,7 +634,7 @@ public enum Descriptor {
      *
      * @see VAdjMaDescriptor
      */
-    V_ADJ_MAT(true, true, false, 1) {
+    V_ADJ_MAT(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(V_ADJ_MAT).calculate(anAtomContainer).getValue()).doubleValue();
@@ -657,7 +651,7 @@ public enum Descriptor {
      *
      * @see WeightedPathDescriptor
      */
-    WEIGHTED_PATH(true, true, false, 5) {
+    WEIGHTED_PATH(true, true, false, false, 5) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(WEIGHTED_PATH).calculate(anAtomContainer).getValue();
@@ -673,7 +667,7 @@ public enum Descriptor {
      *
      * @see ZagrebIndexDescriptor
      */
-    ZAGREB_INDEX(true, true, false, 1) {
+    ZAGREB_INDEX(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(ZAGREB_INDEX).calculate(anAtomContainer).getValue()).doubleValue();
@@ -693,7 +687,7 @@ public enum Descriptor {
      *
      * @see CarbonTypesDescriptor
      */
-    CARBON_TYPES(true, true, false, 9) {
+    CARBON_TYPES(true, true, false, false, 9) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             IntegerArrayResult result = (IntegerArrayResult) descriptorToCdkObjectMap.get(CARBON_TYPES).calculate(anAtomContainer).getValue();
@@ -712,39 +706,25 @@ public enum Descriptor {
      *
      * @see ALOGPDescriptor
      */
-    A_LOG_P(true, true, false, 3) {
+    A_LOG_P(true, true, false, true, 3) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
-            try {
-                IAtomContainer moleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
-                DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(A_LOG_P).calculate(moleculeWithExplicitH).getValue();
-                aVector[aStartIndex] = (float) result.get(0);      // ALogP
-                aVector[aStartIndex + 1] = (float) result.get(1);  // ALogP squared
-                aVector[aStartIndex + 2] = (float) result.get(2);  // Molar Refractivity
-            } catch (CloneNotSupportedException anException) {
-                aVector[aStartIndex] = Float.NaN;
-                aVector[aStartIndex + 1] = Float.NaN;
-                aVector[aStartIndex + 2] = Float.NaN;
-                LOGGER.log(Level.WARNING, "A_LOG_P calculation failed", anException);
-            }
+            DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(A_LOG_P).calculate(anAtomContainer).getValue();
+            aVector[aStartIndex] = (float) result.get(0);      // ALogP
+            aVector[aStartIndex + 1] = (float) result.get(1);  // ALogP squared
+            aVector[aStartIndex + 2] = (float) result.get(2);  // Molar Refractivity
         }
     },
     /**
      * XLogP descriptor, calculates logP based on the atom-type method called XLogP.
-     * Requires all hydrogens to be explicit.
+     * Requires all hydrogen's to be explicit.
      *
      * @see XLogPDescriptor
      */
-    X_LOG_P(true, true, false, 1) {
+    X_LOG_P(true, true, false, true, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
-            try {
-                IAtomContainer moleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
-                aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(X_LOG_P).calculate(moleculeWithExplicitH).getValue()).doubleValue();
-            } catch (CloneNotSupportedException anException) {
-                aVector[aStartIndex] = Float.NaN;
-                LOGGER.log(Level.WARNING, "X_LOG_P calculation failed", anException);
-            }
+            aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(X_LOG_P).calculate(anAtomContainer).getValue()).doubleValue();
         }
     },
     /**
@@ -752,7 +732,7 @@ public enum Descriptor {
      *
      * @see JPlogPDescriptor
      */
-    JP_LOG_P(true, false, false, 1) {
+    JP_LOG_P(true, false, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(JP_LOG_P).calculate(anAtomContainer).getValue()).doubleValue();
@@ -765,7 +745,7 @@ public enum Descriptor {
      *
      * @see MannholdLogPDescriptor
      */
-    MANNHOLD_LOGP(true, true, false, 1) {
+    MANNHOLD_LOGP(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(MANNHOLD_LOGP).calculate(anAtomContainer).getValue()).doubleValue();
@@ -777,7 +757,7 @@ public enum Descriptor {
      *
      * @see APolDescriptor
      */
-    A_POL(true, true, false, 1) {
+    A_POL(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(A_POL).calculate(anAtomContainer).getValue()).doubleValue();
@@ -793,7 +773,7 @@ public enum Descriptor {
      *
      * @see AutocorrelationDescriptorCharge
      */
-    AUTOCORRELATION_CHARGE(true, false, false, 5) {
+    AUTOCORRELATION_CHARGE(true, false, false, false, 5) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(AUTOCORRELATION_CHARGE).calculate(anAtomContainer).getValue();
@@ -811,7 +791,7 @@ public enum Descriptor {
      *
      * @see AutocorrelationDescriptorMass
      */
-    AUTOCORRELATION_MASS(true, true, false, 5) {
+    AUTOCORRELATION_MASS(true, true, false, false, 5) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(AUTOCORRELATION_MASS).calculate(anAtomContainer).getValue();
@@ -830,7 +810,7 @@ public enum Descriptor {
      *
      * @see AutocorrelationDescriptorPolarizability
      */
-    AUTOCORRELATION_POLARIZABILITY(true, true, false, 5) {
+    AUTOCORRELATION_POLARIZABILITY(true, true, false, false, 5) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(AUTOCORRELATION_POLARIZABILITY).calculate(anAtomContainer).getValue();
@@ -853,7 +833,7 @@ public enum Descriptor {
      *
      * @see FragmentComplexityDescriptor
      */
-    FRAGMENT_COMPLEXITY(true, true, false, 1) {
+    FRAGMENT_COMPLEXITY(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FRAGMENT_COMPLEXITY).calculate(anAtomContainer).getValue()).doubleValue();
@@ -877,7 +857,7 @@ public enum Descriptor {
      *
      * @see ChiChainDescriptor
      */
-    CHI_CHAIN(false, true, false, 10) {
+    CHI_CHAIN(false, true, false, false, 10) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_CHAIN).calculate(anAtomContainer).getValue();
@@ -901,7 +881,7 @@ public enum Descriptor {
      *
      * @see ChiClusterDescriptor
      */
-    CHI_CLUSTER(false, true, false, 8) {
+    CHI_CLUSTER(false, true, false, false, 8) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_CLUSTER).calculate(anAtomContainer).getValue();
@@ -923,7 +903,7 @@ public enum Descriptor {
      *
      * @see ChiPathClusterDescriptor
      */
-    CHI_PATH_CLUSTER(false, true, false, 6) {
+    CHI_PATH_CLUSTER(false, true, false, false, 6) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_PATH_CLUSTER).calculate(anAtomContainer).getValue();
@@ -955,7 +935,7 @@ public enum Descriptor {
      *
      * @see ChiPathDescriptor
      */
-    CHI_PATH(false, true, false, 16) {
+    CHI_PATH(false, true, false, false, 16) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(CHI_PATH).calculate(anAtomContainer).getValue();
@@ -972,7 +952,7 @@ public enum Descriptor {
      *
      * @see FractionalPSADescriptor
      */
-    FRACTIONAL_PSA(true, true, false, 1) {
+    FRACTIONAL_PSA(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(FRACTIONAL_PSA).calculate(anAtomContainer).getValue()).doubleValue();
@@ -985,7 +965,7 @@ public enum Descriptor {
      *
      * @see LargestPiSystemDescriptor
      */
-    LARGEST_PI_SYSTEM(true, true, false, 1) {
+    LARGEST_PI_SYSTEM(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(LARGEST_PI_SYSTEM).calculate(anAtomContainer).getValue()).intValue();
@@ -1008,7 +988,7 @@ public enum Descriptor {
      *
      * @see SmallRingDescriptor
      */
-    SMALL_RING(true, true, false, 11) {
+    SMALL_RING(true, true, false, false, 11) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             IntegerArrayResult result = (IntegerArrayResult) descriptorToCdkObjectMap.get(SMALL_RING).calculate(anAtomContainer).getValue();
@@ -1027,7 +1007,7 @@ public enum Descriptor {
      *
      * @see AminoAcidCountDescriptor
      */
-    AMINO_ACID_COUNT(false, true, false, 20) {
+    AMINO_ACID_COUNT(false, true, false, false, 20) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             IntegerArrayResult result = (IntegerArrayResult) descriptorToCdkObjectMap.get(AMINO_ACID_COUNT).calculate(anAtomContainer).getValue();
@@ -1043,7 +1023,7 @@ public enum Descriptor {
      *
      * @see KierHallSmartsDescriptor
      */
-    KIER_HALL_SMARTS(true, true, false, 79) {
+    KIER_HALL_SMARTS(true, true, false, false, 79) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             IntegerArrayResult result = (IntegerArrayResult) descriptorToCdkObjectMap.get(KIER_HALL_SMARTS).calculate(anAtomContainer).getValue();
@@ -1061,7 +1041,7 @@ public enum Descriptor {
      *
      * @see EccentricConnectivityIndexDescriptor
      */
-    ECCENTRIC_CONNECTIVITY_INDEX(true, true, false, 1) {
+    ECCENTRIC_CONNECTIVITY_INDEX(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((IntegerResult) descriptorToCdkObjectMap.get(ECCENTRIC_CONNECTIVITY_INDEX).calculate(anAtomContainer).getValue()).intValue();
@@ -1094,7 +1074,7 @@ public enum Descriptor {
      *
      * @see MDEDescriptor
      */
-    MDE(true, true, false, 19) {
+    MDE(true, true, false, false, 19) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             DoubleArrayResult result = (DoubleArrayResult) descriptorToCdkObjectMap.get(MDE).calculate(anAtomContainer).getValue();
@@ -1110,7 +1090,7 @@ public enum Descriptor {
      *
      * @see VABCDescriptor
      */
-    VABC(true, true, false, 1) {
+    VABC(true, true, false, false, 1) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             aVector[aStartIndex] = (float) ((DoubleResult) descriptorToCdkObjectMap.get(VABC).calculate(anAtomContainer).getValue()).doubleValue();
@@ -1123,7 +1103,7 @@ public enum Descriptor {
      *
      * @see PubchemFingerprinter
      */
-    PUBCHEM_FINGERPRINTER(true, true, true, 881) {
+    PUBCHEM_FINGERPRINTER(true, true, true, false, 881) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             try {
@@ -1144,7 +1124,7 @@ public enum Descriptor {
      *
      * @see CircularFingerprinter
      */
-    CIRCULAR_FINGERPRINTER_ECFP_0(true, true, true, 1024) {
+    CIRCULAR_FINGERPRINTER_ECFP_0(true, true, true, false, 1024) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             try {
@@ -1165,7 +1145,7 @@ public enum Descriptor {
      *
      * @see CircularFingerprinter
      */
-    CIRCULAR_FINGERPRINTER_FCFP_0(true, true, true, 1024) {
+    CIRCULAR_FINGERPRINTER_FCFP_0(true, true, true, false, 1024) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             try {
@@ -1186,7 +1166,7 @@ public enum Descriptor {
      *
      * @see CircularFingerprinter
      */
-    CIRCULAR_FINGERPRINTER_ECFP_2(true, true, true, 1024) {
+    CIRCULAR_FINGERPRINTER_ECFP_2(true, true, true, false, 1024) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             try {
@@ -1207,7 +1187,7 @@ public enum Descriptor {
      *
      * @see CircularFingerprinter
      */
-    CIRCULAR_FINGERPRINTER_FCFP_2(true, true, true, 1024) {
+    CIRCULAR_FINGERPRINTER_FCFP_2(true, true, true, false, 1024) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             try {
@@ -1228,7 +1208,7 @@ public enum Descriptor {
      *
      * @see CircularFingerprinter
      */
-    CIRCULAR_FINGERPRINTER_ECFP_4(true, true, true, 1024) {
+    CIRCULAR_FINGERPRINTER_ECFP_4(true, true, true, false, 1024) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             try {
@@ -1249,7 +1229,7 @@ public enum Descriptor {
      *
      * @see CircularFingerprinter
      */
-    CIRCULAR_FINGERPRINTER_FCFP_4(true, true, true, 1024) {
+    CIRCULAR_FINGERPRINTER_FCFP_4(true, true, true, false, 1024) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             try {
@@ -1270,7 +1250,7 @@ public enum Descriptor {
      *
      * @see CircularFingerprinter
      */
-    CIRCULAR_FINGERPRINTER_ECFP_6(true, true, true, 1024) {
+    CIRCULAR_FINGERPRINTER_ECFP_6(true, true, true, false, 1024) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             try {
@@ -1291,7 +1271,7 @@ public enum Descriptor {
      *
      * @see CircularFingerprinter
      */
-    CIRCULAR_FINGERPRINTER_FCFP_6(true, true, true, 1024) {
+    CIRCULAR_FINGERPRINTER_FCFP_6(true, true, true, false, 1024) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             try {
@@ -1312,7 +1292,7 @@ public enum Descriptor {
      *
      * @see MACCSFingerprinter
      */
-    MACCS_FINGERPRINTER(true, true, true, 166) {
+    MACCS_FINGERPRINTER(true, true, true, false, 166) {
         @Override
         void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
             try {
@@ -1352,6 +1332,11 @@ public enum Descriptor {
     private final boolean isFingerprint;
 
     /**
+     * Indicates whether this descriptor needs explicit hydrogens.
+     */
+    private final boolean needsExplicitHydrogens;
+
+    /**
      * The number of components calculated by this descriptor.
      */
     private final int descriptorComponentNumber;
@@ -1365,10 +1350,11 @@ public enum Descriptor {
      *               inconsistent results or NaN values
      * @param descriptorComponentNumber the number of components calculated by this descriptor
      */
-    Descriptor(boolean isFast, boolean isSafe, boolean isFingerprint, int descriptorComponentNumber) {
+    Descriptor(boolean isFast, boolean isSafe, boolean isFingerprint, boolean needsExplicitHydrogens, int descriptorComponentNumber) {
         this.isFast = isFast;
         this.isSafe = isSafe;
         this.isFingerprint = isFingerprint;
+        this.needsExplicitHydrogens = needsExplicitHydrogens;
         this.descriptorComponentNumber = descriptorComponentNumber;
     }
 
@@ -1402,15 +1388,13 @@ public enum Descriptor {
     }
 
     /**
-     * Abstract calculation method for descriptors.
-     * Note: Checks are NOT performed here. All necessary checks are implemented in the public calculation methods.
+     * Returns whether this descriptor needs explicit hydrogens.
      *
-     * @param anAtomContainer Molecule (IS NOT CHANGED)
-     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
-     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     * @return true if the descriptor requires explicit hydrogens, false otherwise
      */
-    abstract void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex);
-
+    public boolean needsExplicitHydrogens() {
+        return needsExplicitHydrogens;
+    }
 
     /**
      * Returns the number of components calculated by this descriptor.
@@ -1420,6 +1404,19 @@ public enum Descriptor {
     public int getDescriptorComponentNumber() {
         return descriptorComponentNumber;
     }
+
+
+
+    /**
+     * Abstract calculation method for descriptors.
+     * Note: Checks are NOT performed here. All necessary checks are implemented in the public calculation methods.
+     *
+     * @param anAtomContainer Molecule (IS NOT CHANGED)
+     * @param aVector Vector of molecule to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     */
+    abstract void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex);
+
     //</editor-fold>
 
     //<editor-fold desc="Private static final LOGGER">
@@ -3043,9 +3040,17 @@ public enum Descriptor {
             List<int[]> aNanPositions
     ) throws Exception {
         try {
+            IAtomContainer tmpMoleculeWithExplicitHydrogens = null;
+            for (Descriptor aDescriptor : aDescriptors) {
+                if (aDescriptor.needsExplicitHydrogens){
+                    tmpMoleculeWithExplicitHydrogens = createMoleculeWithExplicitHydrogens(anAtomContainer);
+                    break;
+                }
+            }
             boolean tmpIsSuccessful = true;
             for (int i = 0; i < aDescriptors.length; i++) {
-                if (!Descriptor.setDescriptor(aDescriptors[i], anAtomContainer, aVector, aStartIndices[i], aMoleculeIndex, aNanPositions)) {
+                IAtomContainer moleculeToUse = aDescriptors[i].needsExplicitHydrogens ? tmpMoleculeWithExplicitHydrogens : anAtomContainer;
+                if (!Descriptor.setDescriptor(aDescriptors[i], moleculeToUse, aVector, aStartIndices[i], aMoleculeIndex, aNanPositions)) {
                     tmpIsSuccessful = false;
                 }
             }
@@ -3092,9 +3097,18 @@ public enum Descriptor {
             } else {
                 Descriptor.setAromaticity(tmpMolecule, anElectronDonationModel);
             }
+
+            IAtomContainer tmpMoleculeWithExplicitHydrogens = null;
+            for (Descriptor aDescriptor : aDescriptors) {
+                if (aDescriptor.needsExplicitHydrogens){
+                    tmpMoleculeWithExplicitHydrogens = createMoleculeWithExplicitHydrogens(tmpMolecule);
+                    break;
+                }
+            }
             boolean tmpIsSuccessful = true;
             for (int i = 0; i < aDescriptors.length; i++) {
-                if (!Descriptor.setDescriptor(aDescriptors[i], tmpMolecule, aVector, aStartIndices[i], aMoleculeIndex, aNanPositions)) {
+                IAtomContainer moleculeToUse = aDescriptors[i].needsExplicitHydrogens ? tmpMoleculeWithExplicitHydrogens : tmpMolecule;
+                if (!Descriptor.setDescriptor(aDescriptors[i], moleculeToUse, aVector, aStartIndices[i], aMoleculeIndex, aNanPositions)) {
                     tmpIsSuccessful = false;
                 }
             }
@@ -3133,9 +3147,18 @@ public enum Descriptor {
         List<int[]> aNanPositions
     ) throws Exception {
         try {
+            IAtomContainer tmpMoleculeWithExplicitHydrogens = null;
+            for (Descriptor aDescriptor : aDescriptors) {
+                if (aDescriptor.needsExplicitHydrogens){
+                    tmpMoleculeWithExplicitHydrogens = createMoleculeWithExplicitHydrogens(anAtomContainer);
+                    break;
+                }
+            }
+
             boolean tmpIsSuccessful = true;
             for (int i = 0; i < aDescriptors.length; i++) {
-                if (!Descriptor.setDescriptorSynchronized(aDescriptors[i], anAtomContainer, aVector, aStartIndices[i], aMoleculeIndex, aNanPositions)) {
+                IAtomContainer moleculeToUse = aDescriptors[i].needsExplicitHydrogens ? tmpMoleculeWithExplicitHydrogens : anAtomContainer;
+                if (!Descriptor.setDescriptorSynchronized(aDescriptors[i], moleculeToUse, aVector, aStartIndices[i], aMoleculeIndex, aNanPositions)) {
                     tmpIsSuccessful = false;
                 }
             }
@@ -3174,9 +3197,17 @@ public enum Descriptor {
         List<int[]> aNanPositions
     ) throws Exception {
         try {
+            IAtomContainer tmpMoleculeWithExplicitHydrogens = null;
+            for (Descriptor aDescriptor : aDescriptors) {
+                if (aDescriptor.needsExplicitHydrogens){
+                    tmpMoleculeWithExplicitHydrogens = createMoleculeWithExplicitHydrogens(anAtomContainer);
+                    break;
+                }
+            }
             boolean tmpIsSuccessful = true;
             for (int i = 0; i < aDescriptors.length; i++) {
-                if (!Descriptor.setDescriptorNew(aDescriptors[i], anAtomContainer, aVector, aStartIndices[i], aMoleculeIndex, aNanPositions)) {
+                IAtomContainer moleculeToUse = aDescriptors[i].needsExplicitHydrogens ? tmpMoleculeWithExplicitHydrogens : anAtomContainer;
+                if (!Descriptor.setDescriptorNew(aDescriptors[i], moleculeToUse, aVector, aStartIndices[i], aMoleculeIndex, aNanPositions)) {
                     tmpIsSuccessful = false;
                 }
             }
@@ -3216,8 +3247,15 @@ public enum Descriptor {
         try {
             boolean tmpIsSuccessful = true;
             for (int i = 0; i < anAtomContainerArray.length; i++) {
+                if (aDescriptor.needsExplicitHydrogens) {
+                    IAtomContainer tmpMoleculeWithExplicitHydrogens = createMoleculeWithExplicitHydrogens(anAtomContainerArray[i]);
+                    if (!Descriptor.setDescriptorMap(aDescriptor, tmpMoleculeWithExplicitHydrogens, aMatrix[i], aStartIndex, i, aNanPositions)) {
+                        tmpIsSuccessful = false;
+                    }
+                } else {
                 if (!Descriptor.setDescriptorMap(aDescriptor, anAtomContainerArray[i], aMatrix[i], aStartIndex, i, aNanPositions)) {
                     tmpIsSuccessful = false;
+                    }
                 }
             }
             return tmpIsSuccessful;
@@ -3351,6 +3389,7 @@ public enum Descriptor {
      * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation is NaN
+     * TODO: Update Fingerprinter
      */
     private static boolean setDescriptorNew(
             Descriptor aDescriptor,
@@ -3504,8 +3543,7 @@ public enum Descriptor {
                     aVector[aStartIndex] = (float) ((DoubleResult) (new FractionalCSP3Descriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case HYBRIDIZATION_RATIO:
-                    IAtomContainer hybridizationRatioMoleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new HybridizationRatioDescriptor()).calculate(hybridizationRatioMoleculeWithExplicitH).getValue()).doubleValue();
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new HybridizationRatioDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case KAPPA_SHAPE_INDICES:
                     DoubleArrayResult kappaResult = (DoubleArrayResult) (new KappaShapeIndicesDescriptor()).calculate(anAtomContainer).getValue();
@@ -3538,15 +3576,13 @@ public enum Descriptor {
                     }
                     break;
                 case A_LOG_P:
-                    IAtomContainer aLogPMoleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
-                    DoubleArrayResult aLogPResult = (DoubleArrayResult) (new ALOGPDescriptor()).calculate(aLogPMoleculeWithExplicitH).getValue();
+                    DoubleArrayResult aLogPResult = (DoubleArrayResult) (new ALOGPDescriptor()).calculate(anAtomContainer).getValue();
                     aVector[aStartIndex] = (float) aLogPResult.get(0);// ALogP
                     aVector[aStartIndex + 1] = (float) aLogPResult.get(1);  // ALogP squared
                     aVector[aStartIndex + 2] = (float) aLogPResult.get(2);  // Molar Refractivity
                     break;
                 case X_LOG_P:
-                    IAtomContainer xLogPMoleculeWithExplicitH = createMoleculeWithExplicitHydrogens(anAtomContainer);
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new XLogPDescriptor()).calculate(xLogPMoleculeWithExplicitH).getValue()).doubleValue();
+                    aVector[aStartIndex] = (float) ((DoubleResult) (new XLogPDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
                     break;
                 case JP_LOG_P:
                     aVector[aStartIndex] = (float) ((DoubleResult) (new JPlogPDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
@@ -3650,12 +3686,9 @@ public enum Descriptor {
                     break;
                 case PUBCHEM_FINGERPRINTER:
                     try {
-                        IFingerprinter fingerprinter = new PubchemFingerprinter(SilentChemObjectBuilder.getInstance());
-                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
-                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
-
+                        IBitFingerprint fingerprint = new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()).getBitFingerprint(anAtomContainer);
                         for (int i = 0; i < PUBCHEM_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = fingerprintArray[i];
+                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception anException) {
                         for (int i = 0; i < PUBCHEM_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
@@ -3666,15 +3699,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_ECFP_0:
                     try {
-                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, 1024);
-                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
-                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
-
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_0.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, 1024).getBitFingerprint(anAtomContainer);
+                        for (int i = 0; i < 1024; i++) {
+                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception anException) {
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_0.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < 1024; i++) {
                             aVector[aStartIndex + i] = Float.NaN;
                         }
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
@@ -3682,15 +3712,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_FCFP_0:
                     try {
-                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, 1024);
-                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
-                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
-
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_0.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, 1024).getBitFingerprint(anAtomContainer);
+                        for (int i = 0; i < 1024; i++) {
+                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception anException) {
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_0.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < 1024; i++) {
                             aVector[aStartIndex + i] = Float.NaN;
                         }
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
@@ -3698,15 +3725,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_ECFP_2:
                     try {
-                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, 1024);
-                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
-                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
-
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_2.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, 1024).getBitFingerprint(anAtomContainer);
+                        for (int i = 0; i < 1024; i++) {
+                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception anException) {
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_2.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < 1024; i++) {
                             aVector[aStartIndex + i] = Float.NaN;
                         }
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
@@ -3714,15 +3738,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_FCFP_2:
                     try {
-                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, 1024);
-                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
-                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
-
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_2.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, 1024).getBitFingerprint(anAtomContainer);
+                        for (int i = 0; i < 1024; i++) {
+                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception anException) {
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_2.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < 1024; i++) {
                             aVector[aStartIndex + i] = Float.NaN;
                         }
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
@@ -3730,15 +3751,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_ECFP_4:
                     try {
-                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, 1024);
-                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
-                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
-
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_4.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, 1024).getBitFingerprint(anAtomContainer);
+                        for (int i = 0; i < 1024; i++) {
+                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception anException) {
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_4.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < 1024; i++) {
                             aVector[aStartIndex + i] = Float.NaN;
                         }
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
@@ -3746,15 +3764,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_FCFP_4:
                     try {
-                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, 1024);
-                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
-                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
-
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_4.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, 1024).getBitFingerprint(anAtomContainer);
+                        for (int i = 0; i < 1024; i++) {
+                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception anException) {
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_4.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < 1024; i++) {
                             aVector[aStartIndex + i] = Float.NaN;
                         }
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
@@ -3762,15 +3777,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_ECFP_6:
                     try {
-                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, 1024);
-                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
-                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
-
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_6.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, 1024).getBitFingerprint(anAtomContainer);
+                        for (int i = 0; i < 1024; i++) {
+                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception anException) {
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_ECFP_6.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < 1024; i++) {
                             aVector[aStartIndex + i] = Float.NaN;
                         }
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
@@ -3778,15 +3790,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_FCFP_6:
                     try {
-                        IFingerprinter fingerprinter = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, 1024);
-                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
-                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
-
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_6.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = fingerprintArray[i];
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, 1024).getBitFingerprint(anAtomContainer);
+                        for (int i = 0; i < 1024; i++) {
+                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception anException) {
-                        for (int i = 0; i < CIRCULAR_FINGERPRINTER_FCFP_6.getDescriptorComponentNumber(); i++) {
+                        for (int i = 0; i < 1024; i++) {
                             aVector[aStartIndex + i] = Float.NaN;
                         }
                         LOGGER.log(Level.WARNING, anException.toString(), anException);
@@ -3794,12 +3803,9 @@ public enum Descriptor {
                     break;
                 case MACCS_FINGERPRINTER:
                     try {
-                        IFingerprinter fingerprinter = new MACCSFingerprinter(SilentChemObjectBuilder.getInstance());
-                        IBitFingerprint fingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
-                        float[] fingerprintArray = convertBitFingerprintToFloatArray(fingerprint);
-
+                        IBitFingerprint fingerprint = new MACCSFingerprinter(SilentChemObjectBuilder.getInstance()).getBitFingerprint(anAtomContainer);
                         for (int i = 0; i < MACCS_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = fingerprintArray[i];
+                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception anException) {
                         for (int i = 0; i < MACCS_FINGERPRINTER.getDescriptorComponentNumber(); i++) {

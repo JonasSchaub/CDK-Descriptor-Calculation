@@ -142,7 +142,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor WIENER_NUMBER.
+     * Test method for descriptor WIENER_NUMBER.
      */
     @Test
     void test_WIENER_NUMBER() throws Exception {
@@ -235,7 +235,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor ATOM_COUNT.
+     * Test method for descriptor ATOM_COUNT.
      */
     @Test
     void test_ATOM_COUNT() throws Exception {
@@ -325,7 +325,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for the organic subset of individual atom counts (C, H, N, O, S, P, F, Br, Cl, I) in a complex molecule.
+     * Test method for the organic subset of individual atom counts (C, H, N, O, S, P, F, Br, Cl, I) in a complex molecule.
      */
     @Test
     void test_ATOM_COUNT_ORGANIC_SUBSET() throws Exception {
@@ -462,7 +462,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor H_BOND_ACCEPTOR_COUNT.
+     * Test method for descriptor H_BOND_ACCEPTOR_COUNT.
      */
     @Test
     void test_H_BOND_ACCEPTOR_COUNT() throws Exception {
@@ -579,7 +579,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor H_BOND_DONOR_COUNT.
+     * Test method for descriptor H_BOND_DONOR_COUNT.
      */
     @Test
     void test_H_BOND_DONOR_COUNT() throws Exception {
@@ -692,7 +692,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor TPSA.
+     * Test method for descriptor TPSA.
      */
     @Test
     void test_TPSA() throws Exception {
@@ -810,7 +810,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor LARGEST_CHAIN.
+     * Test method for descriptor LARGEST_CHAIN.
      */
     @Test
     void test_LARGEST_CHAIN() throws Exception {
@@ -925,7 +925,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor LONGEST_ALIPHATIC_CHAIN.
+     * Test method for descriptor LONGEST_ALIPHATIC_CHAIN.
      */
     @Test
     void test_LONGEST_ALIPHATIC_CHAIN() throws Exception {
@@ -1040,7 +1040,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor MANNHOLD_LOGP.
+     * Test method for descriptor MANNHOLD_LOGP.
      */
     @Test
     void test_MANNHOLD_LOGP() throws Exception {
@@ -1129,7 +1129,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor BCUT.
+     * Test method for descriptor BCUT.
      */
     @Test
     void test_BCUT() throws Exception {
@@ -1238,7 +1238,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor BOND_COUNT_ALL.
+     * Test method for descriptor BOND_COUNT_ALL.
      */
     @Test
     void test_BOND_COUNT_ALL() throws Exception {
@@ -1341,7 +1341,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptors BOND_COUNT_SINGLE, BOND_COUNT_DOUBLE, and BOND_COUNT_TRIPLE.
+     * Test method for descriptors BOND_COUNT_SINGLE, BOND_COUNT_DOUBLE, and BOND_COUNT_TRIPLE.
      */
     @Test
     void test_BOND_COUNT_SPECIFIED() throws Exception {
@@ -1441,7 +1441,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor B_POL.
+     * Test method for descriptor B_POL.
      */
     @Test
     void test_B_POL() throws Exception {
@@ -1530,7 +1530,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor RULE_OF_FIVE.
+     * Test method for descriptor RULE_OF_FIVE.
      */
     @Test
     void test_RULE_OF_FIVE() throws Exception {
@@ -1634,7 +1634,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor AROMATIC_ATOMS_COUNT.
+     * Test method for descriptor AROMATIC_ATOMS_COUNT.
      */
     @Test
     void test_AROMATIC_ATOMS_COUNT() throws Exception {
@@ -1739,7 +1739,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor AROMATIC_BONDS_COUNT with benzene.
+     * Test method for descriptor AROMATIC_BONDS_COUNT with benzene.
      */
     @Test
     void test_AROMATIC_BONDS_COUNT() throws Exception {
@@ -1843,7 +1843,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor ROTATABLE_BONDS_COUNT.
+     * Test method for descriptor ROTATABLE_BONDS_COUNT.
      */
     @Test
     void test_ROTATABLE_BONDS_COUNT() throws Exception {
@@ -1931,7 +1931,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor FMF.
+     * Test method for descriptor FMF.
      */
     @Test
     void test_FMF() throws Exception {
@@ -2020,7 +2020,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor FRACTIONAL_CSP3.
+     * Test method for descriptor FRACTIONAL_CSP3.
      */
     @Test
     void test_FRACTIONAL_CSP3() throws Exception {
@@ -2109,7 +2109,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor HYBRIDIZATION_RATIO.
+     * Test method for descriptor HYBRIDIZATION_RATIO.
      */
     @Test
     void test_HYBRIDIZATION_RATIO() throws Exception {
@@ -2197,7 +2197,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor KAPPA_SHAPE_INDICES.
+     * Test method for descriptor KAPPA_SHAPE_INDICES.
      */
     @Test
     void test_KAPPA_SHAPE_INDICES() throws Exception {
@@ -2294,7 +2294,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor PETITJEAN_NUMBER.
+     * Test method for descriptor PETITJEAN_NUMBER.
      */
     @Test
     void test_PETITJEAN_NUMBER() throws Exception {
@@ -2383,7 +2383,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor SPIRO_ATOM_COUNT.
+     * Test method for descriptor SPIRO_ATOM_COUNT.
      */
     @Test
     void test_SPIRO_ATOM_COUNT() throws Exception {
@@ -2471,7 +2471,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor V_ADJ_MAT.
+     * Test method for descriptor V_ADJ_MAT.
      */
     @Test
     void test_V_ADJ_MAT() throws Exception {
@@ -2560,7 +2560,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor WEIGHTED_PATH.
+     * Test method for descriptor WEIGHTED_PATH.
      */
     @Test
     void test_WEIGHTED_PATH() throws Exception {
@@ -2665,7 +2665,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor ZAGREB_INDEX.
+     * Test method for descriptor ZAGREB_INDEX.
      */
     @Test
     void test_ZAGREB_INDEX() throws Exception {
@@ -2754,7 +2754,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor CARBON_TYPES.
+     * Test method for descriptor CARBON_TYPES.
      */
     @Test
     void test_CARBON_TYPES() throws Exception {
@@ -2874,7 +2874,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor A_LOG_P.
+     * Test method for descriptor A_LOG_P.
      */
     @Test
     void test_A_LOG_P() throws Exception {
@@ -2971,7 +2971,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor X_LOG_P.
+     * Test method for descriptor X_LOG_P.
      */
     @Test
     void test_X_LOG_P() throws Exception {
@@ -3076,7 +3076,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor JP_LOG_P.
+     * Test method for descriptor JP_LOG_P.
      */
     @Test
     void test_JP_LOG_P() throws Exception {
@@ -3165,7 +3165,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor A_POL.
+     * Test method for descriptor A_POL.
      */
     @Test
     void test_A_POL() throws Exception {
@@ -3254,7 +3254,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor AUTOCORRELATION_CHARGE.
+     * Test method for descriptor AUTOCORRELATION_CHARGE.
      */
     @Test
     void test_AUTOCORRELATION_CHARGE() throws Exception {
@@ -3358,7 +3358,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor AUTOCORRELATION_MASS.
+     * Test method for descriptor AUTOCORRELATION_MASS.
      */
     @Test
     void test_AUTOCORRELATION_MASS() throws Exception {
@@ -3462,7 +3462,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor AUTOCORRELATION_POLARIZABILITY.
+     * Test method for descriptor AUTOCORRELATION_POLARIZABILITY.
      * No validated result because the descriptor itself is not validated in the CDK.
      * Result can be printed to see if descriptor calculates values.
      */
@@ -3554,7 +3554,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor FRAGMENT_COMPLEXITY.
+     * Test method for descriptor FRAGMENT_COMPLEXITY.
      */
     @Test
     void test_FRAGMENT_COMPLEXITY() throws Exception {
@@ -3643,7 +3643,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor CHI_CHAIN.
+     * Test method for descriptor CHI_CHAIN.
      */
     @Test
     void test_CHI_CHAIN() throws Exception {
@@ -3760,7 +3760,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor CHI_CLUSTER.
+     * Test method for descriptor CHI_CLUSTER.
      */
     @Test
     void test_CHI_CLUSTER() throws Exception {
@@ -3877,7 +3877,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor CHI_PATH_CLUSTER.
+     * Test method for descriptor CHI_PATH_CLUSTER.
      */
     @Test
     void test_CHI_PATH_CLUSTER() throws Exception {
@@ -3986,7 +3986,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor CHI_PATH.
+     * Test method for descriptor CHI_PATH.
      */
     @Test
     void test_CHI_PATH() throws Exception {
@@ -4111,7 +4111,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor FRACTIONAL_PSA.
+     * Test method for descriptor FRACTIONAL_PSA.
      * Expected results were calculated by TPSADescriptor / MolecularWeightDescriptor.
      */
     @Test
@@ -4202,7 +4202,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor LARGEST_PI_SYSTEM.
+     * Test method for descriptor LARGEST_PI_SYSTEM.
      */
     @Test
     void test_LARGEST_PI_SYSTEM() throws Exception {
@@ -4291,7 +4291,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor SMALL_RING.
+     * Test method for descriptor SMALL_RING.
      */
     @Test
     void test_SMALL_RING() throws Exception {
@@ -4409,7 +4409,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor BASIC_GROUP_COUNT.
+     * Test method for descriptor BASIC_GROUP_COUNT.
      */
     @Test
     void test_BASIC_GROUP_COUNT() throws Exception {
@@ -4497,7 +4497,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor ACIDIC_GROUP_COUNT.
+     * Test method for descriptor ACIDIC_GROUP_COUNT.
      */
     @Test
     void test_ACIDIC_GROUP_COUNT() throws Exception {
@@ -4585,7 +4585,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor AMINO_ACID_COUNT.
+     * Test method for descriptor AMINO_ACID_COUNT.
      */
     @Test
     void test_AMINO_ACID_COUNT() throws Exception {
@@ -4691,7 +4691,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor KIER_HALL_SMARTS.
+     * Test method for descriptor KIER_HALL_SMARTS.
      */
     @Test
     void test_KIER_HALL_SMARTS() throws Exception {
@@ -4795,7 +4795,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor ECCENTRIC_CONNECTIVITY_INDEX.
+     * Test method for descriptor ECCENTRIC_CONNECTIVITY_INDEX.
      */
     @Test
     void test_ECCENTRIC_CONNECTIVITY_INDEX() throws Exception {
@@ -4883,7 +4883,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor MDE.
+     * Test method for descriptor MDE.
      */
     @Test
     void test_MDE() throws Exception {
@@ -4980,7 +4980,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor VABC.
+     * Test method for descriptor VABC.
      */
     @Test
     void test_VABC() throws Exception {
@@ -5153,7 +5153,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor MACCS_FINGERPRINTER.
+     * Test method for descriptor MACCS_FINGERPRINTER.
      */
     @Test
     void test_MACCS_FINGERPRINTER() throws Exception {
@@ -5219,7 +5219,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor CIRCULAR_FINGERPRINTER_ECFP.
+     * Test method for descriptor CIRCULAR_FINGERPRINTER_ECFP.
      */
     @Test
     void test_CIRCULAR_FINGERPRINTER_ECFP() throws Exception {
@@ -5282,7 +5282,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests method for descriptor CIRCULAR_FINGERPRINTER_FCFP.
+     * Test method for descriptor CIRCULAR_FINGERPRINTER_FCFP.
      */
     @Test
     void test_CIRCULAR_FINGERPRINTER_FCFP() throws Exception {
@@ -5992,7 +5992,7 @@ class DescriptorTest {
 
     //<editor-fold desc="Tests preparation Methods">
     /**
-     * Tests createMoleculeWithExplicitHydrogens.
+     * Test method for createMoleculeWithExplicitHydrogens.
      */
     @Test
     void testCreateMoleculeWithExplicitHydrogens() throws Exception {
@@ -6044,7 +6044,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests the copyMolecule method.
+     * Test method for copyMolecule method.
      */
     @Test
     void testCopyMolecule() throws Exception {
@@ -6079,7 +6079,7 @@ class DescriptorTest {
     }
 
     /**
-     * Tests getAllFingerprints.
+     * Test method for getAllFingerprints.
      */
     @Test
     void test_getAllFingerprints() {
