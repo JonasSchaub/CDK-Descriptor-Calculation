@@ -59,9 +59,11 @@ javadoc {
 
 repositories {
     mavenCentral()
+    // CDK SNAPSHOT repository, uncomment if needed
+    maven { url = uri("https://central.sonatype.com/repository/maven-snapshots/") }
 }
 
-def cdkVersion = '2.11'
+def cdkVersion = '2.12-SNAPSHOT'
 
 dependencies {
     implementation group: 'org.jetbrains', name : 'annotations', version: '23.0.0'
@@ -81,6 +83,7 @@ dependencies {
     implementation group: 'org.openscience.cdk', name: 'cdk-interfaces', version: cdkVersion
     implementation group: 'org.openscience.cdk', name: 'cdk-qsar', version: cdkVersion
     implementation group: 'org.openscience.cdk', name: 'cdk-qsarmolecular', version: cdkVersion
+    implementation group: 'org.openscience.cdk', name: 'cdk-qsarprotein', version: cdkVersion
 }
 
 tasks.withType(Test).configureEach {
