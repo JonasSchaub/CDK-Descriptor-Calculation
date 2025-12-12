@@ -25,6 +25,7 @@
 
 package de.unijena.cheminf.clustering.desccalc;
 
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.aromaticity.Aromaticity;
@@ -76,41 +77,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(60.05, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(60.05, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -163,44 +130,9 @@ class DescriptorTest {
                             {0f, 0f}
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(9.0, tmpMatrix[0][0]); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
-            Assertions.assertEquals(0.0, tmpMatrix[0][1]); // there are no atoms that are 3 bonds apart
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f}
-                    };
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(9.0, tmpMatrix[0][0]); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
-            Assertions.assertEquals(0.0, tmpMatrix[0][1]); // there are no atoms that are 3 bonds apart
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -257,42 +189,9 @@ class DescriptorTest {
                     };
 
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(8.0, tmpMatrix[0][0]); // Acetic acid has 8 atoms
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(8.0, tmpMatrix[0][0]); // Acetic acid has 8 atoms
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -357,61 +256,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-
-            // Expected values for the organic subset atoms in this complex molecule
-            Assertions.assertEquals(62, tmpMatrix[0][0]); // C count
-            Assertions.assertEquals(88, tmpMatrix[0][1]); // H count
-            Assertions.assertEquals(13, tmpMatrix[0][2]); // N count
-            Assertions.assertEquals(14, tmpMatrix[0][3]);  // O count
-            Assertions.assertEquals(0, tmpMatrix[0][4]);  // S count
-            Assertions.assertEquals(1, tmpMatrix[0][5]);  // P count
-            Assertions.assertEquals(0, tmpMatrix[0][6]);  // F count
-            Assertions.assertEquals(0, tmpMatrix[0][7]);  // Br count
-            Assertions.assertEquals(0, tmpMatrix[0][8]);  // Cl count
-            Assertions.assertEquals(0, tmpMatrix[0][9]);  // I count
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(62, tmpMatrix[0][0]); // C count
-            Assertions.assertEquals(88, tmpMatrix[0][1]); // H count
-            Assertions.assertEquals(13, tmpMatrix[0][2]); // N count
-            Assertions.assertEquals(14, tmpMatrix[0][3]);  // O count
-            Assertions.assertEquals(0, tmpMatrix[0][4]);  // S count
-            Assertions.assertEquals(1, tmpMatrix[0][5]);  // P count
-            Assertions.assertEquals(0, tmpMatrix[0][6]);  // F count
-            Assertions.assertEquals(0, tmpMatrix[0][7]);  // Br count
-            Assertions.assertEquals(0, tmpMatrix[0][8]);  // Cl count
-            Assertions.assertEquals(0, tmpMatrix[0][9]);  // I count
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f,}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -506,44 +351,9 @@ class DescriptorTest {
                                 {0f}, {0f}
                         };
                 List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(2, tmpMatrix[0][0]);
-                Assertions.assertEquals(1, tmpMatrix[1][0]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}, {0f}
-                        };
                 aNanPositions = Collections.synchronizedList(new LinkedList<>());
                 Assertions.assertTrue(
                         Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(2, tmpMatrix[0][0]);
-                Assertions.assertEquals(1, tmpMatrix[1][0]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}, {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                                 tmpDescriptors,
                                 tmpMoleculesArray,
                                 tmpMatrix,
@@ -620,43 +430,7 @@ class DescriptorTest {
                         };
                 List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
                 Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(1, tmpMatrix[0][0]); // Acetic acid has 1 hydrogen bond donor
-                Assertions.assertEquals(1, tmpMatrix[1][0]); // Phenol has 1 hydrogen bond donor
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}, {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
                         Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(1, tmpMatrix[0][0]); // Acetic acid has 1 hydrogen bond donor
-                Assertions.assertEquals(1, tmpMatrix[1][0]); // Phenol has 1 hydrogen bond donor
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}, {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                                 tmpDescriptors,
                                 tmpMoleculesArray,
                                 tmpMatrix,
@@ -738,24 +512,6 @@ class DescriptorTest {
                         };
                 List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
                 Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(39.39, tmpMatrix[0][0], epsilon);
-                Assertions.assertEquals(45.82, tmpMatrix[1][0], epsilon);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}, {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
                         Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                                 tmpDescriptors,
                                 tmpMoleculesArray,
@@ -767,25 +523,6 @@ class DescriptorTest {
                 );
                 Assertions.assertEquals(39.39, tmpMatrix[0][0], epsilon);
                 Assertions.assertEquals(45.82, tmpMatrix[1][0], epsilon);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}, {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(39.39, tmpMatrix[0][0], epsilon);
-                Assertions.assertEquals(45.82, tmpMatrix[1][0], epsilon);
-
                 tmpMatrix = new float[][]
                         {
                                 {0f}, {0f}
@@ -853,43 +590,7 @@ class DescriptorTest {
                         };
                 List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
                 Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(4, tmpMatrix[0][0]);
-                Assertions.assertEquals(5, tmpMatrix[1][0]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}, {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
                         Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(4, tmpMatrix[0][0]);
-                Assertions.assertEquals(5, tmpMatrix[1][0]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}, {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                                 tmpDescriptors,
                                 tmpMoleculesArray,
                                 tmpMatrix,
@@ -968,43 +669,7 @@ class DescriptorTest {
                         };
                 List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
                 Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(4, tmpMatrix[0][0]);
-                Assertions.assertEquals(4, tmpMatrix[1][0]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}, {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
                         Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(4, tmpMatrix[0][0]);
-                Assertions.assertEquals(4, tmpMatrix[1][0]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}, {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                                 tmpDescriptors,
                                 tmpMoleculesArray,
                                 tmpMatrix,
@@ -1062,41 +727,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1.57, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1.57, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -1151,51 +782,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(11.881587, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(16.005958, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(-0.381844, tmpMatrix[0][2], epsilon);
-            Assertions.assertEquals(0.325509, tmpMatrix[0][3], epsilon);
-            Assertions.assertEquals(3.374638, tmpMatrix[0][4], epsilon);
-            Assertions.assertEquals(5.033583, tmpMatrix[0][5], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(11.881587, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(16.005958, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(-0.381844, tmpMatrix[0][2], epsilon);
-            Assertions.assertEquals(0.325509, tmpMatrix[0][3], epsilon);
-            Assertions.assertEquals(3.374638, tmpMatrix[0][4], epsilon);
-            Assertions.assertEquals(5.033583, tmpMatrix[0][5], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -1266,45 +853,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(2, tmpMatrix[0][0]);
-            Assertions.assertEquals(2, tmpMatrix[1][0]);
-            Assertions.assertEquals(2, tmpMatrix[2][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}, {0f}, {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(2, tmpMatrix[0][0]);
-            Assertions.assertEquals(2, tmpMatrix[1][0]);
-            Assertions.assertEquals(2, tmpMatrix[2][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}, {0f}, {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -1366,45 +915,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1, tmpMatrix[0][0]); // Single bonds
-            Assertions.assertEquals(1, tmpMatrix[0][1]); // Double bonds
-            Assertions.assertEquals(1, tmpMatrix[0][2]); // Triple bonds
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1, tmpMatrix[0][0]); // Single bonds
-            Assertions.assertEquals(1, tmpMatrix[0][1]); // Double bonds
-            Assertions.assertEquals(1, tmpMatrix[0][2]); // Triple bonds
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -1463,41 +974,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(7.517242, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(7.517242, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -1566,41 +1043,7 @@ class DescriptorTest {
                         };
                 List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
                 Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(3, tmpMatrix[0][0]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
                         Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(3, tmpMatrix[0][0]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                                 tmpDescriptors,
                                 tmpMoleculesArray,
                                 tmpMatrix,
@@ -1671,41 +1114,7 @@ class DescriptorTest {
                         };
                 List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
                 Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(6, tmpMatrix[0][0]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
                         Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(6, tmpMatrix[0][0]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                                 tmpDescriptors,
                                 tmpMoleculesArray,
                                 tmpMatrix,
@@ -1775,41 +1184,7 @@ class DescriptorTest {
                         };
                 List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
                 Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(6, tmpMatrix[0][0]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
                         Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(6, tmpMatrix[0][0]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                                 tmpDescriptors,
                                 tmpMoleculesArray,
                                 tmpMatrix,
@@ -1864,41 +1239,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(4, tmpMatrix[0][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(4, tmpMatrix[0][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -1953,41 +1294,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.353, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.353, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -2042,41 +1349,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.29, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.29, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -2130,41 +1403,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1.00, tmpMatrix[0][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1.00, tmpMatrix[0][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -2219,45 +1458,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(5.0, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(2.25, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(4.0, tmpMatrix[0][2], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(5.0, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(2.25, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(4.0, tmpMatrix[0][2], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -2316,41 +1517,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.33333334, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.33333334, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -2404,41 +1571,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1, tmpMatrix[0][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1, tmpMatrix[0][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -2493,41 +1626,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(4.459, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(4.459, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -2582,49 +1681,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(6.87132, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(1.71783, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(0.0, tmpMatrix[0][2], epsilon);
-            Assertions.assertEquals(0.0, tmpMatrix[0][3], epsilon);
-            Assertions.assertEquals(0.0, tmpMatrix[0][4], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(6.87132, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(1.71783, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(0.0, tmpMatrix[0][2], epsilon);
-            Assertions.assertEquals(0.0, tmpMatrix[0][3], epsilon);
-            Assertions.assertEquals(0.0, tmpMatrix[0][4], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -2687,41 +1744,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(16, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(16, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -2775,57 +1798,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0, tmpMatrix[0][0]);
-            Assertions.assertEquals(0, tmpMatrix[0][1]);
-            Assertions.assertEquals(0, tmpMatrix[0][2]);
-            Assertions.assertEquals(0, tmpMatrix[0][3]);
-            Assertions.assertEquals(0, tmpMatrix[0][4]);
-            Assertions.assertEquals(2, tmpMatrix[0][5]);
-            Assertions.assertEquals(2, tmpMatrix[0][6]);
-            Assertions.assertEquals(0, tmpMatrix[0][7]);
-            Assertions.assertEquals(0, tmpMatrix[0][8]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0, tmpMatrix[0][0]);
-            Assertions.assertEquals(0, tmpMatrix[0][1]);
-            Assertions.assertEquals(0, tmpMatrix[0][2]);
-            Assertions.assertEquals(0, tmpMatrix[0][3]);
-            Assertions.assertEquals(0, tmpMatrix[0][4]);
-            Assertions.assertEquals(2, tmpMatrix[0][5]);
-            Assertions.assertEquals(2, tmpMatrix[0][6]);
-            Assertions.assertEquals(0, tmpMatrix[0][7]);
-            Assertions.assertEquals(0, tmpMatrix[0][8]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -2896,45 +1869,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1.719, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(2.955, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(20.584, tmpMatrix[0][2], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1.719, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(2.955, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(20.584, tmpMatrix[0][2], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -3008,41 +1943,7 @@ class DescriptorTest {
                         };
                 List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
                 Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(-3.30, tmpMatrix[0][0], epsilon);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
                         Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(-3.30, tmpMatrix[0][0], epsilon);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                                 tmpDescriptors,
                                 tmpMoleculesArray,
                                 tmpMatrix,
@@ -3098,41 +1999,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.3, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.3, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -3187,41 +2054,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(10.88, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(10.88, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -3275,49 +2108,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertNotEquals(0f, tmpMatrix[0][0]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][1]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][2]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][3]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][4]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertNotEquals(0f, tmpMatrix[0][0]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][1]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][2]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][3]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][4]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -3379,49 +2170,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertNotEquals(0f, tmpMatrix[0][0]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][1]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][2]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][3]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][4]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertNotEquals(0f, tmpMatrix[0][0]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][1]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][2]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][3]);
-            Assertions.assertNotEquals(0f, tmpMatrix[0][4]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -3485,24 +2234,6 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            System.out.println("Synchronized calculation results:");
-            System.out.println(Arrays.toString(tmpMatrix[0]));
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
@@ -3514,22 +2245,6 @@ class DescriptorTest {
             );
             System.out.println("New calculation results:");
             System.out.println(Arrays.toString(tmpMatrix[0]));
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
 
             tmpMatrix = new float[][]
                     {
@@ -3576,41 +2291,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(659.00, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(659.00, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -3665,55 +2346,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(0.2887, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][2], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][3], epsilon);
-            Assertions.assertEquals(0.1667, tmpMatrix[0][5], epsilon);
-            Assertions.assertEquals(0.1667, tmpMatrix[0][6], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][7], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][8], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(0.2887, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][2], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][3], epsilon);
-            Assertions.assertEquals(0.1667, tmpMatrix[0][5], epsilon);
-            Assertions.assertEquals(0.1667, tmpMatrix[0][6], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][7], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][8], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -3782,55 +2415,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][2], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][3], epsilon);
-            Assertions.assertEquals(0.1667, tmpMatrix[0][4], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][5], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][6], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][7], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][2], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][3], epsilon);
-            Assertions.assertEquals(0.1667, tmpMatrix[0][4], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][5], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][6], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][7], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -3899,51 +2484,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.7416, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(1.0934, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(1.0202, tmpMatrix[0][2], epsilon);
-            Assertions.assertEquals(0.4072, tmpMatrix[0][3], epsilon);
-            Assertions.assertEquals(0.5585, tmpMatrix[0][4], epsilon);
-            Assertions.assertEquals(0.4376, tmpMatrix[0][5], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.7416, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(1.0934, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(1.0202, tmpMatrix[0][2], epsilon);
-            Assertions.assertEquals(0.4072, tmpMatrix[0][3], epsilon);
-            Assertions.assertEquals(0.5585, tmpMatrix[0][4], epsilon);
-            Assertions.assertEquals(0.4376, tmpMatrix[0][5], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -4008,59 +2549,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(2.9916, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(1.8938, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(1.6825, tmpMatrix[0][2], epsilon);
-            Assertions.assertEquals(0.5773, tmpMatrix[0][3], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][5], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][6], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][7], epsilon);
-            Assertions.assertEquals(2.6927, tmpMatrix[0][8], epsilon);
-            Assertions.assertEquals(1.5099, tmpMatrix[0][9], epsilon);
-            Assertions.assertEquals(1.1439, tmpMatrix[0][10], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(2.9916, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(1.8938, tmpMatrix[0][1], epsilon);
-            Assertions.assertEquals(1.6825, tmpMatrix[0][2], epsilon);
-            Assertions.assertEquals(0.5773, tmpMatrix[0][3], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][5], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][6], epsilon);
-            Assertions.assertEquals(0.0000, tmpMatrix[0][7], epsilon);
-            Assertions.assertEquals(2.6927, tmpMatrix[0][8], epsilon);
-            Assertions.assertEquals(1.5099, tmpMatrix[0][9], epsilon);
-            Assertions.assertEquals(1.1439, tmpMatrix[0][10], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -4134,42 +2623,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.4077, tmpMatrix[0][0], epsilon);
-
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.4077, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -4214,80 +2668,46 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LARGEST_PI_SYSTEM};
         boolean tmpIsParallelCalculation = false;
 
-            try {
-                Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+        try {
+            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
-                float[][] tmpMatrix = new float[][]
-                        {
-                                {0f}
-                        };
-                List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(8, tmpMatrix[0][0]);
+            float[][] tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+            Assertions.assertEquals(8, tmpMatrix[0][0]);
 
-                tmpMatrix = new float[][]
-                        {
-                                {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(8, tmpMatrix[0][0]);
+            tmpMatrix = new float[][]
+                    {
+                            {0f}
+                    };
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelization(
+                            tmpDescriptors,
+                            tmpMoleculesArray,
+                            tmpMatrix,
+                            tmpStartIndex,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+            Assertions.assertEquals(8, tmpMatrix[0][0]);
 
-                tmpMatrix = new float[][]
-                        {
-                                {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(8, tmpMatrix[0][0]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelization(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(8, tmpMatrix[0][0]);
-
-            } catch (Exception anException) {
-                Assertions.fail();
-            }
+        } catch (Exception anException) {
+            Assertions.fail();
+        }
     }
 
     /**
@@ -4329,47 +2749,7 @@ class DescriptorTest {
                         };
                 List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
                 Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(5, tmpMatrix[0][0]);
-                Assertions.assertEquals(5, tmpMatrix[0][1]);
-                Assertions.assertEquals(1, tmpMatrix[0][2]);
-                Assertions.assertEquals(1, tmpMatrix[0][3]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
                         Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                                tmpDescriptors,
-                                tmpMoleculesArray,
-                                tmpMatrix,
-                                tmpStartIndex,
-                                tmpIsParallelCalculation,
-                                aNanPositions
-                        )
-                );
-                Assertions.assertEquals(5, tmpMatrix[0][0]);
-                Assertions.assertEquals(5, tmpMatrix[0][1]);
-                Assertions.assertEquals(1, tmpMatrix[0][2]);
-                Assertions.assertEquals(1, tmpMatrix[0][3]);
-
-                tmpMatrix = new float[][]
-                        {
-                                {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                        };
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                Assertions.assertTrue(
-                        Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                                 tmpDescriptors,
                                 tmpMoleculesArray,
                                 tmpMatrix,
@@ -4430,41 +2810,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1, tmpMatrix[0][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1, tmpMatrix[0][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -4518,41 +2864,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1, tmpMatrix[0][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1, tmpMatrix[0][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -4612,47 +2924,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(2, tmpMatrix[0][8]);
-            Assertions.assertEquals(2, tmpMatrix[0][16]);
-            Assertions.assertEquals(2, tmpMatrix[1][8]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f},
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(2, tmpMatrix[0][8]);
-            Assertions.assertEquals(2, tmpMatrix[0][16]);
-            Assertions.assertEquals(2, tmpMatrix[1][8]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f},
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -4712,49 +2984,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(2, tmpMatrix[0][33]);
-            Assertions.assertEquals(1, tmpMatrix[0][34]);
-            Assertions.assertEquals(1, tmpMatrix[0][35]);
-            Assertions.assertEquals(1, tmpMatrix[0][20]);
-            Assertions.assertEquals(1, tmpMatrix[0][23]);
-
-            tmpMatrix = new float[][]
-                    {
-                            new float[79]
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(2, tmpMatrix[0][33]);
-            Assertions.assertEquals(1, tmpMatrix[0][34]);
-            Assertions.assertEquals(1, tmpMatrix[0][35]);
-            Assertions.assertEquals(1, tmpMatrix[0][20]);
-            Assertions.assertEquals(1, tmpMatrix[0][23]);
-
-            tmpMatrix = new float[][]
-                    {
-                            new float[79]
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -4816,41 +3046,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(254, tmpMatrix[0][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(254, tmpMatrix[0][0]);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -4905,45 +3101,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.0000, tmpMatrix[0][10], epsilon);
-            Assertions.assertEquals(1.1547, tmpMatrix[0][11], epsilon);
-            Assertions.assertEquals(2.9416, tmpMatrix[0][12], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0.0000, tmpMatrix[0][10], epsilon);
-            Assertions.assertEquals(1.1547, tmpMatrix[0][11], epsilon);
-            Assertions.assertEquals(2.9416, tmpMatrix[0][12], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -5003,41 +3161,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(292.23, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(292.23, tmpMatrix[0][0], epsilon);
-
-            tmpMatrix = new float[][]
-                    {
-                            {0f}
-                    };
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -5094,26 +3218,7 @@ class DescriptorTest {
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
 
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-
-            for (int i = 0; i < 881; i++) {
-                float expected = ref.get(i) ? 1.0f : 0.0f;
-                Assertions.assertEquals(expected, tmpMatrix[0][i]);
-            }
-
-            tmpMatrix = new float[1][881];
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -5172,7 +3277,7 @@ class DescriptorTest {
             float[][] tmpMatrix = new float[1][166];
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -5188,21 +3293,6 @@ class DescriptorTest {
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(1, tmpMatrix[0][124]);
-            Assertions.assertEquals(0, tmpMatrix[0][165]);
-
-            tmpMatrix = new float[1][166];
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -5238,7 +3328,7 @@ class DescriptorTest {
             float[][] tmpMatrix = new float[1][1024 * 4];
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -5253,20 +3343,6 @@ class DescriptorTest {
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0, aNanPositions.size());
-
-            tmpMatrix = new float[1][1024 * 4];
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -5301,7 +3377,7 @@ class DescriptorTest {
             float[][] tmpMatrix = new float[1][4 * 1024];
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -5316,20 +3392,6 @@ class DescriptorTest {
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-            Assertions.assertEquals(0, aNanPositions.size());
-
-            tmpMatrix = new float[1][4 * 1024];
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -5349,6 +3411,7 @@ class DescriptorTest {
     //</editor-fold>
 
     //<editor-fold desc="Tests with all implemented descriptors">
+
     /**
      * Tests parallelization.
      */
@@ -5358,11 +3421,13 @@ class DescriptorTest {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         int tmpNumberOfMolecules = 1000;
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
+        String[] tmpMoleculeStringsArray = new String[tmpNumberOfMolecules];
 
         for (int i = 0; i < tmpNumberOfMolecules; i++) {
             IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
             Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
             tmpMoleculesArray[i] = tmpMolecule;
+            tmpMoleculeStringsArray[i] = tmpSmiles;
         }
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = Descriptor.getAllDescriptors();
@@ -5377,7 +3442,7 @@ class DescriptorTest {
             boolean tmpIsParallelCalculation = false;
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrixSequential,
@@ -5394,235 +3459,7 @@ class DescriptorTest {
             tmpIsParallelCalculation = true;
             List<int[]> aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrixParallel,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositionsParallel
-                    )
-            );
-
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                for (int j = 0; j < tmpNumberOfComponents; j++) {
-                    Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
-                }
-            }
-
-            tmpMatrixSequential = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
-            }
-            tmpIsParallelCalculation = false;
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrixSequential,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-
-            tmpMatrixParallel = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
-            }
-            tmpIsParallelCalculation = true;
-            aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrixParallel,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositionsParallel
-                    )
-            );
-
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                for (int j = 0; j < tmpNumberOfComponents; j++) {
-                    Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
-                }
-            }
-
-            tmpMatrixSequential = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
-            }
-            tmpIsParallelCalculation = false;
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrixSequential,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-
-            tmpMatrixParallel = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
-            }
-            tmpIsParallelCalculation = true;
-            aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrixParallel,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositionsParallel
-                    )
-            );
-
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                for (int j = 0; j < tmpNumberOfComponents; j++) {
-                    Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
-                }
-            }
-
-        } catch (Exception anException) {
-            Assertions.fail();
-        }
-    }
-
-    /**
-     * Tests parallelization without fingerprints.
-     */
-    @Test
-    void test_Parallelization_without_Fingerprints() throws Exception {
-        String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
-        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        int tmpNumberOfMolecules = 1000;
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
-        String[] tmpMoleculeStringsArray = new String[tmpNumberOfMolecules];
-
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-            Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
-            tmpMoleculesArray[i] = tmpMolecule;
-            tmpMoleculeStringsArray[i] = tmpSmiles;
-        }
-        int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = Descriptor.getSpecifiedDescriptors(true, true, true, false);
-        int tmpNumberOfComponents = Descriptor.getNumberOfComponents(tmpDescriptors);
-
-        try {
-
-            float[][] tmpMatrixSequential = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
-            }
-            boolean tmpIsParallelCalculation = false;
-            List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrixSequential,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-
-            float[][] tmpMatrixParallel = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
-            }
-            tmpIsParallelCalculation = true;
-            List<int[]> aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrixParallel,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositionsParallel
-                    )
-            );
-
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                for (int j = 0; j < tmpNumberOfComponents; j++) {
-                    Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
-                }
-            }
-
-            tmpMatrixSequential = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
-            }
-            tmpIsParallelCalculation = false;
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrixSequential,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-
-            tmpMatrixParallel = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
-            }
-            tmpIsParallelCalculation = true;
-            aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrixParallel,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositionsParallel
-                    )
-            );
-
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                for (int j = 0; j < tmpNumberOfComponents; j++) {
-                    Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
-                }
-            }
-
-            tmpMatrixSequential = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
-            }
-            tmpIsParallelCalculation = false;
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrixSequential,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-
-            tmpMatrixParallel = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
-            }
-            tmpIsParallelCalculation = true;
-            aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrixParallel,
@@ -5727,7 +3564,7 @@ class DescriptorTest {
             tmpIsParallelCalculation = false;
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculeSmilesStringsByBatchParallelization(
+                    Descriptor.setDescriptorsForMoleculeBySmilesStringsBatchParallelization(
                             tmpDescriptors,
                             tmpMoleculeStringsArray,
                             tmpMatrixSequential,
@@ -5746,7 +3583,7 @@ class DescriptorTest {
             tmpIsParallelCalculation = true;
             aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculeSmilesStringsByBatchParallelization(
+                    Descriptor.setDescriptorsForMoleculeBySmilesStringsBatchParallelization(
                             tmpDescriptors,
                             tmpMoleculeStringsArray,
                             tmpMatrixParallel,
@@ -5778,11 +3615,13 @@ class DescriptorTest {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         int tmpNumberOfMolecules = 1000;
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
+        String[] tmpMoleculeStringsArray = new String[tmpNumberOfMolecules];
 
         for (int i = 0; i < tmpNumberOfMolecules; i++) {
             IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
             Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
             tmpMoleculesArray[i] = tmpMolecule;
+            tmpMoleculeStringsArray[i] = tmpSmiles;
         }
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = Descriptor.getAllDescriptors();
@@ -5796,8 +3635,9 @@ class DescriptorTest {
                 tmpMatrix1[i] = new float[tmpNumberOfComponents];
             }
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix1,
@@ -5813,7 +3653,7 @@ class DescriptorTest {
             }
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix2,
@@ -5829,95 +3669,12 @@ class DescriptorTest {
             }
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
+                    Descriptor.setDescriptorsForMoleculesByBatchParallelization(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix3,
                             tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                for (int j = 0; j < tmpNumberOfComponents; j++) {
-                    Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix2[i][j]);
-                    Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix3[i][j]);
-                }
-            }
-
-        } catch (Exception anException) {
-            Assertions.fail();
-        }
-    }
-
-    /**
-     * Tests integrity without Fingerprints because Descriptor.setDescriptorsForMoleculesByMoleculeParallelization does not support the calculation of Fingerprints.
-     */
-    @Test
-    void test_Integrity_without_Fingerprints() throws Exception {
-        String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
-        SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        int tmpNumberOfMolecules = 1000;
-        IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
-        String[] tmpMoleculeStringsArray = new String[tmpNumberOfMolecules];
-
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
-            Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
-            tmpMoleculesArray[i] = tmpMolecule;
-            tmpMoleculeStringsArray[i] = tmpSmiles;
-        }
-        int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = Descriptor.getSpecifiedDescriptors(true, true, true, false);
-        int tmpNumberOfComponents = Descriptor.getNumberOfComponents(tmpDescriptors);
-        boolean tmpIsParallelCalculation = false;
-
-        try {
-
-            float[][] tmpMatrix1 = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrix1[i] = new float[tmpNumberOfComponents];
-            }
-            List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationSynchronized(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix1,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-
-            float[][] tmpMatrix2 = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrix2[i] = new float[tmpNumberOfComponents];
-            }
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix2,
-                            tmpStartIndex,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-
-            float[][] tmpMatrix3 = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrix3[i] = new float[tmpNumberOfComponents];
-            }
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByDescriptorParallelization(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix3,
-                            tmpStartIndex,
+                            100,
                             tmpIsParallelCalculation,
                             aNanPositions
                     )
@@ -5929,45 +3686,28 @@ class DescriptorTest {
             }
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelization(
+                    Descriptor.setDescriptorsForMoleculeBySmilesStringsBatchParallelization(
                             tmpDescriptors,
-                            tmpMoleculesArray,
+                            tmpMoleculeStringsArray,
                             tmpMatrix4,
                             tmpStartIndex,
+                            100,
+                            null,
                             tmpIsParallelCalculation,
                             aNanPositions
                     )
             );
-
             float[][] tmpMatrix5 = new float[tmpNumberOfMolecules][];
             for (int i = 0; i < tmpNumberOfMolecules; i++) {
                 tmpMatrix5[i] = new float[tmpNumberOfComponents];
             }
             aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByBatchParallelization(
-                            tmpDescriptors,
-                            tmpMoleculesArray,
-                            tmpMatrix5,
-                            tmpStartIndex,
-                            100,
-                            tmpIsParallelCalculation,
-                            aNanPositions
-                    )
-            );
-
-            float[][] tmpMatrix6 = new float[tmpNumberOfMolecules][];
-            for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                tmpMatrix6[i] = new float[tmpNumberOfComponents];
-            }
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculeSmilesStringsByBatchParallelization(
+                    Descriptor.setDescriptorsForMoleculesBySmilesStringParallelization(
                             tmpDescriptors,
                             tmpMoleculeStringsArray,
-                            tmpMatrix6,
+                            tmpMatrix5,
                             tmpStartIndex,
-                            100,
                             null,
                             tmpIsParallelCalculation,
                             aNanPositions
@@ -5980,7 +3720,6 @@ class DescriptorTest {
                     Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix3[i][j]);
                     Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix4[i][j]);
                     Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix5[i][j]);
-                    Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix6[i][j]);
                 }
             }
 
