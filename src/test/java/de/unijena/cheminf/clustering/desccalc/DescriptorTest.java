@@ -3601,6 +3601,48 @@ class DescriptorTest {
                 }
             }
 
+            tmpMatrixSequential = new float[tmpNumberOfMolecules][];
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
+            }
+            tmpIsParallelCalculation = false;
+            aNanPositions = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesBySmilesStringParallelization(
+                            tmpDescriptors,
+                            tmpMoleculeStringsArray,
+                            tmpMatrixSequential,
+                            tmpStartIndex,
+                            null,
+                            tmpIsParallelCalculation,
+                            aNanPositions
+                    )
+            );
+
+            tmpMatrixParallel = new float[tmpNumberOfMolecules][];
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
+            }
+            tmpIsParallelCalculation = true;
+            aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
+            Assertions.assertTrue(
+                    Descriptor.setDescriptorsForMoleculesBySmilesStringParallelization(
+                            tmpDescriptors,
+                            tmpMoleculeStringsArray,
+                            tmpMatrixParallel,
+                            tmpStartIndex,
+                            null,
+                            tmpIsParallelCalculation,
+                            aNanPositionsParallel
+                    )
+            );
+
+            for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                for (int j = 0; j < tmpNumberOfComponents; j++) {
+                    Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
+                }
+            }
+
         } catch (Exception anException) {
             Assertions.fail();
         }

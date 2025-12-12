@@ -1625,70 +1625,90 @@ public enum Descriptor {
         // PUBCHEM_FINGERPRINTER Pool
         BlockingQueue<IFingerprinter> pubchemPool = new LinkedBlockingQueue<>(fingerprintPoolSize);
         for (int i = 0; i < fingerprintPoolSize; i++) {
-            pubchemPool.offer(new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()));
+            if (!pubchemPool.offer(new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()))) {
+                throw new RuntimeException("Failed to initialize pubchem fingerprint pool.");
+            }
         }
         fingerprintPoolMap.put(PUBCHEM_FINGERPRINTER, pubchemPool);
 
         // CIRCULAR_FINGERPRINTER_ECFP_0 Pool
         BlockingQueue<IFingerprinter> ecfp0Pool = new LinkedBlockingQueue<>(fingerprintPoolSize);
         for (int i = 0; i < fingerprintPoolSize; i++) {
-            ecfp0Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, 1024));
+            if (!ecfp0Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, 1024))) {
+                throw new RuntimeException("Failed to initialize circular fingerprint ecfp 0 pool.");
+            }
         }
         fingerprintPoolMap.put(CIRCULAR_FINGERPRINTER_ECFP_0, ecfp0Pool);
 
         // CIRCULAR_FINGERPRINTER_FCFP_0 Pool
         BlockingQueue<IFingerprinter> fcfp0Pool = new LinkedBlockingQueue<>(fingerprintPoolSize);
         for (int i = 0; i < fingerprintPoolSize; i++) {
-            fcfp0Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, 1024));
+            if (!fcfp0Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, 1024))) {
+                throw new RuntimeException("Failed to initialize circular fingerprint fcfp 0 pool.");
+            }
         }
         fingerprintPoolMap.put(CIRCULAR_FINGERPRINTER_FCFP_0, fcfp0Pool);
 
         // CIRCULAR_FINGERPRINTER_ECFP_2 Pool
         BlockingQueue<IFingerprinter> ecfp2Pool = new LinkedBlockingQueue<>(fingerprintPoolSize);
         for (int i = 0; i < fingerprintPoolSize; i++) {
-            ecfp2Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, 1024));
+            if (!ecfp2Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, 1024))) {
+                throw new RuntimeException("Failed to initialize circular fingerprint ecfp 2 pool.");
+            }
         }
         fingerprintPoolMap.put(CIRCULAR_FINGERPRINTER_ECFP_2, ecfp2Pool);
 
         // CIRCULAR_FINGERPRINTER_FCFP_2 Pool
         BlockingQueue<IFingerprinter> fcfp2Pool = new LinkedBlockingQueue<>(fingerprintPoolSize);
         for (int i = 0; i < fingerprintPoolSize; i++) {
-            fcfp2Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, 1024));
+            if (!fcfp2Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, 1024))) {
+                throw new RuntimeException("Failed to initialize circular fingerprint fcfp 2 pool.");
+            }
         }
         fingerprintPoolMap.put(CIRCULAR_FINGERPRINTER_FCFP_2, fcfp2Pool);
 
         // CIRCULAR_FINGERPRINTER_ECFP_4 Pool
         BlockingQueue<IFingerprinter> ecfp4Pool = new LinkedBlockingQueue<>(fingerprintPoolSize);
         for (int i = 0; i < fingerprintPoolSize; i++) {
-            ecfp4Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, 1024));
+            if (!ecfp4Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, 1024))){
+                throw new RuntimeException("Failed to initialize circular fingerprint ecfp 4 pool.");
+            }
         }
         fingerprintPoolMap.put(CIRCULAR_FINGERPRINTER_ECFP_4, ecfp4Pool);
 
         // CIRCULAR_FINGERPRINTER_FCFP_4 Pool
         BlockingQueue<IFingerprinter> fcfp4Pool = new LinkedBlockingQueue<>(fingerprintPoolSize);
         for (int i = 0; i < fingerprintPoolSize; i++) {
-            fcfp4Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, 1024));
+            if (!fcfp4Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, 1024))) {
+                throw new RuntimeException("Failed to initialize circular fingerprint fcfp 4 pool.");
+            }
         }
         fingerprintPoolMap.put(CIRCULAR_FINGERPRINTER_FCFP_4, fcfp4Pool);
 
         // CIRCULAR_FINGERPRINTER_ECFP_6 Pool
         BlockingQueue<IFingerprinter> ecfp6Pool = new LinkedBlockingQueue<>(fingerprintPoolSize);
         for (int i = 0; i < fingerprintPoolSize; i++) {
-            ecfp6Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, 1024));
+            if (!ecfp6Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, 1024))) {
+                throw new RuntimeException("Failed to initialize circular fingerprint ecfp 6 pool.");
+            }
         }
         fingerprintPoolMap.put(CIRCULAR_FINGERPRINTER_ECFP_6, ecfp6Pool);
 
         // CIRCULAR_FINGERPRINTER_FCFP_6 Pool
         BlockingQueue<IFingerprinter> fcfp6Pool = new LinkedBlockingQueue<>(fingerprintPoolSize);
         for (int i = 0; i < fingerprintPoolSize; i++) {
-            fcfp6Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, 1024));
+            if (!fcfp6Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, 1024))) {
+                throw new RuntimeException("Failed to initialize circular fingerprint fcfp 6 pool.");
+            }
         }
         fingerprintPoolMap.put(CIRCULAR_FINGERPRINTER_FCFP_6, fcfp6Pool);
 
         // MACCS_FINGERPRINTER Pool
         BlockingQueue<IFingerprinter> maccsPool = new LinkedBlockingQueue<>(fingerprintPoolSize);
         for (int i = 0; i < fingerprintPoolSize; i++) {
-            maccsPool.offer(new MACCSFingerprinter(SilentChemObjectBuilder.getInstance()));
+            if (!maccsPool.offer(new MACCSFingerprinter(SilentChemObjectBuilder.getInstance()))) {
+                throw new RuntimeException("Failed to initialize maccs fingerprint pool.");
+            }
         }
         fingerprintPoolMap.put(MACCS_FINGERPRINTER, maccsPool);
     }
