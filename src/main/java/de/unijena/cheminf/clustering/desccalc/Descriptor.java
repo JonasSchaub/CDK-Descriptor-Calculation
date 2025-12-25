@@ -1,6 +1,6 @@
 /*
  * CDK-Descriptor-Calculation
- * Copyright (C) 2025 Jonas Schaub, Christoph Steinbeck, and Achim Zielesny
+ * Copyright (C) 2025 Manuel Schauer, Jonas Schaub, Christoph Steinbeck, and Achim Zielesny
  *
  * Source code is available at <https://github.com/JonasSchaub/CDK-Descriptor-Calculation>
  *
@@ -107,9 +107,10 @@ import java.util.stream.IntStream;
 
 /**
  * Descriptor related calculations based on the CDK for the enrichment of data vectors.
- * Note: There are 4 "public static boolean setDescriptorsForMolecules...()" methods with different forms of
+ * Note: There are 5 different "public static boolean setDescriptorsForMolecules...()" methods with different forms of
  * (parallelized) calculation. There is single molecule processing or batch processing for large datastructures.
  * Single and Batch processing can be used with either an IAtomContainer array or with a String Array of SMILES codes.
+ * <p>
  * Note: For adding a new descriptor, go to "Add new descriptor information here!"
  *
  * Example usage of the Descriptor class:
@@ -128,7 +129,7 @@ import java.util.stream.IntStream;
  *
  * // B: String preprocessing
  * // 1: Create a String array of SMILES codes
- * String[] moleculeSmilesStrings = "CCO", "CCC(O)O", ...
+ * String[] moleculeSmilesStrings = new String[] {"CCO", "CCC(O)O", ...}
  *
  * // Define parameters
  * // 1: Define descriptor array
@@ -160,11 +161,11 @@ import java.util.stream.IntStream;
  *
  * // For Batch Processing:
  * // Define batch size
- * int aBatchSize = 100
+ * int aBatchSize = 100;
  *
  * // For SMILES Processing
  * // Define anElectronDonation model for aromaticity handling
- * ElectronDonation anElectronDonationModel = Aromaticity.Model.Daylight
+ * ElectronDonation anElectronDonationModel = Aromaticity.Model.Daylight;
  *
  * // Calculate descriptors (choose one of the following methods)
  *
@@ -196,6 +197,7 @@ import java.util.stream.IntStream;
  * @author Achim Zielesny
  * @author Jonas Schaub
  * @author Manuel Schauer
+ * @version 1.0.0
  */
 public enum Descriptor {
     //<editor-fold desc="Descriptor enumeration and initialization">
@@ -2007,11 +2009,6 @@ public enum Descriptor {
 
             return !tmpHasNaN.get();
         } catch (Exception anException) {
-            Descriptor.LOGGER.log(
-                    Level.SEVERE,
-                    "Descriptor.setDescriptorsForMoleculesByBatchParallelization: Fatal error occurred.",
-                    anException
-            );
             throw new Exception("Descriptor.setDescriptorsForMoleculesByBatchParallelization: An exception occurred.", anException);
         }
     }
@@ -2122,11 +2119,6 @@ public enum Descriptor {
 
             return !tmpHasNaN.get();
         } catch (Exception anException) {
-            Descriptor.LOGGER.log(
-                    Level.SEVERE,
-                    "Descriptor.setDescriptorsForMoleculeBySmilesStringsBatchParallelization: Fatal error occurred.",
-                    anException
-            );
             throw new Exception("Descriptor.setDescriptorsForMoleculeBySmilesStringsBatchParallelization: An exception occurred.", anException);
         }
     }
@@ -2229,10 +2221,6 @@ public enum Descriptor {
                 return tmpIsSuccessful;
             }
         } catch (Exception anException) {
-            Descriptor.LOGGER.log(
-                    Level.SEVERE,
-                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: An exception occurred: This should never happen.", anException
-            );
             throw anException;
         }
     }
@@ -2335,11 +2323,6 @@ public enum Descriptor {
 
         return !tmpHasNaN.get();
     } catch (Exception anException) {
-        Descriptor.LOGGER.log(
-                Level.SEVERE,
-                "Descriptor.setDescriptorsForMoleculesBySmilesStringParallelization: Fatal error occurred.",
-                anException
-        );
         throw new Exception("Descriptor.setDescriptorsForMoleculesBySmilesStringParallelization: An exception occurred.", anException);
     }
     }
@@ -2441,11 +2424,7 @@ public enum Descriptor {
                 return tmpIsSuccessful;
             }
         } catch (Exception anException) {
-            Descriptor.LOGGER.log(
-                    Level.SEVERE,
-                    "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: An exception occurred: This should never happen.", anException
-            );
-            throw anException;
+            throw new Exception("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: An exception occurred.", anException);
         }
     }
     //</editor-fold>
@@ -2491,10 +2470,6 @@ public enum Descriptor {
             }
             return tmpIsSuccessful;
         } catch (Exception anException) {
-            Descriptor.LOGGER.log(
-                    Level.SEVERE,
-                    "Descriptor.setCalculatedDescriptorComponents: An exception occurred: This should never happen.", anException
-            );
             throw new Exception("Descriptor.setCalculatedDescriptorComponents: An exception occurred: This should never happen.", anException);
         }
     }
@@ -2549,10 +2524,6 @@ public enum Descriptor {
             }
             return tmpIsSuccessful;
         } catch (Exception anException) {
-            Descriptor.LOGGER.log(
-                    Level.SEVERE,
-                    "Descriptor.setDescriptorsForSingleMoleculeString: An exception occurred: This should never happen.", anException
-            );
             throw new Exception("Descriptor.setDescriptorsForSingleMoleculeString: An exception occurred: This should never happen.", anException);
         }
     }
@@ -2598,10 +2569,6 @@ public enum Descriptor {
             }
             return tmpIsSuccessful;
         } catch (Exception anException) {
-            Descriptor.LOGGER.log(
-                    Level.SEVERE,
-                    "Descriptor.setDescriptorsForSingleMoleculeNew: An exception occurred: This should never happen.", anException
-            );
             throw new Exception("Descriptor.setDescriptorsForSingleMoleculeNew: An exception occurred: This should never happen.", anException);
         }
     }
@@ -3155,8 +3122,8 @@ public enum Descriptor {
             }
             LOGGER.log(Level.WARNING, anException.toString(), anException);
         } finally {
-            if (fingerprinter != null) {
-                fingerprintPoolMap.get(this).offer(fingerprinter);
+            if (fingerprinter != null && !fingerprintPoolMap.get(this).offer(fingerprinter)) {
+                LOGGER.log(Level.WARNING, "Failed to return fingerprinter to pool for: " + this.name());
             }
         }
     }
@@ -3234,7 +3201,7 @@ public enum Descriptor {
     }
 
     /**
-     * Validates an atom container input and its molecules.
+     * Validates a string array input and its SMILES strings.
      *
      * @param methodName the calling method name for error messages
      * @param aMoleculeSmilesStringArray the molecule smiles string array to validate
