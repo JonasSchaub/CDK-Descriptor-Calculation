@@ -23,20 +23,35 @@
  * SOFTWARE.
  */
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        if (JavaVersion.current() >= JavaVersion.VERSION_11) {
+            classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.19.0'
+        }
+    }
+}
+
 plugins {
     id 'application'
     id 'org.gradle.java'
     id 'jacoco'
     id 'java-library'
     id 'java'
-    id("com.diffplug.spotless") version "6.19.0"
     id 'org.gradle.maven-publish'
     id 'signing'
     id("org.sonarqube") version "6.0.1.5171"
 }
 
+// Apply spotless only for Java 11+
+if (JavaVersion.current() >= JavaVersion.VERSION_11) {
+    apply plugin: 'com.diffplug.spotless'
+}
+
 group = 'io.github.jonasschaub'
-archivesBaseName = 'CDK-Descriptor-Calculation'
+base.archivesName = 'CDK-Descriptor-Calculation'
 //see also version for publishing below! And do not forget to update CITATION.cff version as well!!!
 version = '0.0.0.1'
 
@@ -67,8 +82,8 @@ def cdkVersion = '2.12-SNAPSHOT'
 
 dependencies {
     implementation group: 'org.jetbrains', name : 'annotations', version: '23.0.0'
-    testImplementation(platform('org.junit:junit-bom:5.9.1'))
-    testImplementation('org.junit.jupiter:junit-jupiter')
+    testImplementation("org.junit.jupiter:junit-jupiter:6.0.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     //TODO: we probably do not need all of them, so reduce again later
     implementation group: 'org.openscience.cdk', name: 'cdk-bundle', version: cdkVersion
     implementation group: 'org.openscience.cdk', name: 'cdk-base', version: cdkVersion
@@ -107,26 +122,28 @@ jacocoTestReport {
     dependsOn test // tests are required to run before generating the report
 }
 
-spotless {
-    java {
-        encoding 'UTF-8'
-        cleanthat()
-        importOrder('de', 'org', 'com', 'java', 'javax')
-        removeUnusedImports()
-        indentWithSpaces(4) // doesn't really seem to work...
-        trimTrailingWhitespace()
-        endWithNewline()
-        licenseHeaderFile('License-header/License-header.txt')
-        //eclipse() //not optimal, because indents with tabs..
-        //googleJavaFormat() //not optimal, because indents with two spaces...
-        //palantirJavaFormat() //not optimal, because unnecessary line breaks in head of for loop and corrupts editor folds
-        //prettier() //needs npm installed, unsuitable...
-        //clangFormat() //also needs an installation...
-        custom 'Refuse wildcard imports', {
-            // Wildcard imports can't be resolved by spotless itself.
-            // This will require the developer themselves to adhere to best practices.
-            if (it =~ /\nimport .*\*;/) {
-                throw new AssertionError("Do not use wildcard imports. 'spotlessApply' cannot resolve this issue.")
+if (JavaVersion.current() >= JavaVersion.VERSION_11) {
+    spotless {
+        java {
+            encoding 'UTF-8'
+            cleanthat()
+            importOrder('de', 'org', 'com', 'java', 'javax')
+            removeUnusedImports()
+            indentWithSpaces(4) // doesn't really seem to work...
+            trimTrailingWhitespace()
+            endWithNewline()
+            licenseHeaderFile('License-header/License-header.txt')
+            //eclipse() //not optimal, because indents with tabs..
+            //googleJavaFormat() //not optimal, because indents with two spaces...
+            //palantirJavaFormat() //not optimal, because unnecessary line breaks in head of for loop and corrupts editor folds
+            //prettier() //needs npm installed, unsuitable...
+            //clangFormat() //also needs an installation...
+            custom 'Refuse wildcard imports', {
+                // Wildcard imports can't be resolved by spotless itself.
+                // This will require the developer themselves to adhere to best practices.
+                if (it =~ /\nimport .*\*;/) {
+                    throw new AssertionError("Do not use wildcard imports. 'spotlessApply' cannot resolve this issue.")
+                }
             }
         }
     }
