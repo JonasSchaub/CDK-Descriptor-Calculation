@@ -44,9 +44,6 @@ version = '0.0.0.1'
 
 //Creates javadoc and sources jars
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
     withJavadocJar()
     withSourcesJar()
 }
@@ -183,6 +180,12 @@ publishing {
                 }
 
                 developers {
+                    developer {
+                        id = 'ManuelSchauer'
+                        name = 'Manuel Schauer'
+                        email = 'manuel.schauer@studmail.w-hs.de'
+                        url = 'https://github.com/ManuelSchauer'
+                    }
                     developer {
                         id = 'JonasSchaub'
                         name = 'Jonas Schaub'

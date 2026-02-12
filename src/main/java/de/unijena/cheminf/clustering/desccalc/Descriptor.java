@@ -993,15 +993,19 @@ public enum Descriptor {
 
                     IDescriptorResult result = cdkDescriptor.calculate(anAtomContainer).getValue();
 
-                    if (result instanceof DoubleResult doubleResult) {
+                    if (result instanceof DoubleResult) {
+                        DoubleResult doubleResult = (DoubleResult) result;
                         aVector[aStartIndex] = (float) doubleResult.doubleValue();
-                    } else if (result instanceof IntegerResult integerResult) {
+                    } else if (result instanceof IntegerResult) {
+                        IntegerResult integerResult = (IntegerResult) result;
                         aVector[aStartIndex] = (float) integerResult.intValue();
-                    } else if (result instanceof DoubleArrayResult arrayResult) {
+                    } else if (result instanceof DoubleArrayResult) {
+                        DoubleArrayResult arrayResult = (DoubleArrayResult) result;
                         for (int i = 0; i < this.descriptorComponentNumber; i++) {
                             aVector[aStartIndex + i] = (float) arrayResult.get(i);
                         }
-                    } else if (result instanceof IntegerArrayResult arrayResult) {
+                    } else if (result instanceof IntegerArrayResult) {
+                        IntegerArrayResult arrayResult = (IntegerArrayResult) result;
                         for (int i = 0; i < this.descriptorComponentNumber; i++) {
                             aVector[aStartIndex + i] = (float) arrayResult.get(i);
                         }
@@ -1012,7 +1016,6 @@ public enum Descriptor {
             throw new CDKException("Calculation failed for " + this.name(), e);
         }
     }
-
     //</editor-fold>
 
     //<editor-fold desc="Private static final LOGGER">
@@ -1481,6 +1484,89 @@ public enum Descriptor {
     }
 
     /**
+     * Returns the descriptor and component index for a given position in a descriptor array.
+     * <p>
+     * Example: Given descriptors [MOLECULAR_WEIGHT (1 component), BCUT (6 components), WIENER_NUMBER (2 components)]:
+     * <ul>
+     *   <li>Index 0 → MOLECULAR_WEIGHT, component 0</li>
+     *   <li>Index 1 → BCUT, component 0</li>
+     *   <li>Index 6 → BCUT, component 5</li>
+     *   <li>Index 7 → WIENER_NUMBER, component 0</li>
+     *   <li>Index 8 → WIENER_NUMBER, component 1</li>
+     * </ul>
+     *
+     * @param aDescriptors Array of descriptors (must not be null or empty)
+     * @param anIndex The index in the descriptor array (must be &gt;= 0 and &lt; total component count)
+     * @return A two-element int array: [descriptor index in aDescriptors, component index within that descriptor]
+     * @throws IllegalArgumentException if aDescriptors is null/empty, anIndex is negative,
+     *                                  or anIndex exceeds the total number of components
+     */
+    public static int[] getDescriptorAndComponentIndex(Descriptor[] aDescriptors, int anIndex)
+            throws IllegalArgumentException {
+        // Checks
+        if (aDescriptors == null || aDescriptors.length == 0) {
+            throw new IllegalArgumentException(
+                    "Descriptor.getDescriptorAndComponentIndex: aDescriptors must not be null or empty."
+            );
+        }
+        if (anIndex < 0) {
+            throw new IllegalArgumentException(
+                    "Descriptor.getDescriptorAndComponentIndex: anIndex must be >= 0."
+            );
+        }
+
+        // Calculate cumulative component counts and find the target descriptor
+        int cumulativeCount = 0;
+        for (int i = 0; i < aDescriptors.length; i++) {
+            if (aDescriptors[i] == null) {
+                throw new IllegalArgumentException(
+                        "Descriptor.getDescriptorAndComponentIndex: aDescriptors contains null element at index " + i
+                );
+            }
+
+            int componentCount = aDescriptors[i].getDescriptorComponentNumber();
+            int nextCumulativeCount = cumulativeCount + componentCount;
+
+            // Check if anIndex falls within this descriptor's range
+            if (anIndex < nextCumulativeCount) {
+                int componentIndex = anIndex - cumulativeCount;
+                return new int[] { i, componentIndex };
+            }
+
+            cumulativeCount = nextCumulativeCount;
+        }
+
+        // If we reach here, anIndex is out of bounds
+        throw new IllegalArgumentException(
+                "Descriptor.getDescriptorAndComponentIndex: anIndex (" + anIndex +
+                        ") exceeds total component count (" + cumulativeCount + ")."
+        );
+    }
+
+    /**
+     * Returns the descriptor and its component name for a given position in a descriptor array.
+     * <p>
+     * This is a convenience method that extends {@link #getDescriptorAndComponentIndex} by also
+     * providing human-readable names for the descriptor and component.
+     *
+     * @param aDescriptors Array of descriptors (must not be null or empty)
+     * @param anIndex The index in the descriptor array (must be &gt;= 0 and &lt; total component count)
+     * @return A String array: [descriptor name, component index as string]
+     * @throws IllegalArgumentException if aDescriptors is null/empty, anIndex is negative,
+     *                                  or anIndex exceeds the total number of components
+     */
+    public static String[] getDescriptorAndComponentInfo(Descriptor[] aDescriptors, int anIndex)
+            throws IllegalArgumentException {
+        int[] indices = getDescriptorAndComponentIndex(aDescriptors, anIndex);
+        Descriptor descriptor = aDescriptors[indices[0]];
+
+        return new String[] {
+                descriptor.getName(),
+                String.valueOf(indices[1])
+        };
+    }
+
+    /**
      * Sets the pool size for fingerprinter instances and reinitialized all fingerprint pools.
      * The default pool size is 4, which should be sufficient for regular users.
      * Increasing the pool size can improve performance in highly parallel environments
@@ -1561,6 +1647,143 @@ public enum Descriptor {
             throw new Exception("Failed to detect aromaticity: " + anException.getMessage(), anException);
         }
     }
+
+    /**
+     * Calculates a single descriptor for the given molecule and returns the result as a float array.
+     * <p>
+     * This method is a convenience wrapper around the internal {@link #calculate} method for
+     * single descriptor calculations. If the calculation fails, all values in the result array
+     * will be set to {@link Float#NaN}.
+     * <p>
+     * <b>Important:</b> The molecule must have aromaticity already perceived if required by the descriptor.
+     * Use {@link #setAromaticity(IAtomContainer, ElectronDonation)} before calling this method if needed.
+     *
+     * @param aDescriptor The descriptor to calculate (must not be null)
+     * @param aMolecule The molecule to calculate the descriptor for (must not be null or empty);
+     *                  aromaticity must be perceived beforehand if required
+     * @return A float array containing the calculated descriptor components. Length equals
+     *         {@link #getDescriptorComponentNumber()}. Contains NaN values if calculation fails.
+     * @throws NullPointerException if aDescriptor or aMolecule is null
+     * @throws IllegalArgumentException if aMolecule is empty
+     */
+    public static float[] calculateDescriptor(Descriptor aDescriptor, IAtomContainer aMolecule)
+            throws NullPointerException, IllegalArgumentException {
+        // Checks
+        if (aDescriptor == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: aDescriptor must not be null.");
+        }
+        if (aMolecule == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: aMolecule must not be null.");
+        }
+        if (aMolecule.isEmpty()) {
+            throw new IllegalArgumentException("Descriptor.calculateDescriptor: aMolecule must not be empty.");
+        }
+
+        float[] result = new float[aDescriptor.descriptorComponentNumber];
+        try {
+            aDescriptor.calculate(aMolecule, result, 0);
+        } catch (CDKException e) {
+            // Fill with NaN on failure and log the error
+            Arrays.fill(result, Float.NaN);
+            LOGGER.log(Level.WARNING, () ->
+                    "Failed to calculate descriptor " + aDescriptor.getName() + ": " + e.getMessage()
+            );
+        }
+        return result;
+    }
+
+    /**
+     * Calculates a single descriptor for the given molecule with automatic aromaticity perception.
+     * <p>
+     * This is a convenience method that automatically perceives aromaticity using the specified
+     * electron donation model before calculating the descriptor. If aromaticity perception or
+     * calculation fails, all values in the result array will be set to {@link Float#NaN}.
+     *
+     * @param aDescriptor The descriptor to calculate (must not be null)
+     * @param aMolecule The molecule to calculate the descriptor for (must not be null or empty)
+     * @param anElectronDonation The electron donation model to use for aromaticity perception (must not be null)
+     * @return A float array containing the calculated descriptor components. Length equals
+     *         {@link #getDescriptorComponentNumber()}. Contains NaN values if calculation fails.
+     * @throws NullPointerException if aDescriptor, aMolecule, or anElectronDonation is null
+     * @throws IllegalArgumentException if aMolecule is empty
+     */
+    public static float[] calculateDescriptor(Descriptor aDescriptor, IAtomContainer aMolecule,
+                                              ElectronDonation anElectronDonation)
+            throws NullPointerException, IllegalArgumentException {
+        // Checks
+        if (aDescriptor == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: aDescriptor must not be null.");
+        }
+        if (aMolecule == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: aMolecule must not be null.");
+        }
+        if (aMolecule.isEmpty()) {
+            throw new IllegalArgumentException("Descriptor.calculateDescriptor: aMolecule must not be empty.");
+        }
+        if (anElectronDonation == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: anElectronDonation must not be null.");
+        }
+
+        float[] result = new float[aDescriptor.descriptorComponentNumber];
+        try {
+            setAromaticity(aMolecule, anElectronDonation);
+            aDescriptor.calculate(aMolecule, result, 0);
+        } catch (Exception e) {
+            Arrays.fill(result, Float.NaN);
+            LOGGER.log(Level.WARNING, () ->
+                    "Failed to calculate descriptor " + aDescriptor.getName() + ": " + e.getMessage()
+            );
+        }
+        return result;
+    }
+
+    /**
+     * Calculates a single descriptor for the given SMILES string with automatic parsing and aromaticity perception.
+     * <p>
+     * This is a convenience method that automatically parses the SMILES string into a molecule,
+     * perceives aromaticity using the specified electron donation model, and then calculates the descriptor.
+     * If parsing, aromaticity perception, or calculation fails, all values in the result array
+     * will be set to {@link Float#NaN}.
+     *
+     * @param aDescriptor The descriptor to calculate (must not be null)
+     * @param aSmilesString The SMILES string representing the molecule (must not be null or empty)
+     * @param anElectronDonation The electron donation model to use for aromaticity perception (must not be null)
+     * @return A float array containing the calculated descriptor components. Length equals
+     *         {@link #getDescriptorComponentNumber()}. Contains NaN values if calculation fails.
+     * @throws NullPointerException if aDescriptor, aSmilesString, or anElectronDonation is null
+     * @throws IllegalArgumentException if aSmilesString is blank
+     */
+    public static float[] calculateDescriptor(Descriptor aDescriptor, String aSmilesString,
+                                              ElectronDonation anElectronDonation)
+            throws NullPointerException, IllegalArgumentException {
+        // Checks
+        if (aDescriptor == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: aDescriptor must not be null.");
+        }
+        if (aSmilesString == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: aSmilesString must not be null.");
+        }
+        if (aSmilesString.isBlank()) {
+            throw new IllegalArgumentException("Descriptor.calculateDescriptor: aSmilesString must not be blank.");
+        }
+        if (anElectronDonation == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: anElectronDonation must not be null.");
+        }
+
+        float[] result = new float[aDescriptor.descriptorComponentNumber];
+        try {
+            IAtomContainer molecule = SMILES_PARSER.parseSmiles(aSmilesString);
+            setAromaticity(molecule, anElectronDonation);
+            aDescriptor.calculate(molecule, result, 0);
+        } catch (Exception e) {
+            Arrays.fill(result, Float.NaN);
+            LOGGER.log(Level.WARNING, () ->
+                    "Failed to calculate descriptor " + aDescriptor.getName() + " for SMILES '" + aSmilesString + "': " + e.getMessage()
+            );
+        }
+        return result;
+    }
+
 
     /**
      * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
@@ -1979,7 +2202,7 @@ public enum Descriptor {
         return !tmpHasNaN.get();
     } catch (Exception anException) {
         throw new Exception("Descriptor.setDescriptorsForMoleculesBySmilesStringParallelization: An exception occurred.", anException);
-    }
+        }
     }
 
     /**
@@ -2755,7 +2978,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule (row in data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      */
-    private void calculateFingerprintFromPool(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) {
+    private void calculateFingerprintFromPool(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) throws CDKException, InterruptedException {
         IFingerprinter fingerprinter = null;
         try {
             BlockingQueue<IFingerprinter> pool = fingerprintPoolMap.get(this);
@@ -2767,19 +2990,11 @@ public enum Descriptor {
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            for (int i = 0; i < this.getDescriptorComponentNumber(); i++) {
-                aVector[aStartIndex + i] = Float.NaN;
-            }
-            LOGGER.log(Level.SEVERE, "Thread interrupted during fingerprint calculation", e);
+            throw new InterruptedException("Thread interrupted during fingerprint calculation.");
         } catch (Exception anException) {
-            for (int i = 0; i < this.getDescriptorComponentNumber(); i++) {
-                aVector[aStartIndex + i] = Float.NaN;
-            }
-            LOGGER.log(Level.WARNING, anException.toString(), anException);
+            throw new CDKException("Failed to calculate: " + this.name(), anException);
         } finally {
-            if (fingerprinter != null && !fingerprintPoolMap.get(this).offer(fingerprinter)) {
-                LOGGER.log(Level.WARNING, "Failed to return fingerprinter to pool for: " + this.name());
-            }
+            fingerprintPoolMap.get(this).offer(fingerprinter);
         }
     }
 
