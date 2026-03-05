@@ -1681,8 +1681,13 @@ public enum Descriptor {
 
         float[] result = new float[aDescriptor.descriptorComponentNumber];
         try {
-            aDescriptor.calculate(aMolecule, result, 0);
-        } catch (CDKException e) {
+            if (aDescriptor.needsExplicitHydrogens){
+                IAtomContainer tmpMoleculeWithExplicitHydrogens = createMoleculeWithExplicitHydrogens(aMolecule);
+                aDescriptor.calculate(tmpMoleculeWithExplicitHydrogens, result, 0);
+            } else {
+                aDescriptor.calculate(aMolecule, result, 0);
+            }
+        } catch (Exception e) {
             // Fill with NaN on failure and log the error
             Arrays.fill(result, Float.NaN);
             LOGGER.log(Level.WARNING, () ->
@@ -1727,7 +1732,12 @@ public enum Descriptor {
         float[] result = new float[aDescriptor.descriptorComponentNumber];
         try {
             setAromaticity(aMolecule, anElectronDonation);
-            aDescriptor.calculate(aMolecule, result, 0);
+            if (aDescriptor.needsExplicitHydrogens){
+                IAtomContainer tmpMoleculeWithExplicitHydrogens = createMoleculeWithExplicitHydrogens(aMolecule);
+                aDescriptor.calculate(tmpMoleculeWithExplicitHydrogens, result, 0);
+            } else {
+                aDescriptor.calculate(aMolecule, result, 0);
+            }
         } catch (Exception e) {
             Arrays.fill(result, Float.NaN);
             LOGGER.log(Level.WARNING, () ->
@@ -1772,9 +1782,14 @@ public enum Descriptor {
 
         float[] result = new float[aDescriptor.descriptorComponentNumber];
         try {
-            IAtomContainer molecule = SMILES_PARSER.parseSmiles(aSmilesString);
-            setAromaticity(molecule, anElectronDonation);
-            aDescriptor.calculate(molecule, result, 0);
+            IAtomContainer tmpMolecule = SMILES_PARSER.parseSmiles(aSmilesString);
+            setAromaticity(tmpMolecule, anElectronDonation);
+            if (aDescriptor.needsExplicitHydrogens){
+                    IAtomContainer tmpMoleculeWithExplicitHydrogens = createMoleculeWithExplicitHydrogens(tmpMolecule);
+                    aDescriptor.calculate(tmpMoleculeWithExplicitHydrogens, result, 0);
+            } else {
+                    aDescriptor.calculate(tmpMolecule, result, 0);
+            }
         } catch (Exception e) {
             Arrays.fill(result, Float.NaN);
             LOGGER.log(Level.WARNING, () ->
