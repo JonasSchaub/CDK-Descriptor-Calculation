@@ -109,6 +109,7 @@ import java.util.stream.IntStream;
 
 /**
  * Descriptor related calculations based on the CDK for the enrichment of data vectors.
+ * <p>
  * Note: There are 5 different "public static boolean setDescriptorsForMolecules...()" methods with different forms of
  * (parallelized) calculation. There is single molecule processing or batch processing for large datastructures.
  * Single and Batch processing can be used with either an IAtomContainer array or with a String Array of SMILES codes.
@@ -400,7 +401,7 @@ public enum Descriptor {
      *
      * @see BCUTDescriptor
      */
-    BCUT(true, false, false, false, 6, "BCUT"),
+    BCUT(false, false, false, false, 6, "BCUT"),
     /**
      * Bond polarizability descriptor.
      * The BPolDescriptor calculates the bond polarizability of a molecule.
@@ -455,7 +456,7 @@ public enum Descriptor {
      *
      * @see KappaShapeIndicesDescriptor
      */
-    KAPPA_SHAPE_INDICES(true, true, false, true, 3, "Kappa Shape Indices"),
+    KAPPA_SHAPE_INDICES(false, true, false, true, 3, "Kappa Shape Indices"),
     /**
      * Petitjean number descriptor, calculates an index characterizing molecular graph topology.
      * This topological descriptor is based on the calculation of the graph eccentricity
@@ -487,10 +488,11 @@ public enum Descriptor {
      * 3. WTPT3 - sum of path lengths starting from heteroatoms<br>
      * 4. WTPT4 - sum of path lengths starting from oxygens<br>
      * 5. WTPT5 - sum of path lengths starting from nitrogens<br>
-     *
+     * <p>
+     * Note: This descriptor computes all paths which is an NP-hard problem, do not use it for complex molecules.
      * @see WeightedPathDescriptor
      */
-    WEIGHTED_PATH(true, true, false, false, 5, "Weighted Path"),
+    WEIGHTED_PATH(false, true, false, false, 5, "Weighted Path"),
     /**
      * Zagreb index descriptor, calculates the Zagreb index of a molecule.
      * The Zagreb index is the sum of the squares of atom degrees over all heavy atoms,
@@ -780,7 +782,7 @@ public enum Descriptor {
      *
      * @see PubchemFingerprinter
      */
-    PUBCHEM_FINGERPRINTER(true, true, true, false, 881, "PubChem Fingerprinter"),
+    PUBCHEM_FINGERPRINTER(false, true, true, false, 881, "PubChem Fingerprinter"),
     /**
      * Circular fingerprinter, generates an extended-connectivity fingerprint with a path diameter of 0.
      *
@@ -896,7 +898,8 @@ public enum Descriptor {
     }
 
     /**
-     * Returns whether this descriptor is quickly calculable.
+     * Returns whether this descriptor can be calculated quickly. This classification is based on a performance benchmark
+     * of 10,000 molecules: descriptors computed in under 1 second for 10,000 molecules are considered fast.
      *
      * @return true if the descriptor has low computational complexity and can be
      *         calculated efficiently, false if it requires intensive computation
@@ -950,7 +953,6 @@ public enum Descriptor {
     public String getName() {
         return name;
     }
-
 
     /**
      * Calculates descriptor or fingerprint values for a molecule and stores them in the result vector.
