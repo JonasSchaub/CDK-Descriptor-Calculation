@@ -1243,7 +1243,7 @@ public enum Descriptor {
             // LARGEST_PI_SYSTEM
             LargestPiSystemDescriptor largestPiSystemDescriptor = new LargestPiSystemDescriptor();
             largestPiSystemDescriptor.setParameters(new Object[] {false}); //do not check aromaticity again
-            descriptorToCdkObjectMap.put(LARGEST_PI_SYSTEM, new LargestPiSystemDescriptor());
+            descriptorToCdkObjectMap.put(LARGEST_PI_SYSTEM, largestPiSystemDescriptor);
 
             // SMALL_RING
             descriptorToCdkObjectMap.put(SMALL_RING, new SmallRingDescriptor());
@@ -1390,49 +1390,41 @@ public enum Descriptor {
 
     /**
      * Returns specified available descriptors.
-     * Note: If both speed flags are false, an empty array is returned. If both speed flags are true, then all descriptors are returned.
+     * Note: Fast, safe, and non-fingerprint descriptors are automatically included by default.
      *
-     * @param isQuicklyCalculableDescriptorInclusion True: Quickly calculable descriptors are returned, false: Otherwise.
-     * @param isSlowlyCalculableDescriptorInclusion True: Slowly calculable descriptors are returned, false: Otherwise.
+     * @param isSlowlyCalculableDescriptorInclusion True: Slowly calculable descriptors are included in the result, false: Otherwise.
      * @param isUnsafeDescriptorInclusion True: Unsafe descriptors are included in the result, false: Unsafe descriptors
      *                                     are excluded from the result, this does not mean no NaN's can be produced.
      * @param isFingerprintAsDescriptorInclusion True: Fingerprint descriptors are included in the result, false: Fingerprint descriptors are excluded.
      * @return Specified descriptors
      */
     public static Descriptor[] getSpecifiedDescriptors(
-            boolean isQuicklyCalculableDescriptorInclusion,
             boolean isSlowlyCalculableDescriptorInclusion,
             boolean isUnsafeDescriptorInclusion,
             boolean isFingerprintAsDescriptorInclusion
     ) {
-        if (!isQuicklyCalculableDescriptorInclusion && !isSlowlyCalculableDescriptorInclusion) {
-            return new Descriptor[0];
-        }
         // Initialize ArrayList with maximum possible capacity to avoid internal resizing during element addition
         List<Descriptor> result = new ArrayList<>(values().length);
 
         for (Descriptor descriptor : values()) {
-            boolean includeDescriptor = false;
+            boolean includeDescriptor = true;
 
-            // Check if descriptor matches speed criteria
-            if (isQuicklyCalculableDescriptorInclusion && descriptor.isFast()) {
-                includeDescriptor = true;
-            }
-            if (isSlowlyCalculableDescriptorInclusion && !descriptor.isFast()) {
-                includeDescriptor = true;
+            // Exclude slow descriptors if not requested
+            if (!descriptor.isFast() && !isSlowlyCalculableDescriptorInclusion) {
+                includeDescriptor = false;
             }
 
-            // Include unsafe descriptors only if requested
-            if (includeDescriptor && !descriptor.isSafe() && !isUnsafeDescriptorInclusion) {
+            // Exclude unsafe descriptors if not requested
+            if (!descriptor.isSafe() && !isUnsafeDescriptorInclusion) {
                 includeDescriptor = false;
             }
 
             // Exclude fingerprint descriptors if not requested
-            if (includeDescriptor && descriptor.isFingerprint && !isFingerprintAsDescriptorInclusion) {
+            if (descriptor.isFingerprint() && !isFingerprintAsDescriptorInclusion) {
                 includeDescriptor = false;
             }
 
-            if (includeDescriptor) {
+            if (includeDescriptor) { // Only fast, safe, and non-fingerprint descriptors remain if all flags are false
                 result.add(descriptor);
             }
         }
@@ -1702,9 +1694,9 @@ public enum Descriptor {
     /**
      * Calculates a single descriptor for the given molecule with automatic aromaticity perception.
      * <p>
-     * This is a convenience method that automatically perceives aromaticity using the specified
-     * electron donation model before calculating the descriptor. If aromaticity perception or
-     * calculation fails, all values in the result array will be set to {@link Float#NaN}.
+     * This method is a convenience wrapper around the internal {@link #calculate} method for single descriptor calculations.
+     * The method automatically perceives aromaticity using the specified electron donation model before calculating the descriptor.
+     * If aromaticity perception or calculation fails, all values in the result array will be set to {@link Float#NaN}.
      *
      * @param aDescriptor The descriptor to calculate (must not be null)
      * @param aMolecule The molecule to calculate the descriptor for (must not be null or empty)
@@ -1733,12 +1725,13 @@ public enum Descriptor {
 
         float[] result = new float[aDescriptor.descriptorComponentNumber];
         try {
-            setAromaticity(aMolecule, anElectronDonation);
+            IAtomContainer tmpMolecule = copyMolecule(aMolecule); // Create a copy to avoid modifying the original molecule
+            setAromaticity(tmpMolecule, anElectronDonation);
             if (aDescriptor.needsExplicitHydrogens){
-                IAtomContainer tmpMoleculeWithExplicitHydrogens = createMoleculeWithExplicitHydrogens(aMolecule);
+                IAtomContainer tmpMoleculeWithExplicitHydrogens = createMoleculeWithExplicitHydrogens(tmpMolecule);
                 aDescriptor.calculate(tmpMoleculeWithExplicitHydrogens, result, 0);
             } else {
-                aDescriptor.calculate(aMolecule, result, 0);
+                aDescriptor.calculate(tmpMolecule, result, 0);
             }
         } catch (Exception e) {
             Arrays.fill(result, Float.NaN);
@@ -1752,7 +1745,8 @@ public enum Descriptor {
     /**
      * Calculates a single descriptor for the given SMILES string with automatic parsing and aromaticity perception.
      * <p>
-     * This is a convenience method that automatically parses the SMILES string into a molecule,
+     * This method is a convenience wrapper around the internal {@link #calculate} method for single descriptor calculations.
+     * The method automatically parses the SMILES string into a molecule,
      * perceives aromaticity using the specified electron donation model, and then calculates the descriptor.
      * If parsing, aromaticity perception, or calculation fails, all values in the result array
      * will be set to {@link Float#NaN}.
