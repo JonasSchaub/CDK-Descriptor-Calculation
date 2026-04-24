@@ -1,6 +1,6 @@
 /*
  * CDK-Descriptor-Calculation
- * Copyright (C) 2025 Manuel Schauer, Jonas Schaub, Christoph Steinbeck, and Achim Zielesny
+ * Copyright (C) 2026 Manuel Schauer, Jonas Schaub, Christoph Steinbeck, and Achim Zielesny
  *
  * Source code is available at <https://github.com/JonasSchaub/CDK-Descriptor-Calculation>
  *
