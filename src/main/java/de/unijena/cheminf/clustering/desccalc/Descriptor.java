@@ -1140,6 +1140,7 @@ public enum Descriptor {
     //<editor-fold desc="Private static final LOGGER">
     /**
      * Logger of this class.
+     * TODO for CDK integration: must be replaced with CDK ILoggingTool instance.
      */
     private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());
     //</editor-fold>
@@ -1420,7 +1421,7 @@ public enum Descriptor {
         // PUBCHEM_FINGERPRINTER Pool
         BlockingQueue<IFingerprinter> pubchemPool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            //TODO: handle the case that false is returned by offer()?
+            //TODO: handle the case that false is returned by offer()? It shouldn't really happen because we only add as many fingerprinters as the pool size.
             pubchemPool.offer(new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()));
         }
         Descriptor.fingerprintPoolMap.put(Descriptor.PUBCHEM_FINGERPRINTER, pubchemPool);
@@ -1937,7 +1938,7 @@ public enum Descriptor {
      *                    column to start filling with descriptors
      * @param aBatchSize Number of molecules to process in each batch
      * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
-     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
@@ -1951,15 +1952,24 @@ public enum Descriptor {
             int aStartIndex,
             int aBatchSize,
             boolean anIsParallelCalculation,
-            List<int[]> aNanPositions
+            List<int[]> aNanPositionsList
     ) throws IllegalArgumentException, InterruptedException {
         //<editor-fold desc="Checks">
         final String methodName = "setDescriptorsForMoleculesByMoleculeBatchParallelization";
-        Descriptor.validateDescriptors(methodName, aDescriptors);
-        Descriptor.validateAtomContainerArray(methodName, anAtomContainerArray);
-        Descriptor.validateMatrix(methodName, aDescriptors, aMatrix, anAtomContainerArray, aStartIndex);
-        Descriptor.validateNanPositions(methodName, aNanPositions);
-        Descriptor.validateBatchSize(methodName, aBatchSize);
+        if (!Descriptor.validateDescriptors(aDescriptors, methodName)) {
+            Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
+            return true;
+        }
+        if (!Descriptor.validateAtomContainerArray(anAtomContainerArray, methodName)) {
+            Descriptor.LOGGER.log(Level.WARNING, "{0} : Given atom container array is empty, calculation aborted.", methodName);
+            return true;
+        }
+        // throws NullPointerException or IllegalArgumentException if the matrix or on eof its rows is null or its dimensions are invalid
+        Descriptor.validateMatrix(aMatrix, aDescriptors, anAtomContainerArray, aStartIndex, methodName);
+        // throws NullPointerException if list is null
+        Descriptor.validateNanPositionsList(aNanPositionsList, methodName);
+        // throws IllegalArgumentException if batch size is <= 0
+        Descriptor.validateBatchSize(aBatchSize, methodName);
         //</editor-fold>
 
         int tmpNumberOfMolecules = anAtomContainerArray.length;
@@ -1987,7 +1997,7 @@ public enum Descriptor {
                                     aMatrix[i],
                                     tmpStartIndices,
                                     i,
-                                    aNanPositions
+                                    aNanPositionsList
                             );
                             if (!tmpSuccess) {
                                 tmpHasNaN.set(true);
@@ -2009,7 +2019,7 @@ public enum Descriptor {
             } else {
                 for (int i = 0; i < tmpNumberOfMolecules; i++) {
                     //TODO: why is there no try-catch for every single descriptor calculation necessary here? Same in the methods below
-                    if (!Descriptor.setDescriptorsForSingleMolecule(aDescriptors, anAtomContainerArray[i], aMatrix[i], tmpStartIndices, i, aNanPositions)) {
+                    if (!Descriptor.setDescriptorsForSingleMolecule(aDescriptors, anAtomContainerArray[i], aMatrix[i], tmpStartIndices, i, aNanPositionsList)) {
                         tmpHasNaN.set(true);
                     }
                 }
@@ -2046,7 +2056,7 @@ public enum Descriptor {
      * @param anElectronDonationModel An Aromaticity model that is applied to every molecule. NOTE: Can be null, then
      *                                Aromaticity.Model.Daylight is used as default.
      * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
-     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
@@ -2061,15 +2071,24 @@ public enum Descriptor {
             int aBatchSize,
             ElectronDonation anElectronDonationModel,
             boolean anIsParallelCalculation,
-            List<int[]> aNanPositions
+            List<int[]> aNanPositionsList
     ) throws IllegalArgumentException, InterruptedException {
         //<editor-fold desc="Checks">
         final String methodName = "setDescriptorsForMoleculeBySmilesStringsBatchParallelization";
-        Descriptor.validateDescriptors(methodName, aDescriptors);
-        Descriptor.validateSmilesStringArray(methodName, aMoleculeSmilesStringArray);
-        Descriptor.validateMatrix(methodName, aDescriptors, aMatrix, aMoleculeSmilesStringArray, aStartIndex);
-        Descriptor.validateNanPositions(methodName, aNanPositions);
-        Descriptor.validateBatchSize(methodName, aBatchSize);
+        if (!Descriptor.validateDescriptors(aDescriptors, methodName)) {
+            Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
+            return true;
+        }
+        if (!Descriptor.validateSmilesStringArray(aMoleculeSmilesStringArray, methodName)) {
+            Descriptor.LOGGER.log(Level.WARNING, "{0} : Given SMILES string array is empty, calculation aborted.", methodName);
+            return true;
+        }
+        // throws NullPointerException or IllegalArgumentException if the matrix or on eof its rows is null or its dimensions are invalid
+        Descriptor.validateMatrix(aMatrix, aDescriptors, aMoleculeSmilesStringArray, aStartIndex, methodName);
+        // throws NullPointerException if list is null
+        Descriptor.validateNanPositionsList(aNanPositionsList, methodName);
+        // throws IllegalArgumentException if batch size is <= 0
+        Descriptor.validateBatchSize(aBatchSize, methodName);
         //</editor-fold>
 
         int tmpNumberOfMolecules = aMoleculeSmilesStringArray.length;
@@ -2098,7 +2117,7 @@ public enum Descriptor {
                                     tmpStartIndices,
                                     i,
                                     anElectronDonationModel,
-                                    aNanPositions
+                                    aNanPositionsList
                             );
                             if (!tmpSuccess) {
                                 tmpHasNaN.set(true);
@@ -2119,7 +2138,7 @@ public enum Descriptor {
 
             } else {
                 for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                    if (!Descriptor.setDescriptorsForSingleMoleculeSmilesString(aDescriptors, aMoleculeSmilesStringArray[i], aMatrix[i], tmpStartIndices, i, anElectronDonationModel, aNanPositions)) {
+                    if (!Descriptor.setDescriptorsForSingleMoleculeSmilesString(aDescriptors, aMoleculeSmilesStringArray[i], aMatrix[i], tmpStartIndices, i, anElectronDonationModel, aNanPositionsList)) {
                         tmpHasNaN.set(true);
                     }
                 }
@@ -2153,7 +2172,7 @@ public enum Descriptor {
      * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
      *                    column to start filling with descriptors
      * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
-     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
@@ -2166,14 +2185,22 @@ public enum Descriptor {
             float[][] aMatrix,
             int aStartIndex,
             boolean anIsParallelCalculation,
-            List<int[]> aNanPositions
+            List<int[]> aNanPositionsList
     ) throws IllegalArgumentException, InterruptedException {
         //<editor-fold desc="Checks">
         final String methodName = "setDescriptorsForMoleculesByMoleculeParallelization";
-        Descriptor.validateDescriptors(methodName, aDescriptors);
-        Descriptor.validateAtomContainerArray(methodName, anAtomContainerArray);
-        Descriptor.validateMatrix(methodName, aDescriptors, aMatrix, anAtomContainerArray, aStartIndex);
-        Descriptor.validateNanPositions(methodName, aNanPositions);
+        if (!Descriptor.validateDescriptors(aDescriptors, methodName)) {
+            Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
+            return true;
+        }
+        if (!Descriptor.validateAtomContainerArray(anAtomContainerArray, methodName)) {
+            Descriptor.LOGGER.log(Level.WARNING, "{0} : Given atom container array is empty, calculation aborted.", methodName);
+            return true;
+        }
+        // throws NullPointerException or IllegalArgumentException if the matrix or on eof its rows is null or its dimensions are invalid
+        Descriptor.validateMatrix(aMatrix, aDescriptors, anAtomContainerArray, aStartIndex, methodName);
+        // throws NullPointerException if list is null
+        Descriptor.validateNanPositionsList(aNanPositionsList, methodName);
         //</editor-fold>
 
         int[] tmpStartIndices = new int[aDescriptors.length];
@@ -2197,7 +2224,7 @@ public enum Descriptor {
                                         aMatrix[i],
                                         tmpStartIndices,
                                         i,
-                                        aNanPositions
+                                        aNanPositionsList
                                 );
                                 if (!tmpSuccess) {
                                     tmpHasNaN.set(true);
@@ -2220,7 +2247,7 @@ public enum Descriptor {
                 //TODO: why this extra boolean here?
                 boolean tmpIsSuccessful = true;
                 for (int i = 0; i < anAtomContainerArray.length; i++) {
-                    if (!Descriptor.setDescriptorsForSingleMolecule(aDescriptors, anAtomContainerArray[i], aMatrix[i], tmpStartIndices, i, aNanPositions)) {
+                    if (!Descriptor.setDescriptorsForSingleMolecule(aDescriptors, anAtomContainerArray[i], aMatrix[i], tmpStartIndices, i, aNanPositionsList)) {
                         tmpIsSuccessful = false;
                     }
                 }
@@ -2256,7 +2283,7 @@ public enum Descriptor {
      * @param anElectronDonationModel An Aromaticity model that is applied to every molecule. NOTE: Can be null, then
      *                                Aromaticity.Model.Daylight is used as default.
      * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
-     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
@@ -2270,14 +2297,22 @@ public enum Descriptor {
             int aStartIndex,
             ElectronDonation anElectronDonationModel,
             boolean anIsParallelCalculation,
-            List<int[]> aNanPositions
+            List<int[]> aNanPositionsList
     ) throws IllegalArgumentException, InterruptedException {
         //<editor-fold desc="Checks">
         final String methodName = "setDescriptorsForMoleculesBySmilesStringParallelization";
-        Descriptor.validateDescriptors(methodName, aDescriptors);
-        Descriptor.validateSmilesStringArray(methodName, aMoleculeSmilesStringArray);
-        Descriptor.validateMatrix(methodName, aDescriptors, aMatrix, aMoleculeSmilesStringArray, aStartIndex);
-        Descriptor.validateNanPositions(methodName, aNanPositions);
+        if (!Descriptor.validateDescriptors(aDescriptors, methodName)) {
+            Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
+            return true;
+        }
+        if (!Descriptor.validateSmilesStringArray(aMoleculeSmilesStringArray, methodName)) {
+            Descriptor.LOGGER.log(Level.WARNING, "{0} : Given SMILES string array is empty, calculation aborted.", methodName);
+            return true;
+        }
+        // throws NullPointerException or IllegalArgumentException if the matrix or on eof its rows is null or its dimensions are invalid
+        Descriptor.validateMatrix(aMatrix, aDescriptors, aMoleculeSmilesStringArray, aStartIndex, methodName);
+        // throws NullPointerException if list is null
+        Descriptor.validateNanPositionsList(aNanPositionsList, methodName);
         //</editor-fold>
 
         int tmpNumberOfMolecules = aMoleculeSmilesStringArray.length;
@@ -2302,7 +2337,7 @@ public enum Descriptor {
                                         tmpStartIndices,
                                         i,
                                         anElectronDonationModel,
-                                        aNanPositions
+                                        aNanPositionsList
                                 );
                                 if (!tmpSuccess) {
                                     tmpHasNaN.set(true);
@@ -2322,7 +2357,7 @@ public enum Descriptor {
 
             } else {
                 for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                    if (!Descriptor.setDescriptorsForSingleMoleculeSmilesString(aDescriptors, aMoleculeSmilesStringArray[i], aMatrix[i], tmpStartIndices, i, anElectronDonationModel, aNanPositions)) {
+                    if (!Descriptor.setDescriptorsForSingleMoleculeSmilesString(aDescriptors, aMoleculeSmilesStringArray[i], aMatrix[i], tmpStartIndices, i, anElectronDonationModel, aNanPositionsList)) {
                         tmpHasNaN.set(true);
                     }
                 }
@@ -2358,7 +2393,7 @@ public enum Descriptor {
      * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
      *                    column to start filling with descriptors
      * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
-     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
@@ -2371,14 +2406,22 @@ public enum Descriptor {
             float[][] aMatrix,
             int aStartIndex,
             boolean anIsParallelCalculation,
-            List<int[]> aNanPositions
+            List<int[]> aNanPositionsList
     ) throws IllegalArgumentException {
         //<editor-fold desc="Checks">
         final String methodName = "setDescriptorsForMoleculesByMoleculeParallelizationNew";
-        Descriptor.validateDescriptors(methodName, aDescriptors);
-        Descriptor.validateAtomContainerArray(methodName, anAtomContainerArray);
-        Descriptor.validateMatrix(methodName, aDescriptors, aMatrix, anAtomContainerArray, aStartIndex);
-        Descriptor.validateNanPositions(methodName, aNanPositions);
+        if (!Descriptor.validateDescriptors(aDescriptors, methodName)) {
+            Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
+            return true;
+        }
+        if (!Descriptor.validateAtomContainerArray(anAtomContainerArray, methodName)) {
+            Descriptor.LOGGER.log(Level.WARNING, "{0} : Given atom container array is empty, calculation aborted.", methodName);
+            return true;
+        }
+        // throws NullPointerException or IllegalArgumentException if the matrix or on eof its rows is null or its dimensions are invalid
+        Descriptor.validateMatrix(aMatrix, aDescriptors, anAtomContainerArray, aStartIndex, methodName);
+        // throws NullPointerException if list is null
+        Descriptor.validateNanPositionsList(aNanPositionsList, methodName);
         //</editor-fold>
 
         int[] tmpStartIndices = new int[aDescriptors.length];
@@ -2402,7 +2445,7 @@ public enum Descriptor {
                                         aMatrix[i],
                                         tmpStartIndices,
                                         i,
-                                        aNanPositions
+                                        aNanPositionsList
                                 );
                                 if (!tmpSuccess) {
                                     tmpHasNaN.set(true);
@@ -2423,7 +2466,7 @@ public enum Descriptor {
                 //TODO: again, why the extra variable here?
                 boolean tmpIsSuccessful = true;
                 for (int i = 0; i < anAtomContainerArray.length; i++) {
-                    if (!Descriptor.setDescriptorsForSingleMoleculeNew(aDescriptors, anAtomContainerArray[i], aMatrix[i], tmpStartIndices, i, aNanPositions)) {
+                    if (!Descriptor.setDescriptorsForSingleMoleculeNew(aDescriptors, anAtomContainerArray[i], aMatrix[i], tmpStartIndices, i, aNanPositionsList)) {
                         tmpIsSuccessful = false;
                     }
                 }
@@ -2585,7 +2628,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule (row of data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @param aMoleculeIndex Index of the current molecule being processed (row index in data matrix)
-     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation result is NaN
      */
@@ -2595,23 +2638,23 @@ public enum Descriptor {
             float[] aVector,
             int aStartIndex,
             int aMoleculeIndex,
-            List<int[]> aNanPositions
+            List<int[]> aNanPositionsList
     ) throws InterruptedException {
         try {
             aDescriptor.calculate(anAtomContainer, aVector, aStartIndex);
 
             // Check for NaN values in the calculated result and track them
             int numComponents = aDescriptor.getDescriptorComponentNumber();
-            return !Descriptor.checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositions);
+            return !Descriptor.checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositionsList);
         } catch (InterruptedException e) {
             throw e;
         } catch (Exception anException) {
             int numComponents = aDescriptor.getDescriptorComponentNumber();
             for (int i = 0; i < numComponents; i++) {
                 aVector[aStartIndex + i] = Float.NaN;
-                // Track NaN position if aNanPositions is provided
-                if (aNanPositions != null) {
-                    aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
+                // Track NaN position if aNanPositionsList is provided
+                if (aNanPositionsList != null) {
+                    aNanPositionsList.add(new int[]{aMoleculeIndex, aStartIndex + i});
                 }
             }
             Descriptor.LOGGER.log(
@@ -2638,7 +2681,7 @@ public enum Descriptor {
      * @param aVector Vector of molecule (row in data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
      * @param aMoleculeIndex Index of the current molecule being processed
-     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation result is NaN
      */
@@ -2648,7 +2691,7 @@ public enum Descriptor {
             float[] aVector,
             int aStartIndex,
             int aMoleculeIndex,
-            List<int[]> aNanPositions
+            List<int[]> aNanPositionsList
     ) {
         try {
             switch (aDescriptor) {
@@ -3073,14 +3116,14 @@ public enum Descriptor {
             }
             // Check for NaN values in the calculated result and track them
             int numComponents = aDescriptor.getDescriptorComponentNumber();
-            return !Descriptor.checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositions);
+            return !Descriptor.checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositionsList);
         } catch (Exception anException) {
             int numComponents = aDescriptor.getDescriptorComponentNumber();
             for (int i = 0; i < numComponents; i++) {
                 aVector[aStartIndex + i] = Float.NaN;
-                // Track NaN position if aNanPositions is provided
-                if (aNanPositions != null) {
-                    aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
+                // Track NaN position if aNanPositionsList is provided
+                if (aNanPositionsList != null) {
+                    aNanPositionsList.add(new int[]{aMoleculeIndex, aStartIndex + i});
                 }
             }
             Descriptor.LOGGER.log(
@@ -3121,34 +3164,41 @@ public enum Descriptor {
         } catch (Exception anException) {
             throw new CDKException("Failed to calculate: " + this.name(), anException);
         } finally {
+            //TODO: should always return true because we are only putting back the fingerprinter we have taken from the queue before; log a warning anyway when it does return false?
             Descriptor.fingerprintPoolMap.get(this).offer(fingerprinter);
         }
     }
 
     /**
      * Helper method to check for NaN values in a calculated descriptor result and track their positions.
-     * This method is thread-safe when used with a synchronized LinkedList.
+     * This method is thread-safe when used with a synchronized LinkedList. Note that not the entire data vector is
+     * checked but only the positions [aStartIndex, aStartIndex + numComponents].
      *
      * @param aVector The vector containing calculated descriptor values
      * @param aStartIndex The start index in the vector for this descriptor
      * @param numComponents The number of components for this descriptor
      * @param aMoleculeIndex The index of the current molecule
-     * @param aNanPositions List to track NaN positions (can be null if NaN positions should not be tracked);
+     * @param aNanPositionsList List to track NaN positions (can be null if NaN positions should not be tracked);
      *                      must be thread-safe for parallel access; will be filled with int[] {[moleculeIndex, componentIndex]}
-     *                      pairs of NaN values
+     *                      pairs of NaN value positions (i.e. row and column index in the data matrix)
      * @return true if any NaN values were found, false otherwise
      */
-    private static boolean checkAndTrackNaNValues(float[] aVector, int aStartIndex, int numComponents,
-                                          int aMoleculeIndex, List<int[]> aNanPositions) {
+    private static boolean checkAndTrackNaNValues(
+            float[] aVector,
+            int aStartIndex,
+            int numComponents,
+            int aMoleculeIndex,
+            List<int[]> aNanPositionsList
+    ) {
         boolean foundNaN = false;
         for (int i = 0; i < numComponents; i++) {
             if (Float.isNaN(aVector[aStartIndex + i])) {
                 foundNaN = true;
-                // Track NaN position if aNanPositions is provided
-                // Note: aNanPositions must be thread-safe for parallel access
-                if (aNanPositions != null) {
+                // Track NaN position if aNanPositionsList is provided
+                // Note: aNanPositionsList must be thread-safe for parallel access
+                if (aNanPositionsList != null) {
                     // Synchronize the add operation to ensure thread safety
-                    aNanPositions.add(new int[]{aMoleculeIndex, aStartIndex + i});
+                    aNanPositionsList.add(new int[]{aMoleculeIndex, aStartIndex + i});
                 }
             }
         }
@@ -3158,145 +3208,153 @@ public enum Descriptor {
     //<editor-fold desc="Validation Methods">
     /**
      * Validates descriptor array input. Throws NullPointerExceptions if the array or one of its elements is null.
+     * Returns false if the array is empty.
      *
-     * @param methodName the calling method name for error messages
      * @param aDescriptorArray the descriptor array to validate
+     * @param methodName the calling method name for error messages
      * @throws NullPointerException if descriptor array or one of its elements is null
-     * @throws IllegalArgumentException if descriptor array is empty
+     * @return false if descriptor array is empty; true otherwise
      */
-    private static void validateDescriptors(String methodName, Descriptor[] aDescriptorArray) {
+    private static boolean validateDescriptors(Descriptor[] aDescriptorArray, String methodName) {
         if (aDescriptorArray == null) {
             throw new NullPointerException(methodName + ": Given descriptor array is null");
         }
         if (aDescriptorArray.length == 0) {
-            throw new IllegalArgumentException(methodName + ": Given descriptor array is empty");
+            return false;
         }
         for (Descriptor tmpDescriptor : aDescriptorArray) {
             if (tmpDescriptor == null) {
                 throw new NullPointerException(methodName + ": A single descriptor in aDescriptors is null.");
             }
         }
+        return true;
     }
 
     /**
-     * Validates an atom container array input and its molecules.
+     * Validates an atom container array input and its contents. Throws NullPointerExceptions if the array or one of
+     * its elements is null. Returns false if the array is empty. Note that the molecules in the array are allowed to be empty.
      *
+     * @param anAtomContainerArray the atom container array to validate
      * @param methodName the calling method name for error messages
-     * @param anAtomContainerArray the atom container to validate
-     * @throws NullPointerException if molecule collection is null
-     * @throws IllegalArgumentException if molecule collection is empty
+     * @throws NullPointerException if molecule array or one of its elements is null
+     * @return false if the atom container array is empty; true otherwise
      */
-    private static void validateAtomContainerArray(String methodName, IAtomContainer[] anAtomContainerArray) {
-        if (anAtomContainerArray == null || anAtomContainerArray.length == 0) {
-            throw new IllegalArgumentException(methodName + ": anAtomContainerArray is null or has length 0.");
+    private static boolean validateAtomContainerArray(IAtomContainer[] anAtomContainerArray, String methodName) {
+        if (anAtomContainerArray == null) {
+            throw new NullPointerException(methodName + ": anAtomContainerArray is null.");
+        }
+        if (anAtomContainerArray.length == 0) {
+            return false;
         }
         for (IAtomContainer tmpMolecule : anAtomContainerArray) {
-            if (tmpMolecule == null || tmpMolecule.isEmpty()) {
-                throw new IllegalArgumentException(methodName + ": A single molecule in anAtomContainerArray is null or empty.");
+            if (tmpMolecule == null) {
+                throw new NullPointerException(methodName + ": A single molecule in anAtomContainerArray is null.");
             }
+            //do nothing if a molecule is empty
         }
+        return true;
     }
 
     /**
-     * Validates a string array input and its SMILES strings.
+     * Validates a SMILES string array input and its content. Throws NullPointerExceptions if the array or one of
+     * its elements is null. Returns false if the array is empty.
      *
+     * @param aMoleculeSmilesStringArray the molecule SMILES string array to validate
      * @param methodName the calling method name for error messages
-     * @param aMoleculeSmilesStringArray the molecule smiles string array to validate
-     * @throws NullPointerException if molecule collection is null
-     * @throws IllegalArgumentException if molecule collection is empty
+     * @throws NullPointerException if the SMILES string array or one of its elements is null
+     * @return false if the SMILES string array is empty; true otherwise
      */
-    private static void validateSmilesStringArray(String methodName, String[] aMoleculeSmilesStringArray) {
-        if (aMoleculeSmilesStringArray == null || aMoleculeSmilesStringArray.length == 0) {
-            throw new IllegalArgumentException(methodName + ": anAtomContainerArray is null or has length 0.");
+    private static boolean validateSmilesStringArray(String[] aMoleculeSmilesStringArray, String methodName) {
+        if (aMoleculeSmilesStringArray == null) {
+            throw new NullPointerException(methodName + ": aMoleculeSmilesStringArray is null.");
+        }
+        if (aMoleculeSmilesStringArray.length == 0) {
+            return false;
         }
         for (String tmpMolecule : aMoleculeSmilesStringArray) {
-            if (tmpMolecule == null || tmpMolecule.isEmpty()) {
-                throw new IllegalArgumentException(methodName + ": A single molecule in anAtomContainerArray is null or empty.");
+            if (tmpMolecule == null) {
+                throw new NullPointerException(methodName + ": A single SMILES string in aMoleculeSmilesStringArray is null.");
             }
+            //do nothing if a String is empty
         }
+        return true;
     }
 
+    //TODO: if there is truly nothing else to validate, this does not have to be a separate method
     /**
-     * Validates NaN positions list.
+     * Validates NaN positions list. Throws a NullPointerException if the list is null.
      *
+     * @param aNanPositionsList the NaN positions list (must not be null)
      * @param methodName the calling method name for error messages
-     * @param aNanPositions the NaN positions list (can be null)
+     * @throws NullPointerException if aNanPositionsList is null
      */
-    private static void validateNanPositions(String methodName, List<int[]> aNanPositions) {
-        if (aNanPositions == null) {
-            throw new IllegalArgumentException(methodName + ": aNaNPositions is null.");
+    private static void validateNanPositionsList(List<int[]> aNanPositionsList, String methodName) {
+        if (aNanPositionsList == null) {
+            throw new NullPointerException(methodName + ": aNanPositionsList is null.");
         }
     }
 
+    //TODO: if there is truly nothing else to validate, this does not have to be a separate method
     /**
      * Validates batch size.
      *
+     * @param aBatchSize a batch size (must be &gt; 0)
      * @param methodName the calling method name for error messages
-     * @param aBatchSize a batch size (>= 0)
+     * @throws IllegalArgumentException if aBatchSize is &lt;= 0
      */
-    private static void validateBatchSize(String methodName, int aBatchSize) {
+    private static void validateBatchSize(int aBatchSize, String methodName) {
         if (aBatchSize <= 0) {
-            throw new IllegalArgumentException(methodName + ": aBatchSize must be greater than 0.");
+            throw new IllegalArgumentException(methodName + ": aBatchSize must be greater than 0 but was " + aBatchSize + ".");
         }
     }
 
     /**
-     * Validates matrix dimensions and start index.
+     * Validates matrix dimensions and start index. Throws a NullPointerException if the matrix or one of its rows is
+     * null. Returns false if the matrix is empty. Note that some parameters like {@code aDescriptors} have their own validation methods.
      *
-     * @param aDescriptors the descriptors to validate
-     * @param methodName the calling method name for error messages
      * @param aMatrix the matrix to validate
-     * @param anAtomContainerArray the atom container array to validate
-     * @param aStartIndex the start index in the matrix
-     * @throws NullPointerException if matrix is null
-     * @throws IllegalArgumentException if matrix dimensions are invalid
-     * @throws ArrayIndexOutOfBoundsException if start index is out of bounds
-     */
-    private static void validateMatrix(String methodName, Descriptor[] aDescriptors, float[][] aMatrix, IAtomContainer[] anAtomContainerArray, int aStartIndex) {
-        if (aMatrix == null || aMatrix.length == 0) {
-            throw new IllegalArgumentException(methodName + ": aMatrix is null or has length 0.");
-        }
-        if (aMatrix.length != anAtomContainerArray.length) {
-            throw new IllegalArgumentException(methodName + ": aMatrix and anAtomContainerArray must have the same length.");
-        }
-        for (float[] tmpVector : aMatrix) {
-            if (tmpVector == null || tmpVector.length == 0) {
-                throw new IllegalArgumentException(methodName + ": A vector in aMatrix is null or has length 0.");
-            }
-            if (aStartIndex >= tmpVector.length) {
-                throw new IllegalArgumentException(methodName + ": aStartIndex is greater than or equal to vector length.");
-            }
-            int tmpNumberOfComponents = Descriptor.getNumberOfComponents(aDescriptors);
-            if (aStartIndex + tmpNumberOfComponents > tmpVector.length) {
-                throw new IllegalArgumentException(methodName + ": Not enough space in vector for descriptors.");
-            }
-        }
-    }
-
-    /**
-     * Validates matrix dimensions and start index.
-     *
-     * @param aDescriptors the descriptors to validate
+     * @param aDescriptors the descriptors intended to be calculated for validating the matrix dimensions (min. nr. of columns)
+     * @param aMoleculeArray the input molecule array (either an {@code IAtomContainer[]} or a {@code String[]}) for
+     *                       validating the matrix dimensions (exact(!) nr. of rows)
+     * @param aStartIndex the start index in the matrix (starting there, enough columns must be left to fit all descriptor results)
      * @param methodName the calling method name for error messages
-     * @param aMatrix the matrix to validate
-     * @param aMoleculeSmilesStringArray the smiles string array to validate
-     * @param aStartIndex the start index in the matrix
-     * @throws NullPointerException if matrix is null
+     * @throws NullPointerException if the matrix or one of its rows is null
      * @throws IllegalArgumentException if matrix dimensions are invalid
-     * @throws ArrayIndexOutOfBoundsException if start index is out of bounds
      */
-    private static void validateMatrix(String methodName, Descriptor[] aDescriptors, float[][] aMatrix, String[] aMoleculeSmilesStringArray, int aStartIndex) {
-        if (aMatrix == null || aMatrix.length == 0) {
-            throw new IllegalArgumentException(methodName + ": aMatrix is null or has length 0.");
+    private static void validateMatrix(
+            float[][] aMatrix,
+            Descriptor[] aDescriptors,
+            Object[] aMoleculeArray,
+            int aStartIndex,
+            String methodName
+    ) {
+        if (aMatrix == null) {
+            throw new NullPointerException(methodName + ": aMatrix is null.");
         }
-        if (aMatrix.length != aMoleculeSmilesStringArray.length) {
-            throw new IllegalArgumentException(methodName + ": aMatrix and anAtomContainerArray must have the same length.");
+        if (aMatrix.length == 0) {
+            throw new IllegalArgumentException(methodName + ": aMatrix is of length 0.");
         }
+        if (aMatrix.length != aMoleculeArray.length) {
+            throw new IllegalArgumentException(methodName + ": aMatrix and aMoleculeArray must have the same length.");
+        }
+        if (!(aMoleculeArray instanceof IAtomContainer[]) && !(aMoleculeArray instanceof String[])) {
+            throw new IllegalArgumentException(methodName + ": aMoleculeArray must be an IAtomContainer[] or a String[].");
+        }
+        int colNum = -1;
         for (float[] tmpVector : aMatrix) {
-            if (tmpVector == null || tmpVector.length == 0) {
-                throw new IllegalArgumentException(methodName + ": A vector in aMatrix is null or has length 0.");
+            if (tmpVector == null) {
+                throw new NullPointerException(methodName + ": A vector in aMatrix is null.");
             }
-            if (aStartIndex >= tmpVector.length) {
+            if (tmpVector.length == 0) {
+                throw new IllegalArgumentException(methodName + ": A vector in aMatrix has length 0.");
+            }
+            if (colNum == -1) {
+                colNum = tmpVector.length;
+            }
+            if (tmpVector.length != colNum) {
+                throw new IllegalArgumentException(methodName + ": All vectors in aMatrix must have the same length.");
+            }
+            if (aStartIndex > tmpVector.length) {
                 throw new IllegalArgumentException(methodName + ": aStartIndex is greater than or equal to vector length.");
             }
             int tmpNumberOfComponents = Descriptor.getNumberOfComponents(aDescriptors);

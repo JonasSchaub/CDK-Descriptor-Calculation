@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+//TODO test descriptors for how they handle emtpy molecules and empty SMILES strings.
 /**
  * Test class for Descriptor class.
  * Note: For adding tests of a new descriptor goto "Add new descriptor tests here!"
