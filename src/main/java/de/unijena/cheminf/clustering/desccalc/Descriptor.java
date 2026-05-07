@@ -108,6 +108,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
+//TODO: add a note on which descriptors are included here (all IMolecularDescriptor implementing classes except for
+// those that require 3D coordinates, correct? Actually, we could still add them along with a new field "requires3DCoordinates")
 /**
  * Descriptor related calculations based on the CDK for the enrichment of data vectors.
  * <p>
@@ -1065,7 +1067,7 @@ public enum Descriptor {
     }
 
     //TODO for CDK integration: remove a/an prefixes of method parameters
-    //TODO: since this method returns void right now, we can habve it return boolean to indicate whether the calculation
+    //TODO: since this method returns void right now, we can have it return boolean to indicate whether the calculation
     // was successful or not and hence remove th exception throwing (John will like that); the exception thrown in the
     // try-catch block could then be logged as a warning
     /**
@@ -1096,8 +1098,11 @@ public enum Descriptor {
      *                        values are stored starting at aStartIndex
      * @param aStartIndex     the starting index in aVector where results should be written;
      *                        subsequent values are written to aStartIndex + 1, aStartIndex + 2, etc.
-     * @throws CDKException if the calculation fails for any reason, wrapping the original exception
+      * @throws CDKException if the calculation fails for any reason, wrapping the original exception
      *                      with information about which descriptor failed
+     * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
+     *                              fingerprinter instance from the pool (only relevant for fingerprint
+     *                              descriptors; propagated from {@link #calculateFingerprintFromPool})
      */
     private void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) throws CDKException, InterruptedException {
         try {
@@ -1176,7 +1181,7 @@ public enum Descriptor {
     /*
      * Static initializer block to populate the descriptorToCdkObjectMap and initialize the fingerprint pool.
      * Note: we use the map and initialize it here (instead of giving each descriptor constant an instance field)
-     * to be able to do error handling. TODO: where there other reasons? Note them here!
+     * to be able to do error handling. TODO: where there other reasons? If yes, please document them here!
      */
     static {
         try {
@@ -1724,15 +1729,12 @@ public enum Descriptor {
      * Uses a specified aromaticity model to modify aMolecule.
      * The method performs a complete workflow of:
      * <ol>
-     *     //TODO: why is this done here?
-     *     <li>Suppresses explicit hydrogens.</li>
-     *     //TODO: this is only necessary now if CDK_AtomTypes is used! Ok, and for the hydrogen adding...
-     *     <li>Perceives atom types and configures atoms.</li>
+     *     <li>Suppresses explicit hydrogens. TODO: why is this done here?</li>
+     *     <li>Perceives atom types and configures atoms. TODO: this is only necessary now if CDK_AtomTypes is used! Ok, and for the hydrogen adding...</li>
      *     <li>Clears existing aromaticity flags.</li>
      *     <li>Detects rings.</li>
      *     <li>Applies the specified {@link ElectronDonation} model.</li>
-     *     //TODO: why is this done here?
-     *     <li>Adds implicit hydrogen's.</li>
+     *     <li>Adds implicit hydrogen's. TODO: why is this done here?</li>
      * </ol>
      * Note: This method changes the input molecule by applying the specified aromaticity model and reconfiguring its hydrogens.
      *
@@ -1781,6 +1783,9 @@ public enum Descriptor {
      *                  aromaticity must be perceived beforehand if required; if it is empty, an empty array is returned
      * @return A float array containing the calculated descriptor components. Length equals
      *         {@link #getDescriptorComponentNumber()}. Contains NaN values if calculation fails.
+     * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
+     *                              fingerprinter instance from the pool (only relevant for fingerprint
+     *                              descriptors; the thread's interrupt status is preserved)
      */
     public static float[] calculateDescriptor(Descriptor aDescriptor, IAtomContainer aMolecule) throws InterruptedException {
         // Checks
@@ -1824,6 +1829,9 @@ public enum Descriptor {
      * @param anElectronDonation The electron donation model to use for aromaticity perception (must not be null)
      * @return A float array containing the calculated descriptor components. Length equals
      *         {@link #getDescriptorComponentNumber()}. Contains NaN values if calculation fails.
+     * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
+     *                              fingerprinter instance from the pool (only relevant for fingerprint
+     *                              descriptors; the thread's interrupt status is preserved)
      */
     public static float[] calculateDescriptor(Descriptor aDescriptor,
                                               IAtomContainer aMolecule,
@@ -1883,6 +1891,9 @@ public enum Descriptor {
      * @param anElectronDonation The electron donation model to use for aromaticity perception (must not be null)
      * @return A float array containing the calculated descriptor components. Length equals
      *         {@link #getDescriptorComponentNumber()}. Contains NaN values if calculation fails.
+     * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
+     *                              fingerprinter instance from the pool (only relevant for fingerprint
+     *                              descriptors; the thread's interrupt status is preserved)
      */
     public static float[] calculateDescriptor(Descriptor aDescriptor,
                                               String aSmilesString,
@@ -1944,6 +1955,10 @@ public enum Descriptor {
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
      * @throws IllegalArgumentException Thrown if an argument is illegal TODO: add more info! Here and in the other methods below as well
+     * @throws InterruptedException if the current thread is interrupted during sequential fingerprint
+     *                              calculation; in parallel mode, interruption is handled internally
+     *                              by restoring the thread's interrupt flag via
+     *                              {@link Thread#interrupt()} and the affected batch is aborted silently
      */
     public static boolean setDescriptorsForMoleculesByBatchParallelization(
             Descriptor[] aDescriptors,
@@ -2062,6 +2077,10 @@ public enum Descriptor {
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
      * @throws IllegalArgumentException Thrown if an argument is illegal
+     * @throws InterruptedException if the current thread is interrupted during sequential fingerprint
+     *                              calculation; in parallel mode, interruption is handled internally
+     *                              by restoring the thread's interrupt flag via
+     *                              {@link Thread#interrupt()} and the affected batch is aborted silently
      */
     public static boolean setDescriptorsForMoleculeBySmilesStringsBatchParallelization(
             Descriptor[] aDescriptors,
@@ -2178,6 +2197,10 @@ public enum Descriptor {
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
      * @throws IllegalArgumentException Thrown if an argument is illegal
+     * @throws InterruptedException if the current thread is interrupted during sequential fingerprint
+     *                              calculation; in parallel mode, interruption is handled internally
+     *                              by restoring the thread's interrupt flag via
+     *                              {@link Thread#interrupt()} and the affected molecule is skipped silently
      */
     public static boolean setDescriptorsForMoleculesByMoleculeParallelization(
             Descriptor[] aDescriptors,
@@ -2289,6 +2312,10 @@ public enum Descriptor {
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
      * @throws IllegalArgumentException Thrown if an argument is illegal
+     * @throws InterruptedException if the current thread is interrupted during sequential fingerprint
+     *                              calculation; in parallel mode, interruption is handled internally
+     *                              by restoring the thread's interrupt flag via
+     *                              {@link Thread#interrupt()} and the affected molecule is skipped silently
      */
     public static boolean setDescriptorsForMoleculesBySmilesStringParallelization(
             Descriptor[] aDescriptors,
@@ -2499,6 +2526,8 @@ public enum Descriptor {
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation result is NaN
      * @throws CloneNotSupportedException if copying the molecule fails
+     * @throws InterruptedException if the current thread is interrupted during fingerprint calculation
+     *                              (propagated from {@link #setDescriptor})
      */
     private static boolean setDescriptorsForSingleMolecule (
             Descriptor[] aDescriptors,
@@ -2543,6 +2572,8 @@ public enum Descriptor {
      * descriptor calculation result is NaN
      * @throws CloneNotSupportedException if copying the molecule fails
      * @throws CDKException if SMILES parsing or aromaticity detection fails
+     * @throws InterruptedException if the current thread is interrupted during fingerprint calculation
+     *                              (propagated from {@link #setDescriptor})
      */
     private static boolean setDescriptorsForSingleMoleculeSmilesString (
             Descriptor[] aDescriptors,
@@ -2631,6 +2662,9 @@ public enum Descriptor {
      * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation result is NaN
+     * @throws InterruptedException if the current thread is interrupted during fingerprint calculation
+     *                              (propagated from {@link #calculate}); all other exceptions are caught,
+     *                              logged, and converted to NaN values in aVector
      */
     private static boolean setDescriptor(
             Descriptor aDescriptor,
@@ -3147,25 +3181,37 @@ public enum Descriptor {
      * @param anAtomContainer Molecule (IS NOT CHANGED)
      * @param aVector Vector of molecule (row in data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
      * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     * @throws CDKException if the fingerprint calculation fails
+     * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
+     *                              fingerprinter instance from the pool; this is the root source of
+     *                              {@link InterruptedException} in this class — {@link BlockingQueue#take()}
+     *                              throws it if the thread is interrupted while blocked waiting for an
+     *                              available fingerprinter, or if it is already interrupted when called
      */
     private void calculateFingerprintFromPool(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex)
             throws CDKException, InterruptedException {
         IFingerprinter fingerprinter = null;
         try {
             BlockingQueue<IFingerprinter> pool = Descriptor.fingerprintPoolMap.get(this);
+            // take() blocks until a fingerprinter is available in the pool; throws InterruptedException
+            // if the thread is interrupted while waiting (or already interrupted). InterruptedException is
+            // neither CDKException nor RuntimeException, so it is not caught below and propagates naturally.
             fingerprinter = pool.take();
 
             IBitFingerprint bitFingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
             for (int i = 0; i < this.getDescriptorComponentNumber(); i++) {
                 aVector[aStartIndex + i] = bitFingerprint.get(i) ? 1.0f : 0.0f;
             }
-        } catch (InterruptedException interruptedException) {
-            throw interruptedException;
-        } catch (Exception anException) {
+        } catch (CDKException | RuntimeException anException) {
             throw new CDKException("Failed to calculate: " + this.name(), anException);
         } finally {
-            //TODO: should always return true because we are only putting back the fingerprinter we have taken from the queue before; log a warning anyway when it does return false?
-            Descriptor.fingerprintPoolMap.get(this).offer(fingerprinter);
+            // Only return the fingerprinter if it was successfully taken from the pool.
+            // If take() threw InterruptedException, fingerprinter is still null and offer(null)
+            // would throw NullPointerException.
+            //TODO: offer() should always return true here because we only put back what we took; log a warning if it returns false?
+            if (fingerprinter != null) {
+                Descriptor.fingerprintPoolMap.get(this).offer(fingerprinter);
+            }
         }
     }
 
@@ -3366,6 +3412,8 @@ public enum Descriptor {
     //</editor-fold>
 
     //<editor-fold desc="Package private static molecule processing methods">
+    //TODO: @Manuel, how well tested is this? Are we sure all relevant properties are copied?
+    //TODO: have a look at SugarDetectionUtility and CircularFragmenter in CDK and how copying is done there; are there any relevant properties/fields missing here?
     /**
      * Creates a deep copy of the input molecule.
      * Note: This method is used to create a new molecule object
@@ -3374,8 +3422,6 @@ public enum Descriptor {
      *
      * @param aMolecule Source molecule to be copied (NOT MODIFIED)
      * @return New instance of the molecule
-     * @throws NullPointerException If the input molecule is null
-     * @throws IllegalArgumentException If the input molecule is empty
      * @throws CloneNotSupportedException If the molecule cannot be properly copied
      */
     static IAtomContainer copyMolecule(IAtomContainer aMolecule)
@@ -3384,15 +3430,16 @@ public enum Descriptor {
         if (aMolecule == null) {
             throw new NullPointerException("Input molecule must not be null");
         }
-        if (aMolecule.isEmpty()) {
-            throw new IllegalArgumentException("Input molecule must not be empty");
-        }
         //</editor-fold>
         try {
             // Create a new empty atom container with the same properties
             IAtomContainer tmpMoleculeCopy = aMolecule.getBuilder().newInstance(IAtomContainer.class);
+            if (aMolecule.isEmpty()) {
+                return tmpMoleculeCopy;
+            }
             // Copy atoms
             for (IAtom tmpAtom : aMolecule.atoms()) {
+                //TODO: copy.newAtom(element, implicitHCount) would be faster
                 IAtom tmpNewAtom = tmpAtom.getBuilder().newInstance(IAtom.class);
                 // Copy atom properties
                 tmpNewAtom.setSymbol(tmpAtom.getSymbol());
@@ -3413,8 +3460,10 @@ public enum Descriptor {
             }
             // Copy bonds
             for (IBond tmpBond : aMolecule.bonds()) {
+                //TODO: copy.newBond(begin, end, order) would be faster
                 IBond tmpNewBond = tmpBond.getBuilder().newInstance(IBond.class);
                 // Get atoms for this bond in the new molecule
+                //TODO: this concerns me; you are assuming that the atoms in the copy have the same index as in the original; I don't know whether we can safely assume that.
                 IAtom tmpAtom1 = tmpMoleculeCopy.getAtom(aMolecule.indexOf(tmpBond.getBegin()));
                 IAtom tmpAtom2 = tmpMoleculeCopy.getAtom(aMolecule.indexOf(tmpBond.getEnd()));
                 // Set bond properties
@@ -3437,12 +3486,10 @@ public enum Descriptor {
     }
 
     /**
-     * Creates a new molecule with all implicit hydrogen atoms made explicit.
+     * Creates a molecule copy with all implicit hydrogen atoms made explicit.
      *
      * @param aMolecule Source molecule with implicit hydrogens (NOT MODIFIED)
      * @return New molecule (copy of the parameter) with all hydrogens made explicit
-     * @throws NullPointerException If the input molecule is null
-     * @throws IllegalArgumentException If the input molecule is empty
      * @throws CloneNotSupportedException If the molecule cannot be properly processed
      */
     static IAtomContainer createMoleculeWithExplicitHydrogens(
@@ -3453,14 +3500,15 @@ public enum Descriptor {
             throw new NullPointerException("Input molecule must not be null");
         }
         if (aMolecule.isEmpty()) {
-            throw new IllegalArgumentException("Input molecule must not be empty");
+            //returns empty atom container
+            return Descriptor.copyMolecule(aMolecule);
         }
         //</editor-fold>
         try {
             // Create a deep copy of the molecule first
             IAtomContainer tmpMoleculeCopy = Descriptor.copyMolecule(aMolecule);
             // Add explicit hydrogen atoms
-            AtomContainerManipulator.convertImplicitToExplicitHydrogens(tmpMoleculeCopy);
+            AtomContainerManipulator.normalizeHydrogens(tmpMoleculeCopy, HydrogenState.Explicit);
             return tmpMoleculeCopy;
         } catch (Exception anException) {
             throw new CloneNotSupportedException("Could not create molecule with explicit hydrogens: " + anException.getMessage());
