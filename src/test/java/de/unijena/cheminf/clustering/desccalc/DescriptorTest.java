@@ -45,8 +45,8 @@ import java.util.List;
 //TODO test descriptors for how they handle empty molecules and empty SMILES strings.
 /**
  * Test class for Descriptor class. This class first tests all the descriptors included in the {@link Descriptor} class
- * individually, i.e. whether they produce the expected results for some example molecules in different parallelization
- * settings.
+ * individually, i.e. whether they produce the expected results for some example molecules (in most cases taken from the
+ * respective CDK descriptor test class) in different parallelization settings.
  * Note: For adding tests of a new descriptor goto "Add new descriptor tests here!"
  *
  * @author Achim Zielesny
@@ -310,6 +310,13 @@ class DescriptorTest {
         String tmpSmiles1 = "CC(=O)O"; //Acetic Acid CID: 176
         String tmpSmiles2 = "O=N(=O)c1cccc2cn[nH]c12"; // 7-Nitroindole CID: 1893
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.H_BOND_ACCEPTOR_COUNT};
+        boolean tmpIsParallelCalculation = false;
+
+        Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
         ElectronDonation[] models = {
                 // Mdl and PiBonds lead to a calculation of 2 rather than 1 H-bond acceptor which is correct
                 // because of the different handling of aromaticity in the second molecule but this behavior
@@ -335,11 +342,6 @@ class DescriptorTest {
             Descriptor.setAromaticity(tmpMolecule2, model);
 
             IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule1, tmpMolecule2};
-            int tmpStartIndex = 0;
-            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.H_BOND_ACCEPTOR_COUNT};
-            boolean tmpIsParallelCalculation = false;
-
-            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
             float[][] tmpMatrix = new float[][]
                     {
@@ -389,6 +391,13 @@ class DescriptorTest {
         String tmpSmiles1 = "CC(=O)O"; //Acetic Acid CID: 176
         String tmpSmiles2 = "Oc1ccccc1"; // Phenol CID: 996
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.H_BOND_DONOR_COUNT};
+        boolean tmpIsParallelCalculation = false;
+
+        Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
                 Aromaticity.Model.CDK_2x,
@@ -410,11 +419,6 @@ class DescriptorTest {
             Descriptor.setAromaticity(tmpMolecule2, model);
 
             IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule1, tmpMolecule2};
-            int tmpStartIndex = 0;
-            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.H_BOND_DONOR_COUNT};
-            boolean tmpIsParallelCalculation = false;
-
-            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
             float[][] tmpMatrix = new float[][]
                     {
@@ -462,10 +466,18 @@ class DescriptorTest {
     @Test
     void test_TPSA() throws Exception {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        // Preparation of the first molecule
-        String tmpSmiles1 = "C=NC(CC#N)N(C)C"; // Not known in the PubChem database, but a valid SMILES
-        // Preparation of the second Molecule
-        String tmpSmiles2 = "CCCN(=O)=O"; // 1-Nitropropane CID: 7903
+        // 3-(dimethylamino)-3-(methyleneamino)propanenitrile (not in PubChem)
+        String tmpSmiles1 = "C=NC(CC#N)N(C)C";
+        // 1-Nitropropane CID: 7903
+        String tmpSmiles2 = "CCCN(=O)=O";
+
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.TPSA};
+        boolean tmpIsParallelCalculation = false;
+
+        double epsilon = 0.01; //tolerance range
+
+        Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
@@ -488,13 +500,6 @@ class DescriptorTest {
             Descriptor.setAromaticity(tmpMolecule2, model);
 
             IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule1, tmpMolecule2};
-            int tmpStartIndex = 0;
-            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.TPSA};
-            boolean tmpIsParallelCalculation = false;
-
-            double epsilon = 0.01; //tolerance range
-
-            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
             float[][] tmpMatrix = new float[][]
                     {
@@ -542,10 +547,17 @@ class DescriptorTest {
     @Test
     void test_LARGEST_CHAIN() throws Exception {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        // Preparation of the first molecule
-        String tmpSmiles1 = "C=CC=Cc1ccccc1"; // 1-Phenylbutadiene CID: 137048
-        // Preparation of the second molecule
-        String tmpSmiles2 = "C=CC=CCc2ccc(Cc1ccncc1C=C)cc2"; // Not known in the PubChem database, but a valid SMILES
+        // 1-Phenylbutadiene CID: 137048
+        String tmpSmiles1 = "C=CC=Cc1ccccc1";
+        // 4-(4-(penta-2,4-dien-1-yl)benzyl)-3-vinylpyridine (not in PubChem)
+        String tmpSmiles2 = "C=CC=CCc2ccc(Cc1ccncc1C=C)cc2";
+
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LARGEST_CHAIN};
+        boolean tmpIsParallelCalculation = false;
+
+        Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
         //TODO: does this descriptor really need aromaticity info?
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
@@ -568,11 +580,6 @@ class DescriptorTest {
             Descriptor.setAromaticity(tmpMolecule2, model);
 
             IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule1, tmpMolecule2};
-            int tmpStartIndex = 0;
-            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LARGEST_CHAIN};
-            boolean tmpIsParallelCalculation = false;
-
-            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
             float[][] tmpMatrix = new float[][]
                     {
@@ -620,10 +627,17 @@ class DescriptorTest {
     @Test
     void test_LONGEST_ALIPHATIC_CHAIN() throws Exception {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        // Preparation of the first molecule
-        String tmpSmiles1 = "CCCCc1ccccc1"; // Butylbenzene CID: 7705
-        // Preparation of the second molecule
-        String tmpSmiles2 = "CC(C)(C)c2ccc(OCCCC(=O)Nc1nccs1)cc2"; // 4-(4-tert-butylphenoxy)-N-(1,3-thiazol-2-yl)butanamide CID: 1565007
+        // Butylbenzene CID: 7705
+        String tmpSmiles1 = "CCCCc1ccccc1";
+        // 4-(4-tert-butylphenoxy)-N-(1,3-thiazol-2-yl)butanamide CID: 1565007
+        String tmpSmiles2 = "CC(C)(C)c2ccc(OCCCC(=O)Nc1nccs1)cc2";
+
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LONGEST_ALIPHATIC_CHAIN};
+        boolean tmpIsParallelCalculation = false;
+
+        Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
                 Aromaticity.Model.CDK_2x,
@@ -645,11 +659,6 @@ class DescriptorTest {
             Descriptor.setAromaticity(tmpMolecule2, model);
 
             IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule1, tmpMolecule2};
-            int tmpStartIndex = 0;
-            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LONGEST_ALIPHATIC_CHAIN};
-            boolean tmpIsParallelCalculation = false;
-
-            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
             float[][] tmpMatrix = new float[][]
                     {
@@ -813,14 +822,14 @@ class DescriptorTest {
     @Test
     void test_BOND_COUNT_ALL() throws Exception {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        // Preparation of the first molecule
-        String tmpSmiles1 = "CCO"; // Ethanol CID: 702
+        // Ethanol CID: 702
+        String tmpSmiles1 = "CCO";
         IAtomContainer tmpMolecule1 = tmpSmilesParser.parseSmiles(tmpSmiles1);
-        // Preparation of the second molecule
-        String tmpSmiles2 = "C=C=C"; // Allene CID: 10037
+        // Allene CID: 10037
+        String tmpSmiles2 = "C=C=C";
         IAtomContainer tmpMolecule2 = tmpSmilesParser.parseSmiles(tmpSmiles2);
-        // Preparation of the third molecule
-        String tmpSmiles3 = "CC#N"; // Acetonitrile CID: 6342
+        // Acetonitrile CID: 6342
+        String tmpSmiles3 = "CC#N";
         IAtomContainer tmpMolecule3 = tmpSmilesParser.parseSmiles(tmpSmiles3);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule1, tmpMolecule2, tmpMolecule3};
         int tmpStartIndex = 0;
@@ -988,8 +997,16 @@ class DescriptorTest {
      */
     @Test
     void test_RULE_OF_FIVE() throws Exception {
-        String tmpSmiles = "CCCC(OCC)OCC(c1cccc2ccccc12)C4CCC(CCCO)C(CC3CNCNC3)C4"; // Not known in the PubChem database, but a valid SMILES
+        // 3-(4-(2-(1-ethoxybutoxy)-1-(naphthalen-1-yl)ethyl)-2-((hexahydropyrimidin-5-yl)methyl)cyclohexyl)propan-1-ol (not in PubChem)
+        String tmpSmiles = "CCCC(OCC)OCC(c1cccc2ccccc12)C4CCC(CCCO)C(CC3CNCNC3)C4";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.RULE_OF_FIVE};
+        boolean tmpIsParallelCalculation = false;
+
+        Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
                 Aromaticity.Model.CDK_2x,
@@ -1001,17 +1018,12 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model
+            // Parse fresh molecule for each model TODO: again, necessary?
             IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
             // Apply aromaticity with the current model
             Descriptor.setAromaticity(tmpMolecule, model);
 
             IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
-            int tmpStartIndex = 0;
-            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.RULE_OF_FIVE};
-            boolean tmpIsParallelCalculation = false;
-
-            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
             float[][] tmpMatrix = new float[][]
                     {
@@ -1058,6 +1070,13 @@ class DescriptorTest {
     void test_AROMATIC_ATOMS_COUNT() throws Exception {
         String tmpSmiles = "c1ccccc1"; // Benzene CID: 241
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AROMATIC_ATOMS_COUNT};
+        boolean tmpIsParallelCalculation = false;
+
+        Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
         // Array of all available electron donation models
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
@@ -1070,17 +1089,12 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model
+            // Parse fresh molecule for each model TODO see above
             IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
             // Apply aromaticity with the current model
             Descriptor.setAromaticity(tmpMolecule, model);
 
             IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
-            int tmpStartIndex = 0;
-            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AROMATIC_ATOMS_COUNT};
-            boolean tmpIsParallelCalculation = false;
-
-            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
             float[][] tmpMatrix = new float[][]
                     {
@@ -1127,6 +1141,13 @@ class DescriptorTest {
     void test_AROMATIC_BONDS_COUNT() throws Exception {
         String tmpSmiles = "c1ccccc1"; // Benzene CID: 241
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AROMATIC_BONDS_COUNT};
+        boolean tmpIsParallelCalculation = false;
+
+        Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
                 Aromaticity.Model.CDK_2x,
@@ -1138,17 +1159,12 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model
+            // Parse fresh molecule for each model TODO see above
             IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
             // Apply aromaticity with the current model
             Descriptor.setAromaticity(tmpMolecule, model);
 
             IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
-            int tmpStartIndex = 0;
-            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AROMATIC_BONDS_COUNT};
-            boolean tmpIsParallelCalculation = false;
-
-            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
             float[][] tmpMatrix = new float[][]
                     {
@@ -1193,7 +1209,8 @@ class DescriptorTest {
      */
     @Test
     void test_ROTATABLE_BONDS_COUNT() throws Exception {
-        String tmpSmiles = "CCNC(=O)CC(C)C"; // N-ethyl-3-methylbutanamide CID: 528605
+        // N-ethyl-3-methylbutanamide CID: 528605
+        String tmpSmiles = "CCNC(=O)CC(C)C";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
@@ -1245,7 +1262,8 @@ class DescriptorTest {
      */
     @Test
     void test_FMF() throws Exception {
-        String tmpSmiles = "Clc1cc(cc(Cl)c1N)C(O)CNC(C)(C)C"; // Clenbuterol CID: 2783
+        // Clenbuterol CID: 2783
+        String tmpSmiles = "Clc1cc(cc(Cl)c1N)C(O)CNC(C)(C)C";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
@@ -1298,7 +1316,8 @@ class DescriptorTest {
      */
     @Test
     void test_FRACTIONAL_CSP3() throws Exception {
-        String tmpSmiles = "CC1=CC=CC(C)=N1"; // 2,6-Dimethylpyridine CID: 7937
+        // 2,6-Dimethylpyridine CID: 7937
+        String tmpSmiles = "CC1=CC=CC(C)=N1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
@@ -1513,7 +1532,8 @@ class DescriptorTest {
      */
     @Test
     void test_SPIRO_ATOM_COUNT() throws Exception {
-        String tmpSmiles = "C1CCC2(CC1)CC=C1C=CC=CC1=C2"; // Not known in the PubChem database, but a valid SMILES
+        // 3'H-spiro[cyclohexane-1,2'-naphthalene] (not in PubChem)
+        String tmpSmiles = "C1CCC2(CC1)CC=C1C=CC=CC1=C2";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
@@ -1572,7 +1592,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.V_ADJ_MAT};
         boolean tmpIsParallelCalculation = false;
-        double epsilon = 0.001; // tolerance range
+        double epsilon = 0.001; // tolerance range TODO: I'm only realising now that the epsilon is different in most cases; what is the rationale behind choosing the value?
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1625,7 +1645,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.WEIGHTED_PATH};
         boolean tmpIsParallelCalculation = false;
-        double epsilon = 0.00001; // tolerance range
+        double epsilon = 0.00001; // tolerance range TODO: a very small tolerance range, is there a reason for it? Or are the others just really large?
 
         Assertions.assertEquals(5, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1859,6 +1879,14 @@ class DescriptorTest {
     void test_X_LOG_P() throws Exception {
         String tmpSmiles = "O=C(O)C(N)CCCN"; // 2,5-Diaminopentanoic Acid CID: 389
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.X_LOG_P};
+        boolean tmpIsParallelCalculation = false;
+        double epsilon = 0.1; // tolerance range TODO: here, for example, is the tolerance so big because of the different models used?
+
+        Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
+
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
                 Aromaticity.Model.CDK_2x,
@@ -1870,18 +1898,12 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model
+            // Parse fresh molecule for each model TODO see above
             IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
             // Apply aromaticity with the current model
             Descriptor.setAromaticity(tmpMolecule, model);
 
             IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
-            int tmpStartIndex = 0;
-            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.X_LOG_P};
-            boolean tmpIsParallelCalculation = false;
-            double epsilon = 0.1; // tolerance range
-
-            Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
             float[][] tmpMatrix = new float[][]
                     {
@@ -2009,7 +2031,7 @@ class DescriptorTest {
 
         tmpMatrix = new float[][]
                 {
-                        {0f}
+                        {0f} //TODO: BTW, does the matrix necessarily have to be initialised with zeros to use the library?
                 };
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
@@ -2057,6 +2079,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
+        //TODO: I know, this is taken like that from the CDK tests; but could we maybe test for the actual values instead of != 0?
         Assertions.assertNotEquals(0f, tmpMatrix[0][0]);
         Assertions.assertNotEquals(0f, tmpMatrix[0][1]);
         Assertions.assertNotEquals(0f, tmpMatrix[0][2]);
@@ -2117,6 +2140,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
+        //TODO see above
         Assertions.assertNotEquals(0f, tmpMatrix[0][0]);
         Assertions.assertNotEquals(0f, tmpMatrix[0][1]);
         Assertions.assertNotEquals(0f, tmpMatrix[0][2]);
@@ -2179,6 +2203,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
+        //TODO: we need to find a better solution for this, there should be no print-outs; maybe there are example values in the original publication?
         System.out.println("New calculation results:");
         System.out.println(Arrays.toString(tmpMatrix[0]));
 
@@ -2524,7 +2549,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor FRACTIONAL_PSA.
-     * Expected results were calculated by TPSADescriptor / MolecularWeightDescriptor.
+     * Expected results were calculated by TPSADescriptor / MolecularWeightDescriptor. TODO: nice!
      * 
      * @throws Exception if anything goes wrong
      */
@@ -2583,7 +2608,8 @@ class DescriptorTest {
      */
     @Test
     void test_LARGEST_PI_SYSTEM() throws Exception {
-        String tmpSmiles = "C=CC=CCc2ccc(Cc1ccncc1C=C)cc2"; // Not known in the PubChem database, but a valid SMILES
+        //4-(4-(penta-2,4-dien-1-yl)benzyl)-3-vinylpyridine (not in PubChem)
+        String tmpSmiles = "C=CC=CCc2ccc(Cc1ccncc1C=C)cc2";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
@@ -2636,8 +2662,15 @@ class DescriptorTest {
      */
     @Test
     void test_SMALL_RING() throws Exception {
-        String tmpSmiles = "O=C1c2ccccc2C(=O)c2cc3cc4ccccc4cc3cc21"; // 5,14-Pentacenedione CID: 10686237
+        // 5,14-Pentacenedione CID: 10686237
+        String tmpSmiles = "O=C1c2ccccc2C(=O)c2cc3cc4ccccc4cc3cc21";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+
+        int tmpStartIndex = 0;
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.SMALL_RING};
+        boolean tmpIsParallelCalculation = false;
+
+        Assertions.assertEquals(11, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
@@ -2650,18 +2683,13 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model
+            // Parse fresh molecule for each model TODO see above
             IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
 
             // Apply aromaticity with the current model
             Descriptor.setAromaticity(tmpMolecule, model);
 
             IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
-            int tmpStartIndex = 0;
-            Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.SMALL_RING};
-            boolean tmpIsParallelCalculation = false;
-
-            Assertions.assertEquals(11, Descriptor.getNumberOfComponents(tmpDescriptors));
 
             float[][] tmpMatrix = new float[][]
                     {
@@ -2817,11 +2845,11 @@ class DescriptorTest {
     @Test
     void test_AMINO_ACID_COUNT() throws Exception {
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        // Preparation of the first molecule
-        String tmpSmiles1 = "N[C@@]([H])([C@]([H])(O)C)C(=O)N[C@@]([H])([C@]([H])(O)C)C(=O)O"; // L-threonyl-L-threonine CID: 11321969
+        // L-threonyl-L-threonine CID: 11321969
+        String tmpSmiles1 = "N[C@@]([H])([C@]([H])(O)C)C(=O)N[C@@]([H])([C@]([H])(O)C)C(=O)O";
         IAtomContainer tmpMolecule1 = tmpSmilesParser.parseSmiles(tmpSmiles1);
-        // Preparation of the second molecule
-        String tmpSmiles2 = "C(C(=O)NCC(=O)O)N"; // Glycylglycine CID: 11163
+        // Glycylglycine CID: 11163
+        String tmpSmiles2 = "C(C(=O)NCC(=O)O)N";
         IAtomContainer tmpMolecule2 = tmpSmilesParser.parseSmiles(tmpSmiles2);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule1, tmpMolecule2};
         int tmpStartIndex = 0;
@@ -2847,7 +2875,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(2, tmpMatrix[0][8]);
+        Assertions.assertEquals(2, tmpMatrix[0][8]); //TODO: is this the inherent behaviour of this descriptor, that all amino acid moieties are also detected as Glycine?
         Assertions.assertEquals(2, tmpMatrix[0][16]);
         Assertions.assertEquals(2, tmpMatrix[1][8]);
 
@@ -2880,7 +2908,8 @@ class DescriptorTest {
      */
     @Test
     void test_KIER_HALL_SMARTS() throws Exception {
-        String tmpSmiles = "c1c(CN)cc(CCNC)cc1C(CO)CC(=O)CCOCCCO"; // Not known in the PubChem database, but a valid SMILES
+        //5-(3-(aminomethyl)-5-(2-(methylamino)ethyl)phenyl)-6-hydroxy-1-(3-hydroxypropoxy)hexan-3-one (not in PubChem)
+        String tmpSmiles = "c1c(CN)cc(CCNC)cc1C(CO)CC(=O)CCOCCCO";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
@@ -2940,7 +2969,8 @@ class DescriptorTest {
      */
     @Test
     void test_ECCENTRIC_CONNECTIVITY_INDEX() throws Exception {
-        String tmpSmiles = "C[C@H]1CC[C@H]2[C@@H](C)C(=O)O[C@@H]3O[C@@]4(C)CC[C@@H]1[C@]32OO4"; // (1R,4S,5S,8S,9R,12S,13R)-1,5,9-trimethyl-11,14,15,16-tetraoxatetracyclo[10.3.1.04,13.08,13]hexadecan-10-one CID: 98047509
+        // (1R,4S,5S,8S,9R,12S,13R)-1,5,9-trimethyl-11,14,15,16-tetraoxatetracyclo[10.3.1.04,13.08,13]hexadecan-10-one CID: 98047509
+        String tmpSmiles = "C[C@H]1CC[C@H]2[C@@H](C)C(=O)O[C@@H]3O[C@@]4(C)CC[C@@H]1[C@]32OO4";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
@@ -2992,7 +3022,8 @@ class DescriptorTest {
      */
     @Test
     void test_MDE() throws Exception {
-        String tmpSmiles = "COOC(C)(CO)OOC"; // Not known in the PubChem database, but a valid SMILES
+        //2,2-bis(methylperoxy)propan-1-ol (not in PubChem)
+        String tmpSmiles = "COOC(C)(CO)OOC";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
@@ -3049,7 +3080,8 @@ class DescriptorTest {
      */
     @Test
     void test_VABC() throws Exception {
-        String tmpSmiles = "COc2ccc1[nH]c(nc1c2)S(=O)Cc3ncc(C)c(OC)c3C"; // Prilosec CID: 4594
+        // Prilosec CID: 4594
+        String tmpSmiles = "COc2ccc1[nH]c(nc1c2)S(=O)Cc3ncc(C)c(OC)c3C";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
@@ -3103,7 +3135,8 @@ class DescriptorTest {
      */
     @Test
     void test_PUBCHEM_FINGERPRINT() throws Exception {
-        String tmpSmiles = "C1=CC=C(C=C1)C[N+]2=C(C=C(C=C2C=CC3=CC=CC=C3)C4=CC=CC=C4)C5=CC=CC=C5"; // 1-Benzyl-2,4-diphenyl-6-(2-phenylethenyl)pyridin-1-ium CID: 3828524
+        // 1-Benzyl-2,4-diphenyl-6-(2-phenylethenyl)pyridin-1-ium CID: 3828524
+        String tmpSmiles = "C1=CC=C(C=C1)C[N+]2=C(C=C(C=C2C=CC3=CC=CC=C3)C4=CC=CC=C4)C5=CC=CC=C5";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
@@ -3112,13 +3145,15 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.PUBCHEM_FINGERPRINTER};
         boolean tmpIsParallelCalculation = false;
         // Verify that expected bits are set (convert reference fingerprint to expected values)
-        BitSet ref = PubchemFingerprinter
-                .decode("AAADceB+AAAAAAAAAAAAAAAAAAAAAAAAAAA8YMGCAAAAAAAB1AAAHAAAAAAADAjBHgQwgJMMEACgAyRiRACCgCAhAiAI2CA4ZJgIIOLAkZGEIAhggADIyAcQgMAOgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==");
+        BitSet ref = PubchemFingerprinter.decode(
+                "AAADceB+AAAAAAAAAAAAAAAAAAAAAAAAAAA8YMGCAAAAAAAB1AAAHAAAAAAADAjBHgQwgJMMEACgAyRiRACCgCAhAiAI2CA4ZJgIIOLAkZGEIAhggADIyAcQgMAOgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+        );
 
         // Test descriptor component count
         Assertions.assertEquals(881, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         float[][] tmpMatrix = new float[1][881];
+        Arrays.fill(tmpMatrix[0], 0f);
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
 
         Assertions.assertTrue(
@@ -3138,6 +3173,7 @@ class DescriptorTest {
         }
 
         tmpMatrix = new float[1][881];
+        Arrays.fill(tmpMatrix[0], 0f);
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
 
         Assertions.assertTrue(
@@ -3165,6 +3201,7 @@ class DescriptorTest {
      */
     @Test
     void test_MACCS_FINGERPRINTER() throws Exception {
+        //1,2-Diphenylethane CID: 7647
         String tmpSmiles = "c1ccccc1CCc1ccccc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -3177,6 +3214,7 @@ class DescriptorTest {
         Assertions.assertEquals(166, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         float[][] tmpMatrix = new float[1][166];
+        Arrays.fill(tmpMatrix[0], 0f);
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
                 Descriptor.setDescriptorsForMoleculesByMoleculeParallelization(
@@ -3192,6 +3230,7 @@ class DescriptorTest {
         Assertions.assertEquals(0, tmpMatrix[0][165]);
 
         tmpMatrix = new float[1][166];
+        Arrays.fill(tmpMatrix[0], 0f);
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
                 Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
@@ -3208,24 +3247,31 @@ class DescriptorTest {
     }
 
     /**
-     * Test method for descriptor CIRCULAR_FINGERPRINTER_ECFP.
+     * Test method for all CIRCULAR_FINGERPRINTER_ECFP descriptors of different diameters.
      * 
      * @throws Exception if anything goes wrong
      */
     @Test
     void test_CIRCULAR_FINGERPRINTER_ECFP() throws Exception {
+        //1,2-Diphenylethane CID: 7647
         String tmpSmiles = "c1ccccc1CCc1ccccc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CIRCULAR_FINGERPRINTER_ECFP_0,Descriptor.CIRCULAR_FINGERPRINTER_ECFP_2, Descriptor.CIRCULAR_FINGERPRINTER_ECFP_4, Descriptor.CIRCULAR_FINGERPRINTER_ECFP_6};
+        Descriptor[] tmpDescriptors = new Descriptor[]{
+                Descriptor.CIRCULAR_FINGERPRINTER_ECFP_0,
+                Descriptor.CIRCULAR_FINGERPRINTER_ECFP_2,
+                Descriptor.CIRCULAR_FINGERPRINTER_ECFP_4,
+                Descriptor.CIRCULAR_FINGERPRINTER_ECFP_6
+        };
         boolean tmpIsParallelCalculation = false;
 
         Assertions.assertEquals(1024 * 4, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         float[][] tmpMatrix = new float[1][1024 * 4];
+        Arrays.fill(tmpMatrix[0], 0f);
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
                 Descriptor.setDescriptorsForMoleculesByMoleculeParallelization(
@@ -3240,6 +3286,7 @@ class DescriptorTest {
         Assertions.assertEquals(0, aNanPositions.size());
 
         tmpMatrix = new float[1][1024 * 4];
+        Arrays.fill(tmpMatrix[0], 0f);
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
                 Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
@@ -3255,24 +3302,31 @@ class DescriptorTest {
     }
 
     /**
-     * Test method for descriptor CIRCULAR_FINGERPRINTER_FCFP.
+     * Test method for all CIRCULAR_FINGERPRINTER_FCFP descriptors of different diameters.
      * 
      * @throws Exception if anything goes wrong
      */
     @Test
     void test_CIRCULAR_FINGERPRINTER_FCFP() throws Exception {
+        //1,2-Diphenylethane CID: 7647
         String tmpSmiles = "c1ccccc1CCc1ccccc1";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.CIRCULAR_FINGERPRINTER_FCFP_0, Descriptor.CIRCULAR_FINGERPRINTER_FCFP_2, Descriptor.CIRCULAR_FINGERPRINTER_FCFP_4, Descriptor.CIRCULAR_FINGERPRINTER_FCFP_6};
+        Descriptor[] tmpDescriptors = new Descriptor[]{
+                Descriptor.CIRCULAR_FINGERPRINTER_FCFP_0,
+                Descriptor.CIRCULAR_FINGERPRINTER_FCFP_2,
+                Descriptor.CIRCULAR_FINGERPRINTER_FCFP_4,
+                Descriptor.CIRCULAR_FINGERPRINTER_FCFP_6
+        };
         boolean tmpIsParallelCalculation = false;
 
         Assertions.assertEquals(4 * 1024, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         float[][] tmpMatrix = new float[1][4 * 1024];
+        Arrays.fill(tmpMatrix[0], 0f);
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
                 Descriptor.setDescriptorsForMoleculesByMoleculeParallelization(
@@ -3287,6 +3341,7 @@ class DescriptorTest {
         Assertions.assertEquals(0, aNanPositions.size());
 
         tmpMatrix = new float[1][4 * 1024];
+        Arrays.fill(tmpMatrix[0], 0f);
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
                 Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
