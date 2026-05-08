@@ -60,7 +60,7 @@ repositories {
     maven { url = uri("https://central.sonatype.com/repository/maven-snapshots/") }
 }
 
-def cdkVersion = '2.12-SNAPSHOT'
+def cdkVersion = '2.13-SNAPSHOT'
 
 dependencies {
     implementation group: 'org.jetbrains', name : 'annotations', version: '23.0.0'

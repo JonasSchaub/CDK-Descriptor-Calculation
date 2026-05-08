@@ -42,7 +42,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-//TODO test descriptors for how they handle emtpy molecules and empty SMILES strings.
+//TODO test descriptors for how they handle empty molecules and empty SMILES strings.
 /**
  * Test class for Descriptor class.
  * Note: For adding tests of a new descriptor goto "Add new descriptor tests here!"
@@ -131,7 +131,6 @@ class DescriptorTest {
                             {0f, 0f}
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
@@ -190,7 +189,6 @@ class DescriptorTest {
                     };
 
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
@@ -352,7 +350,6 @@ class DescriptorTest {
                                 {0f}, {0f}
                         };
                 List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
-                aNanPositions = Collections.synchronizedList(new LinkedList<>());
                 Assertions.assertTrue(
                         Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                                 tmpDescriptors,
@@ -3678,7 +3675,6 @@ class DescriptorTest {
                 tmpMatrix1[i] = new float[tmpNumberOfComponents];
             }
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
-            aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
                     Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
@@ -3779,9 +3775,9 @@ class DescriptorTest {
     @Test
     void testCreateMoleculeWithExplicitHydrogens() throws Exception {
         // Create a simple molecule (methane) with implicit hydrogen atoms
-        String methanSmiles = "C";
+        String methaneSmiles = "C";
         SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
-        IAtomContainer methaneImplicit = smilesParser.parseSmiles(methanSmiles);
+        IAtomContainer methaneImplicit = smilesParser.parseSmiles(methaneSmiles);
 
         // Ensure the input is correct (1 atom, no bonds to H)
         Assertions.assertEquals(1, methaneImplicit.getAtomCount(),
