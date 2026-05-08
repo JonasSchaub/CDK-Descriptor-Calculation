@@ -72,6 +72,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.MOLECULAR_WEIGHT};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.01; // tolerance range
+        float tmpExpected = 60.05f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -90,7 +91,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(60.05, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -107,7 +108,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(60.05, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
     }
 
     /**
@@ -124,6 +125,8 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.WIENER_NUMBER};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpectedWienerPath = 9.0f; // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
+        float tmpExpectedWienerPolarity = 0.0f; // there are no atoms that are 3 bonds apart
 
         Assertions.assertEquals(2, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -142,8 +145,8 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(9.0, tmpMatrix[0][0]); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
-        Assertions.assertEquals(0.0, tmpMatrix[0][1]); // there are no atoms that are 3 bonds apart
+        Assertions.assertEquals(tmpExpectedWienerPath, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpectedWienerPolarity, tmpMatrix[0][1]);
 
         tmpMatrix = new float[][]
                 {
@@ -160,8 +163,8 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(9.0, tmpMatrix[0][0]); // 1(C1C2)+2(C1O1)+2(C1O2)+1(C2O1)+1(C2O2)+2(O1O2) = 9
-        Assertions.assertEquals(0.0, tmpMatrix[0][1]); // there are no atoms that are 3 bonds apart
+        Assertions.assertEquals(tmpExpectedWienerPath, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpectedWienerPolarity, tmpMatrix[0][1]);
     }
 
     //TODO: the CDK definitely needs a heavy atom count descriptor or a way to configure this descriptor to only count heavy atoms. Let's discuss how to best realise this.
@@ -179,6 +182,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ATOM_COUNT};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpected = 8.0f; // Acetic acid has 8 atoms (implicit Hs included)
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -198,7 +202,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(8.0, tmpMatrix[0][0]); // Acetic acid has 8 atoms
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
 
         tmpMatrix = new float[][]
                 {
@@ -215,7 +219,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(8.0, tmpMatrix[0][0]); // Acetic acid has 8 atoms
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
     }
 
     /**
@@ -247,6 +251,19 @@ class DescriptorTest {
 
         Assertions.assertEquals(10, Descriptor.getNumberOfComponents(tmpDescriptors));
 
+        float[] tmpExpected = new float[]{
+                62, // C count
+                88, // H count
+                13, // N count
+                14, // O count
+                0, // S count
+                1, // P count
+                0, // F count
+                0, // Br count
+                0, // Cl count
+                0 // I count
+        };
+
         float[][] tmpMatrix = new float[][]
                 {
                         {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
@@ -262,16 +279,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(62, tmpMatrix[0][0]); // C count
-        Assertions.assertEquals(88, tmpMatrix[0][1]); // H count
-        Assertions.assertEquals(13, tmpMatrix[0][2]); // N count
-        Assertions.assertEquals(14, tmpMatrix[0][3]); // O count
-        Assertions.assertEquals(0, tmpMatrix[0][4]);  // S count
-        Assertions.assertEquals(1, tmpMatrix[0][5]);  // P count
-        Assertions.assertEquals(0, tmpMatrix[0][6]);  // F count
-        Assertions.assertEquals(0, tmpMatrix[0][7]);  // Br count
-        Assertions.assertEquals(0, tmpMatrix[0][8]);  // Cl count
-        Assertions.assertEquals(0, tmpMatrix[0][9]);  // I count
+        Assertions.assertArrayEquals(tmpExpected, tmpMatrix[0]);
 
         tmpMatrix = new float[][]
                 {
@@ -288,16 +296,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(62, tmpMatrix[0][0]); // C count
-        Assertions.assertEquals(88, tmpMatrix[0][1]); // H count
-        Assertions.assertEquals(13, tmpMatrix[0][2]); // N count
-        Assertions.assertEquals(14, tmpMatrix[0][3]);  // O count
-        Assertions.assertEquals(0, tmpMatrix[0][4]);  // S count
-        Assertions.assertEquals(1, tmpMatrix[0][5]);  // P count
-        Assertions.assertEquals(0, tmpMatrix[0][6]);  // F count
-        Assertions.assertEquals(0, tmpMatrix[0][7]);  // Br count
-        Assertions.assertEquals(0, tmpMatrix[0][8]);  // Cl count
-        Assertions.assertEquals(0, tmpMatrix[0][9]);  // I count
+        Assertions.assertArrayEquals(tmpExpected, tmpMatrix[0]);
     }
 
     /**
@@ -314,6 +313,8 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.H_BOND_ACCEPTOR_COUNT};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpectedMol1 = 2f;
+        float tmpExpectedMol2 = 1f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -358,8 +359,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(2, tmpMatrix[0][0]);
-            Assertions.assertEquals(1, tmpMatrix[1][0]);
+            Assertions.assertEquals(tmpExpectedMol1, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpectedMol2, tmpMatrix[1][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -376,8 +377,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(2, tmpMatrix[0][0]);
-            Assertions.assertEquals(1, tmpMatrix[1][0]);
+            Assertions.assertEquals(tmpExpectedMol1, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpectedMol2, tmpMatrix[1][0]);
         }
     }
 
@@ -395,6 +396,8 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.H_BOND_DONOR_COUNT};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpectedMol1 = 1f; // Acetic acid has 1 hydrogen bond donor
+        float tmpExpectedMol2 = 1f; // Phenol has 1 hydrogen bond donor
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -435,8 +438,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(1, tmpMatrix[0][0]); // Acetic acid has 1 hydrogen bond donor
-            Assertions.assertEquals(1, tmpMatrix[1][0]); // Phenol has 1 hydrogen bond donor
+            Assertions.assertEquals(tmpExpectedMol1, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpectedMol2, tmpMatrix[1][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -453,8 +456,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(1, tmpMatrix[0][0]); // Acetic acid has 1 hydrogen bond donor
-            Assertions.assertEquals(1, tmpMatrix[1][0]); // Phenol has 1 hydrogen bond donor
+            Assertions.assertEquals(tmpExpectedMol1, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpectedMol2, tmpMatrix[1][0]);
         }
     }
 
@@ -476,6 +479,8 @@ class DescriptorTest {
         boolean tmpIsParallelCalculation = false;
 
         double epsilon = 0.01; //tolerance range
+        float tmpExpectedMol1 = 39.39f;
+        float tmpExpectedMol2 = 45.82f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -516,8 +521,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(39.39, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(45.82, tmpMatrix[1][0], epsilon);
+            Assertions.assertEquals(tmpExpectedMol1, tmpMatrix[0][0], epsilon);
+            Assertions.assertEquals(tmpExpectedMol2, tmpMatrix[1][0], epsilon);
 
             tmpMatrix = new float[][]
                     {
@@ -534,8 +539,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(39.39, tmpMatrix[0][0], epsilon);
-            Assertions.assertEquals(45.82, tmpMatrix[1][0], epsilon);
+            Assertions.assertEquals(tmpExpectedMol1, tmpMatrix[0][0], epsilon);
+            Assertions.assertEquals(tmpExpectedMol2, tmpMatrix[1][0], epsilon);
         }
     }
 
@@ -555,6 +560,8 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LARGEST_CHAIN};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpectedMol1 = 4f;
+        float tmpExpectedMol2 = 5f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -596,8 +603,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(4, tmpMatrix[0][0]);
-            Assertions.assertEquals(5, tmpMatrix[1][0]);
+            Assertions.assertEquals(tmpExpectedMol1, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpectedMol2, tmpMatrix[1][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -614,8 +621,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(4, tmpMatrix[0][0]);
-            Assertions.assertEquals(5, tmpMatrix[1][0]);
+            Assertions.assertEquals(tmpExpectedMol1, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpectedMol2, tmpMatrix[1][0]);
         }
     }
 
@@ -635,6 +642,8 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LONGEST_ALIPHATIC_CHAIN};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpectedMol1 = 4f;
+        float tmpExpectedMol2 = 4f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -675,8 +684,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(4, tmpMatrix[0][0]);
-            Assertions.assertEquals(4, tmpMatrix[1][0]);
+            Assertions.assertEquals(tmpExpectedMol1, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpectedMol2, tmpMatrix[1][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -693,8 +702,8 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(4, tmpMatrix[0][0]);
-            Assertions.assertEquals(4, tmpMatrix[1][0]);
+            Assertions.assertEquals(tmpExpectedMol1, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpectedMol2, tmpMatrix[1][0]);
         }
     }
 
@@ -713,6 +722,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.MANNHOLD_LOGP};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.01; //tolerance range
+        float tmpExpected = 1.57f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -731,7 +741,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1.57, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -748,7 +758,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1.57, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
     }
 
     /**
@@ -767,6 +777,8 @@ class DescriptorTest {
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.00001; // tolerance range
 
+        float[] tmpExpected = new float[] {11.881587f, 16.005958f, -0.381844f, 0.325509f, 3.374638f, 5.033583f};
+
         Assertions.assertEquals(6, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         float[][] tmpMatrix = new float[][]
@@ -784,12 +796,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(11.881587, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(16.005958, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(-0.381844, tmpMatrix[0][2], epsilon);
-        Assertions.assertEquals(0.325509, tmpMatrix[0][3], epsilon);
-        Assertions.assertEquals(3.374638, tmpMatrix[0][4], epsilon);
-        Assertions.assertEquals(5.033583, tmpMatrix[0][5], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
 
         tmpMatrix = new float[][]
                 {
@@ -806,12 +816,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(11.881587, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(16.005958, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(-0.381844, tmpMatrix[0][2], epsilon);
-        Assertions.assertEquals(0.325509, tmpMatrix[0][3], epsilon);
-        Assertions.assertEquals(3.374638, tmpMatrix[0][4], epsilon);
-        Assertions.assertEquals(5.033583, tmpMatrix[0][5], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
     }
 
     /**
@@ -835,6 +843,8 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BOND_COUNT_ALL};
         boolean tmpIsParallelCalculation = false;
+        //same total bond count for all three molecules
+        float tmpExpected = 2f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -853,9 +863,9 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(2, tmpMatrix[0][0]);
-        Assertions.assertEquals(2, tmpMatrix[1][0]);
-        Assertions.assertEquals(2, tmpMatrix[2][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[1][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[2][0]);
 
         tmpMatrix = new float[][]
                 {
@@ -872,9 +882,9 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(2, tmpMatrix[0][0]);
-        Assertions.assertEquals(2, tmpMatrix[1][0]);
-        Assertions.assertEquals(2, tmpMatrix[2][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[1][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[2][0]);
     }
 
     /**
@@ -898,6 +908,10 @@ class DescriptorTest {
 
         Assertions.assertEquals(3, Descriptor.getNumberOfComponents(tmpDescriptors));
 
+        float tmpExpectedSingleBonds = 1f;
+        float tmpExpectedDoubleBonds = 1f;
+        float tmpExpectedTripleBonds = 1f;
+
         float[][] tmpMatrix = new float[][]
                 {
                         {0f, 0f, 0f}
@@ -913,9 +927,9 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1, tmpMatrix[0][0]); // Single bonds
-        Assertions.assertEquals(1, tmpMatrix[0][1]); // Double bonds
-        Assertions.assertEquals(1, tmpMatrix[0][2]); // Triple bonds
+        Assertions.assertEquals(tmpExpectedSingleBonds, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpectedDoubleBonds, tmpMatrix[0][1]);
+        Assertions.assertEquals(tmpExpectedTripleBonds, tmpMatrix[0][2]);
 
         tmpMatrix = new float[][]
                 {
@@ -932,9 +946,9 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1, tmpMatrix[0][0]); // Single bonds
-        Assertions.assertEquals(1, tmpMatrix[0][1]); // Double bonds
-        Assertions.assertEquals(1, tmpMatrix[0][2]); // Triple bonds
+        Assertions.assertEquals(tmpExpectedSingleBonds, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpectedDoubleBonds, tmpMatrix[0][1]);
+        Assertions.assertEquals(tmpExpectedTripleBonds, tmpMatrix[0][2]);
     }
 
     /**
@@ -952,6 +966,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.B_POL};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.01; // tolerance range
+        float tmpExpected = 7.517242f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -970,7 +985,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(7.517242, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -987,7 +1002,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(7.517242, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
     }
 
     /**
@@ -1004,6 +1019,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.RULE_OF_FIVE};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpected = 3f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1040,7 +1056,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(3, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -1057,7 +1073,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(3, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
         }
     }
 
@@ -1074,6 +1090,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AROMATIC_ATOMS_COUNT};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpected = 6f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1111,7 +1128,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(6, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -1128,7 +1145,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(6, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
         }
     }
 
@@ -1145,6 +1162,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AROMATIC_BONDS_COUNT};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpected = 6f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1181,7 +1199,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(6, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
 
             tmpMatrix = new float[][]
                     {
@@ -1198,7 +1216,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(6, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
         }
     }
 
@@ -1217,6 +1235,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ROTATABLE_BONDS_COUNT};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpected = 4f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1235,7 +1254,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(4, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
 
         tmpMatrix = new float[][]
                 {
@@ -1252,7 +1271,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(4, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
     }
 
     /**
@@ -1271,6 +1290,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.FMF};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.01; // tolerance range
+        float tmpExpected = 0.353f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1289,7 +1309,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.353, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -1306,7 +1326,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.353, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
     }
 
     /**
@@ -1325,6 +1345,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.FRACTIONAL_CSP3};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.01; // tolerance range
+        float tmpExpected = 0.29f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1343,7 +1364,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.29, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -1360,7 +1381,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.29, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
     }
 
     /**
@@ -1377,6 +1398,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.HYBRIDIZATION_RATIO};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpected = 1.00f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1395,7 +1417,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1.00, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
 
         tmpMatrix = new float[][]
                 {
@@ -1412,7 +1434,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1.00, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
     }
 
     /**
@@ -1431,6 +1453,8 @@ class DescriptorTest {
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.0001; // tolerance range
 
+        float[] tmpExpected = new float[] {5.0f, 2.25f, 4.0f};
+
         Assertions.assertEquals(3, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         float[][] tmpMatrix = new float[][]
@@ -1448,9 +1472,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(5.0, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(2.25, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(4.0, tmpMatrix[0][2], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
 
         tmpMatrix = new float[][]
                 {
@@ -1467,9 +1492,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(5.0, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(2.25, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(4.0, tmpMatrix[0][2], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
     }
 
     /**
@@ -1487,6 +1513,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.PETITJEAN_NUMBER};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.01; // tolerance range
+        float tmpExpected = 0.33333334f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1505,7 +1532,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.33333334, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -1522,7 +1549,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.33333334, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
     }
 
     /**
@@ -1540,6 +1567,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.SPIRO_ATOM_COUNT};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpected = 1f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1558,7 +1586,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
 
         tmpMatrix = new float[][]
                 {
@@ -1575,7 +1603,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
     }
 
     /**
@@ -1593,6 +1621,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.V_ADJ_MAT};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.001; // tolerance range TODO: I'm only realising now that the epsilon is different in most cases; what is the rationale behind choosing the value?
+        float tmpExpected = 4.459f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1611,7 +1640,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(4.459, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -1628,7 +1657,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(4.459, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
     }
 
     /**
@@ -1647,6 +1676,8 @@ class DescriptorTest {
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.00001; // tolerance range TODO: a very small tolerance range, is there a reason for it? Or are the others just really large?
 
+        float[] tmpExpected = new float[] {6.87132f, 1.71783f, 0.0f, 0.0f, 0.0f};
+
         Assertions.assertEquals(5, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         float[][] tmpMatrix = new float[][]
@@ -1664,11 +1695,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(6.87132, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(1.71783, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(0.0, tmpMatrix[0][2], epsilon);
-        Assertions.assertEquals(0.0, tmpMatrix[0][3], epsilon);
-        Assertions.assertEquals(0.0, tmpMatrix[0][4], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
 
         tmpMatrix = new float[][]
                 {
@@ -1685,11 +1715,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(6.87132, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(1.71783, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(0.0, tmpMatrix[0][2], epsilon);
-        Assertions.assertEquals(0.0, tmpMatrix[0][3], epsilon);
-        Assertions.assertEquals(0.0, tmpMatrix[0][4], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
     }
 
     /**
@@ -1707,6 +1736,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ZAGREB_INDEX};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.0001; // tolerance range
+        float tmpExpected = 16f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1725,7 +1755,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(16, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -1742,7 +1772,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(16, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
     }
 
     /**
@@ -1762,6 +1792,8 @@ class DescriptorTest {
 
         Assertions.assertEquals(9, Descriptor.getNumberOfComponents(tmpDescriptors));
 
+        float[] tmpExpected = new float[] {0f, 0f, 0f, 0f, 0f, 2f, 2f, 0f, 0f};
+
         float[][] tmpMatrix = new float[][]
                 {
                         {0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f}
@@ -1777,15 +1809,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0, tmpMatrix[0][0]);
-        Assertions.assertEquals(0, tmpMatrix[0][1]);
-        Assertions.assertEquals(0, tmpMatrix[0][2]);
-        Assertions.assertEquals(0, tmpMatrix[0][3]);
-        Assertions.assertEquals(0, tmpMatrix[0][4]);
-        Assertions.assertEquals(2, tmpMatrix[0][5]);
-        Assertions.assertEquals(2, tmpMatrix[0][6]);
-        Assertions.assertEquals(0, tmpMatrix[0][7]);
-        Assertions.assertEquals(0, tmpMatrix[0][8]);
+        Assertions.assertArrayEquals(tmpExpected, tmpMatrix[0]);
 
         tmpMatrix = new float[][]
                 {
@@ -1802,15 +1826,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0, tmpMatrix[0][0]);
-        Assertions.assertEquals(0, tmpMatrix[0][1]);
-        Assertions.assertEquals(0, tmpMatrix[0][2]);
-        Assertions.assertEquals(0, tmpMatrix[0][3]);
-        Assertions.assertEquals(0, tmpMatrix[0][4]);
-        Assertions.assertEquals(2, tmpMatrix[0][5]);
-        Assertions.assertEquals(2, tmpMatrix[0][6]);
-        Assertions.assertEquals(0, tmpMatrix[0][7]);
-        Assertions.assertEquals(0, tmpMatrix[0][8]);
+        Assertions.assertArrayEquals(tmpExpected, tmpMatrix[0]);
     }
 
     /**
@@ -1829,6 +1845,8 @@ class DescriptorTest {
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.001; //tolerance range
 
+        float[] tmpExpected = new float[] {1.719f, 2.955f, 20.584f};
+
         Assertions.assertEquals(3, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         float[][] tmpMatrix = new float[][]
@@ -1846,9 +1864,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1.719, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(2.955, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(20.584, tmpMatrix[0][2], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
 
         tmpMatrix = new float[][]
                 {
@@ -1865,9 +1884,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1.719, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(2.955, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(20.584, tmpMatrix[0][2], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
     }
 
     /**
@@ -1884,6 +1904,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.X_LOG_P};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.1; // tolerance range TODO: here, for example, is the tolerance so big because of the different models used?
+        float tmpExpected = -3.30f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1920,7 +1941,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(-3.30, tmpMatrix[0][0], epsilon);
+            Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
             tmpMatrix = new float[][]
                     {
@@ -1937,7 +1958,7 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(-3.30, tmpMatrix[0][0], epsilon);
+            Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
         }
     }
 
@@ -1956,6 +1977,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.JP_LOG_P};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.1; // tolerance range
+        float tmpExpected = 0.3f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -1974,7 +1996,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.3, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -1991,7 +2013,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.3, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
     }
 
     /**
@@ -2009,6 +2031,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.A_POL};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.01; // tolerance range
+        float tmpExpected = 10.88f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -2027,7 +2050,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(10.88, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -2044,7 +2067,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(10.88, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
     }
 
     /**
@@ -2241,6 +2264,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.FRAGMENT_COMPLEXITY};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.01; // tolerance range
+        float tmpExpected = 659.00f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -2259,7 +2283,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(659.00, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -2276,7 +2300,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(659.00, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
     }
 
     /**
@@ -2295,6 +2319,8 @@ class DescriptorTest {
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.0001; // tolerance range
 
+        float[] tmpExpected = new float[] {0.2887f, 0.2887f, 0.0000f, 0.0000f, 0.0000f, 0.1667f, 0.1667f, 0.0000f, 0.0000f};
+
         Assertions.assertEquals(10, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         float[][] tmpMatrix = new float[][]
@@ -2312,14 +2338,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(0.2887, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][2], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][3], epsilon);
-        Assertions.assertEquals(0.1667, tmpMatrix[0][5], epsilon);
-        Assertions.assertEquals(0.1667, tmpMatrix[0][6], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][7], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][8], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
 
         tmpMatrix = new float[][]
                 {
@@ -2336,14 +2358,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(0.2887, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][2], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][3], epsilon);
-        Assertions.assertEquals(0.1667, tmpMatrix[0][5], epsilon);
-        Assertions.assertEquals(0.1667, tmpMatrix[0][6], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][7], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][8], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
     }
 
     /**
@@ -2362,6 +2380,8 @@ class DescriptorTest {
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.0001; // tolerance range
 
+        float[] tmpExpected = new float[]{0.2887f, 0.0000f, 0.0000f, 0.0000f, 0.1667f, 0.0000f, 0.0000f, 0.0000f};
+
         Assertions.assertEquals(8, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         float[][] tmpMatrix = new float[][]
@@ -2379,14 +2399,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][2], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][3], epsilon);
-        Assertions.assertEquals(0.1667, tmpMatrix[0][4], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][5], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][6], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][7], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
 
         tmpMatrix = new float[][]
                 {
@@ -2403,14 +2419,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.2887, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][2], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][3], epsilon);
-        Assertions.assertEquals(0.1667, tmpMatrix[0][4], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][5], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][6], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][7], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
     }
 
     /**
@@ -2429,6 +2441,8 @@ class DescriptorTest {
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.0001; // tolerance range
 
+        float[] tmpExpected = new float[]{0.7416f, 1.0934f, 1.0202f, 0.4072f, 0.5585f, 0.4376f};
+
         Assertions.assertEquals(6, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         float[][] tmpMatrix = new float[][]
@@ -2446,12 +2460,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.7416, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(1.0934, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(1.0202, tmpMatrix[0][2], epsilon);
-        Assertions.assertEquals(0.4072, tmpMatrix[0][3], epsilon);
-        Assertions.assertEquals(0.5585, tmpMatrix[0][4], epsilon);
-        Assertions.assertEquals(0.4376, tmpMatrix[0][5], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
 
         tmpMatrix = new float[][]
                 {
@@ -2468,12 +2480,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.7416, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(1.0934, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(1.0202, tmpMatrix[0][2], epsilon);
-        Assertions.assertEquals(0.4072, tmpMatrix[0][3], epsilon);
-        Assertions.assertEquals(0.5585, tmpMatrix[0][4], epsilon);
-        Assertions.assertEquals(0.4376, tmpMatrix[0][5], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
     }
 
     /**
@@ -2492,6 +2502,8 @@ class DescriptorTest {
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.0001; // tolerance range
 
+        float[] tmpExpected = new float[] {2.9916f, 1.8938f, 1.6825f, 0.5773f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 2.6927f, 1.5099f, 1.1439f};
+
         Assertions.assertEquals(16, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         float[][] tmpMatrix = new float[][]
@@ -2509,16 +2521,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(2.9916, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(1.8938, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(1.6825, tmpMatrix[0][2], epsilon);
-        Assertions.assertEquals(0.5773, tmpMatrix[0][3], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][5], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][6], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][7], epsilon);
-        Assertions.assertEquals(2.6927, tmpMatrix[0][8], epsilon);
-        Assertions.assertEquals(1.5099, tmpMatrix[0][9], epsilon);
-        Assertions.assertEquals(1.1439, tmpMatrix[0][10], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
 
         tmpMatrix = new float[][]
                 {
@@ -2535,16 +2541,10 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(2.9916, tmpMatrix[0][0], epsilon);
-        Assertions.assertEquals(1.8938, tmpMatrix[0][1], epsilon);
-        Assertions.assertEquals(1.6825, tmpMatrix[0][2], epsilon);
-        Assertions.assertEquals(0.5773, tmpMatrix[0][3], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][5], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][6], epsilon);
-        Assertions.assertEquals(0.0000, tmpMatrix[0][7], epsilon);
-        Assertions.assertEquals(2.6927, tmpMatrix[0][8], epsilon);
-        Assertions.assertEquals(1.5099, tmpMatrix[0][9], epsilon);
-        Assertions.assertEquals(1.1439, tmpMatrix[0][10], epsilon);
+        for (int i = 0; i < tmpExpected.length; i++) {
+            //cannot use Assertions.assertArrayEquals() because there is no epsilon
+            Assertions.assertEquals(tmpExpected[i], tmpMatrix[0][i], epsilon);
+        }
     }
 
     /**
@@ -2563,6 +2563,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.FRACTIONAL_PSA};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.001; // tolerance range
+        float tmpExpected = 0.4077f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -2581,7 +2582,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.4077, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -2598,7 +2599,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.4077, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
     }
 
     /**
@@ -2616,6 +2617,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.LARGEST_PI_SYSTEM};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpected = 8f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -2634,7 +2636,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(8, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
 
         tmpMatrix = new float[][]
                 {
@@ -2651,7 +2653,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(8, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
 
     }
 
@@ -2671,6 +2673,12 @@ class DescriptorTest {
         boolean tmpIsParallelCalculation = false;
 
         Assertions.assertEquals(11, Descriptor.getNumberOfComponents(tmpDescriptors));
+
+        //numbers indicate the tested descriptor value, not all values are tested here, only the first 4 positions
+        float tmpExpected0 = 5f;
+        float tmpExpected1 = 5f;
+        float tmpExpected2 = 1f;
+        float tmpExpected3 = 1f;
 
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
@@ -2706,10 +2714,10 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(5, tmpMatrix[0][0]);
-            Assertions.assertEquals(5, tmpMatrix[0][1]);
-            Assertions.assertEquals(1, tmpMatrix[0][2]);
-            Assertions.assertEquals(1, tmpMatrix[0][3]);
+            Assertions.assertEquals(tmpExpected0, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpected1, tmpMatrix[0][1]);
+            Assertions.assertEquals(tmpExpected2, tmpMatrix[0][2]);
+            Assertions.assertEquals(tmpExpected3, tmpMatrix[0][3]);
 
             tmpMatrix = new float[][]
                     {
@@ -2726,10 +2734,10 @@ class DescriptorTest {
                             aNanPositions
                     )
             );
-            Assertions.assertEquals(5, tmpMatrix[0][0]);
-            Assertions.assertEquals(5, tmpMatrix[0][1]);
-            Assertions.assertEquals(1, tmpMatrix[0][2]);
-            Assertions.assertEquals(1, tmpMatrix[0][3]);
+            Assertions.assertEquals(tmpExpected0, tmpMatrix[0][0]);
+            Assertions.assertEquals(tmpExpected1, tmpMatrix[0][1]);
+            Assertions.assertEquals(tmpExpected2, tmpMatrix[0][2]);
+            Assertions.assertEquals(tmpExpected3, tmpMatrix[0][3]);
         }
     }
 
@@ -2747,6 +2755,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.BASIC_GROUP_COUNT};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpected = 1f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -2765,7 +2774,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
 
         tmpMatrix = new float[][]
                 {
@@ -2782,7 +2791,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
     }
 
     /**
@@ -2799,6 +2808,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ACIDIC_GROUP_COUNT};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpected = 1f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -2817,7 +2827,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
 
         tmpMatrix = new float[][]
                 {
@@ -2834,7 +2844,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(1, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
     }
 
     /**
@@ -2855,6 +2865,8 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.AMINO_ACID_COUNT};
         boolean tmpIsParallelCalculation = false;
+        //expected threonine count does not apply to the 2nd mol
+        float tmpExpectedGlycineAndThreonineCount = 2f;
 
         Assertions.assertEquals(20, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -2875,9 +2887,9 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(2, tmpMatrix[0][8]); //TODO: is this the inherent behaviour of this descriptor, that all amino acid moieties are also detected as Glycine?
-        Assertions.assertEquals(2, tmpMatrix[0][16]);
-        Assertions.assertEquals(2, tmpMatrix[1][8]);
+        Assertions.assertEquals(tmpExpectedGlycineAndThreonineCount, tmpMatrix[0][8]); //TODO: is this the inherent behaviour of this descriptor, that all amino acid moieties are also detected as Glycine?
+        Assertions.assertEquals(tmpExpectedGlycineAndThreonineCount, tmpMatrix[0][16]);
+        Assertions.assertEquals(tmpExpectedGlycineAndThreonineCount, tmpMatrix[1][8]);
 
         tmpMatrix = new float[][]
                 {
@@ -2895,9 +2907,9 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(2, tmpMatrix[0][8]);
-        Assertions.assertEquals(2, tmpMatrix[0][16]);
-        Assertions.assertEquals(2, tmpMatrix[1][8]);
+        Assertions.assertEquals(tmpExpectedGlycineAndThreonineCount, tmpMatrix[0][8]);
+        Assertions.assertEquals(tmpExpectedGlycineAndThreonineCount, tmpMatrix[0][16]);
+        Assertions.assertEquals(tmpExpectedGlycineAndThreonineCount, tmpMatrix[1][8]);
 
     }
 
@@ -2916,6 +2928,12 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.KIER_HALL_SMARTS};
         boolean tmpIsParallelCalculation = false;
+        // numbers indicate the vector positions of the tested descriptor values; not all return values are tested here
+        float tmpExpected33 = 2f;
+        float tmpExpected34 = 1f;
+        float tmpExpected35 = 1f;
+        float tmpExpected20 = 1f;
+        float tmpExpected23 = 1f;
 
         Assertions.assertEquals(79, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -2934,11 +2952,11 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(2, tmpMatrix[0][33]);
-        Assertions.assertEquals(1, tmpMatrix[0][34]);
-        Assertions.assertEquals(1, tmpMatrix[0][35]);
-        Assertions.assertEquals(1, tmpMatrix[0][20]);
-        Assertions.assertEquals(1, tmpMatrix[0][23]);
+        Assertions.assertEquals(tmpExpected33, tmpMatrix[0][33]);
+        Assertions.assertEquals(tmpExpected34, tmpMatrix[0][34]);
+        Assertions.assertEquals(tmpExpected35, tmpMatrix[0][35]);
+        Assertions.assertEquals(tmpExpected20, tmpMatrix[0][20]);
+        Assertions.assertEquals(tmpExpected23, tmpMatrix[0][23]);
 
         tmpMatrix = new float[][]
                 {
@@ -2955,11 +2973,11 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(2, tmpMatrix[0][33]);
-        Assertions.assertEquals(1, tmpMatrix[0][34]);
-        Assertions.assertEquals(1, tmpMatrix[0][35]);
-        Assertions.assertEquals(1, tmpMatrix[0][20]);
-        Assertions.assertEquals(1, tmpMatrix[0][23]);
+        Assertions.assertEquals(tmpExpected33, tmpMatrix[0][33]);
+        Assertions.assertEquals(tmpExpected34, tmpMatrix[0][34]);
+        Assertions.assertEquals(tmpExpected35, tmpMatrix[0][35]);
+        Assertions.assertEquals(tmpExpected20, tmpMatrix[0][20]);
+        Assertions.assertEquals(tmpExpected23, tmpMatrix[0][23]);
     }
 
     /**
@@ -2977,6 +2995,7 @@ class DescriptorTest {
         int tmpStartIndex = 0;
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.ECCENTRIC_CONNECTIVITY_INDEX};
         boolean tmpIsParallelCalculation = false;
+        float tmpExpected = 254f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -2995,7 +3014,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(254, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
 
         tmpMatrix = new float[][]
                 {
@@ -3012,7 +3031,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(254, tmpMatrix[0][0]);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0]);
     }
 
     /**
@@ -3032,6 +3051,11 @@ class DescriptorTest {
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.0001; // tolerance range
 
+        //numbers indicate the position of the tested descriptor result; not all result values are tested here
+        float tmpExpected10 = 0.0000f;
+        float tmpExpected11 = 1.1547f;
+        float tmpExpected12 = 2.9416f;
+
         Assertions.assertEquals(19, Descriptor.getNumberOfComponents(tmpDescriptors));
 
         float[][] tmpMatrix = new float[][]
@@ -3049,9 +3073,9 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.0000, tmpMatrix[0][10], epsilon);
-        Assertions.assertEquals(1.1547, tmpMatrix[0][11], epsilon);
-        Assertions.assertEquals(2.9416, tmpMatrix[0][12], epsilon);
+        Assertions.assertEquals(tmpExpected10, tmpMatrix[0][10], epsilon);
+        Assertions.assertEquals(tmpExpected11, tmpMatrix[0][11], epsilon);
+        Assertions.assertEquals(tmpExpected12, tmpMatrix[0][12], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -3068,9 +3092,9 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(0.0000, tmpMatrix[0][10], epsilon);
-        Assertions.assertEquals(1.1547, tmpMatrix[0][11], epsilon);
-        Assertions.assertEquals(2.9416, tmpMatrix[0][12], epsilon);
+        Assertions.assertEquals(tmpExpected10, tmpMatrix[0][10], epsilon);
+        Assertions.assertEquals(tmpExpected11, tmpMatrix[0][11], epsilon);
+        Assertions.assertEquals(tmpExpected12, tmpMatrix[0][12], epsilon);
     }
 
     /**
@@ -3090,6 +3114,7 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.VABC};
         boolean tmpIsParallelCalculation = false;
         double epsilon = 0.01; // tolerance range
+        float tmpExpected = 292.23f;
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(tmpDescriptors));
 
@@ -3108,7 +3133,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(292.23, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
 
         tmpMatrix = new float[][]
                 {
@@ -3125,11 +3150,11 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
-        Assertions.assertEquals(292.23, tmpMatrix[0][0], epsilon);
+        Assertions.assertEquals(tmpExpected, tmpMatrix[0][0], epsilon);
     }
 
     /**
-     * Tests PubChem fingerprint functionality.
+     * Tests PubChem fingerprint descriptor.
      * 
      * @throws Exception if anything goes wrong
      */
@@ -3226,6 +3251,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
+        //TODO: is there no reference fingerprint?
         Assertions.assertEquals(1, tmpMatrix[0][124]);
         Assertions.assertEquals(0, tmpMatrix[0][165]);
 
@@ -3283,6 +3309,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
+        //TODO see above
         Assertions.assertEquals(0, aNanPositions.size());
 
         tmpMatrix = new float[1][1024 * 4];
@@ -3338,6 +3365,7 @@ class DescriptorTest {
                         aNanPositions
                 )
         );
+        //TODO see above
         Assertions.assertEquals(0, aNanPositions.size());
 
         tmpMatrix = new float[1][4 * 1024];
@@ -3363,11 +3391,12 @@ class DescriptorTest {
     //<editor-fold desc="Tests with all implemented descriptors">
 
     /**
-     * Tests parallelization.
+     * Tests parallelization. TODO: this test can split up into 5. And please add a bit more doc.
      * 
      * @throws Exception if anything goes wrong
      */
     @Test
+    //TODO for CDK integration: tag @Tag("SlowTest") needs to be added here
     void test_Parallelization() throws Exception {
         String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
@@ -3375,6 +3404,7 @@ class DescriptorTest {
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
         String[] tmpMoleculeStringsArray = new String[tmpNumberOfMolecules];
 
+        //fill the arrays with 1000 (independent!) instances of propionic acid
         for (int i = 0; i < tmpNumberOfMolecules; i++) {
             IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
             Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
@@ -3385,11 +3415,9 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = Descriptor.getAllDescriptors();
         int tmpNumberOfComponents = Descriptor.getNumberOfComponents(tmpDescriptors);
 
-
-        float[][] tmpMatrixSequential = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
-        }
+        //first, calculate the results sequentially
+        float[][] tmpMatrixSequential = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
+        //TODO: I again have the question here whether the matrix needs to be initialized with zeros or not; if not, we have to remove all my fill() calls above again and you should not initialize the arrays in the test methods above
         boolean tmpIsParallelCalculation = false;
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
@@ -3403,10 +3431,8 @@ class DescriptorTest {
                 )
         );
 
-        float[][] tmpMatrixParallel = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
-        }
+        //second, test the parallel calculation that uses a new descriptor instance for every calculation
+        float[][] tmpMatrixParallel = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         tmpIsParallelCalculation = true;
         List<int[]> aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
@@ -3420,16 +3446,15 @@ class DescriptorTest {
                 )
         );
 
+        //compare the results
         for (int i = 0; i < tmpNumberOfMolecules; i++) {
             for (int j = 0; j < tmpNumberOfComponents; j++) {
                 Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
             }
         }
 
-        tmpMatrixSequential = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
-        }
+        //override the results to now test the parallelization where single molecules are distributed onto threads
+        tmpMatrixSequential = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         tmpIsParallelCalculation = false;
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
@@ -3443,10 +3468,7 @@ class DescriptorTest {
                 )
         );
 
-        tmpMatrixParallel = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
-        }
+        tmpMatrixParallel = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         tmpIsParallelCalculation = true;
         aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
@@ -3460,17 +3482,17 @@ class DescriptorTest {
                 )
         );
 
+        //compare the results
         for (int i = 0; i < tmpNumberOfMolecules; i++) {
             for (int j = 0; j < tmpNumberOfComponents; j++) {
                 Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
             }
         }
 
-        tmpMatrixSequential = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
-        }
+        //override the results to now test the parallelization where batches of molecules are distributed onto threads
+        tmpMatrixSequential = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         tmpIsParallelCalculation = false;
+        int tmpBatchSize = 100;
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
                 Descriptor.setDescriptorsForMoleculesByBatchParallelization(
@@ -3478,16 +3500,13 @@ class DescriptorTest {
                         tmpMoleculesArray,
                         tmpMatrixSequential,
                         tmpStartIndex,
-                        100,
+                        tmpBatchSize,
                         tmpIsParallelCalculation,
                         aNanPositions
                 )
         );
 
-        tmpMatrixParallel = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
-        }
+        tmpMatrixParallel = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         tmpIsParallelCalculation = true;
         aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
@@ -3496,22 +3515,21 @@ class DescriptorTest {
                         tmpMoleculesArray,
                         tmpMatrixParallel,
                         tmpStartIndex,
-                        100,
+                        tmpBatchSize,
                         tmpIsParallelCalculation,
                         aNanPositionsParallel
                 )
         );
 
+        //compare the results
         for (int i = 0; i < tmpNumberOfMolecules; i++) {
             for (int j = 0; j < tmpNumberOfComponents; j++) {
                 Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
             }
         }
 
-        tmpMatrixSequential = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
-        }
+        //override the results to now test the parallelization where batches of SMILES strings are distributed onto threads
+        tmpMatrixSequential = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         tmpIsParallelCalculation = false;
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
@@ -3520,17 +3538,14 @@ class DescriptorTest {
                         tmpMoleculeStringsArray,
                         tmpMatrixSequential,
                         tmpStartIndex,
-                        100,
-                        null,
+                        tmpBatchSize,
+                        null, //use default aromaticity model
                         tmpIsParallelCalculation,
                         aNanPositions
                 )
         );
 
-        tmpMatrixParallel = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
-        }
+        tmpMatrixParallel = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         tmpIsParallelCalculation = true;
         aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
@@ -3539,23 +3554,22 @@ class DescriptorTest {
                         tmpMoleculeStringsArray,
                         tmpMatrixParallel,
                         tmpStartIndex,
-                        100,
-                        null,
+                        tmpBatchSize,
+                        null, //use default aromaticity model
                         tmpIsParallelCalculation,
                         aNanPositionsParallel
                 )
         );
 
+        //compare the results
         for (int i = 0; i < tmpNumberOfMolecules; i++) {
             for (int j = 0; j < tmpNumberOfComponents; j++) {
                 Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
             }
         }
 
-        tmpMatrixSequential = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrixSequential[i] = new float[tmpNumberOfComponents];
-        }
+        //override the results to now test the parallelization where single SMILES strings are distributed onto threads
+        tmpMatrixSequential = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         tmpIsParallelCalculation = false;
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
@@ -3564,16 +3578,13 @@ class DescriptorTest {
                         tmpMoleculeStringsArray,
                         tmpMatrixSequential,
                         tmpStartIndex,
-                        null,
+                        null, //use default aromaticity model
                         tmpIsParallelCalculation,
                         aNanPositions
                 )
         );
 
-        tmpMatrixParallel = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrixParallel[i] = new float[tmpNumberOfComponents];
-        }
+        tmpMatrixParallel = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         tmpIsParallelCalculation = true;
         aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
@@ -3582,26 +3593,27 @@ class DescriptorTest {
                         tmpMoleculeStringsArray,
                         tmpMatrixParallel,
                         tmpStartIndex,
-                        null,
+                        null, //use default aromaticity model
                         tmpIsParallelCalculation,
                         aNanPositionsParallel
                 )
         );
 
+        //compare the results
         for (int i = 0; i < tmpNumberOfMolecules; i++) {
             for (int j = 0; j < tmpNumberOfComponents; j++) {
                 Assertions.assertEquals(tmpMatrixSequential[i][j], tmpMatrixParallel[i][j]);
             }
         }
-
     }
 
     /**
-     * Tests integrity.
+     * Tests integrity. TODO: please add a bit more doc.
      * 
      * @throws Exception if anything goes wrong
      */
     @Test
+    //TODO for CDK integration: tag @Tag("SlowTest") needs to be added here
     void test_Integrity() throws Exception {
         String tmpSmiles = "CCC(=O)O"; // Propionic acid CID: 1032
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
@@ -3609,6 +3621,7 @@ class DescriptorTest {
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[tmpNumberOfMolecules];
         String[] tmpMoleculeStringsArray = new String[tmpNumberOfMolecules];
 
+        //fill the arrays with 1000 (independent!) instances of propionic acid
         for (int i = 0; i < tmpNumberOfMolecules; i++) {
             IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
             Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
@@ -3619,12 +3632,9 @@ class DescriptorTest {
         Descriptor[] tmpDescriptors = Descriptor.getAllDescriptors();
         int tmpNumberOfComponents = Descriptor.getNumberOfComponents(tmpDescriptors);
         boolean tmpIsParallelCalculation = false;
+        int tmpBatchSize = 100;
 
-
-        float[][] tmpMatrix1 = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrix1[i] = new float[tmpNumberOfComponents];
-        }
+        float[][] tmpMatrix1 = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
                 Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
@@ -3637,10 +3647,7 @@ class DescriptorTest {
                 )
         );
 
-        float[][] tmpMatrix2 = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrix2[i] = new float[tmpNumberOfComponents];
-        }
+        float[][] tmpMatrix2 = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
                 Descriptor.setDescriptorsForMoleculesByMoleculeParallelization(
@@ -3653,10 +3660,7 @@ class DescriptorTest {
                 )
         );
 
-        float[][] tmpMatrix3 = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrix3[i] = new float[tmpNumberOfComponents];
-        }
+        float[][] tmpMatrix3 = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
                 Descriptor.setDescriptorsForMoleculesByBatchParallelization(
@@ -3664,16 +3668,13 @@ class DescriptorTest {
                         tmpMoleculesArray,
                         tmpMatrix3,
                         tmpStartIndex,
-                        100,
+                        tmpBatchSize,
                         tmpIsParallelCalculation,
                         aNanPositions
                 )
         );
 
-        float[][] tmpMatrix4 = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrix4[i] = new float[tmpNumberOfComponents];
-        }
+        float[][] tmpMatrix4 = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
                 Descriptor.setDescriptorsForMoleculeBySmilesStringsBatchParallelization(
@@ -3681,16 +3682,13 @@ class DescriptorTest {
                         tmpMoleculeStringsArray,
                         tmpMatrix4,
                         tmpStartIndex,
-                        100,
-                        null,
+                        tmpBatchSize,
+                        null, //use default aromaticity model
                         tmpIsParallelCalculation,
                         aNanPositions
                 )
         );
-        float[][] tmpMatrix5 = new float[tmpNumberOfMolecules][];
-        for (int i = 0; i < tmpNumberOfMolecules; i++) {
-            tmpMatrix5[i] = new float[tmpNumberOfComponents];
-        }
+        float[][] tmpMatrix5 = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
                 Descriptor.setDescriptorsForMoleculesBySmilesStringParallelization(
@@ -3698,7 +3696,7 @@ class DescriptorTest {
                         tmpMoleculeStringsArray,
                         tmpMatrix5,
                         tmpStartIndex,
-                        null,
+                        null, //use default aromaticity model
                         tmpIsParallelCalculation,
                         aNanPositions
                 )
@@ -3712,7 +3710,6 @@ class DescriptorTest {
                 Assertions.assertEquals(tmpMatrix1[i][j], tmpMatrix5[i][j]);
             }
         }
-
     }
     //</editor-fold>
 
@@ -3731,7 +3728,7 @@ class DescriptorTest {
 
         // Ensure the input is correct (1 atom, no bonds to H)
         Assertions.assertEquals(1, methaneImplicit.getAtomCount(),
-                "Original methane should only have 1 atom");
+                "Original methane should only have 1 heavy/explicit atom at this point");
         Assertions.assertEquals(0, methaneImplicit.getBondCount(),
                 "Original methane should have no bonds");
 
@@ -3761,7 +3758,7 @@ class DescriptorTest {
 
         // Check if input is correct
         Assertions.assertEquals(3, ethanolImplicit.getAtomCount(),
-                "Ethanol should have 3 atoms (implicit H)");
+                "Ethanol should have 3 heavy/explicit atoms here (all Hs are implicit)");
 
         // Convert to molecule with explicit hydrogens
         IAtomContainer ethanolExplicit = Descriptor.createMoleculeWithExplicitHydrogens(ethanolImplicit);
@@ -3772,7 +3769,7 @@ class DescriptorTest {
     }
 
     /**
-     * Test method for copyMolecule method.
+     * Test method for copyMolecule method. TODO: look at my comment on the copy method and extend the test accordingly.
      * 
      * @throws Exception if anything goes wrong
      */
@@ -3809,7 +3806,7 @@ class DescriptorTest {
     }
 
     /**
-     * Test method for getAllFingerprints.
+     * Test method for getAllFingerprints. TODO: is this test really relevant? I could, e.g., rather envision a test of the correct working of the queue for the fingerprint instances
      * 
      * @throws Exception if anything goes wrong
      */
@@ -3826,7 +3823,7 @@ class DescriptorTest {
         }
 
         // Check for presence of specific known fingerprints
-        List<Descriptor> fingerprintList = java.util.Arrays.asList(allFingerprints);
+        List<Descriptor> fingerprintList = Arrays.asList(allFingerprints);
         Assertions.assertTrue(fingerprintList.contains(Descriptor.PUBCHEM_FINGERPRINTER));
         Assertions.assertTrue(fingerprintList.contains(Descriptor.MACCS_FINGERPRINTER));
         Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_0));
