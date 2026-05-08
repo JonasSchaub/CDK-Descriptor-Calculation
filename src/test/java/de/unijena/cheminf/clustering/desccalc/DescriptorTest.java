@@ -113,7 +113,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor WIENER_NUMBER.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -170,7 +170,7 @@ class DescriptorTest {
     //TODO: the CDK definitely needs a heavy atom count descriptor or a way to configure this descriptor to only count heavy atoms. Let's discuss how to best realise this.
     /**
      * Test method for descriptor ATOM_COUNT.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -224,7 +224,7 @@ class DescriptorTest {
 
     /**
      * Test method for the organic subset of individual atom counts (C, H, N, O, S, P, F, Br, Cl, I) in a complex molecule.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -301,7 +301,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor H_BOND_ACCEPTOR_COUNT.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -384,7 +384,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor H_BOND_DONOR_COUNT.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -463,7 +463,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor TPSA.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -546,7 +546,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor LARGEST_CHAIN.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -628,7 +628,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor LONGEST_ALIPHATIC_CHAIN.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -709,7 +709,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor MANNHOLD_LOGP.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -763,7 +763,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor BCUT.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -824,7 +824,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor BOND_COUNT_ALL.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -889,7 +889,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptors BOND_COUNT_SINGLE, BOND_COUNT_DOUBLE, and BOND_COUNT_TRIPLE.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -953,7 +953,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor B_POL.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1007,7 +1007,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor RULE_OF_FIVE.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1079,7 +1079,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor AROMATIC_ATOMS_COUNT.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1151,7 +1151,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor AROMATIC_BONDS_COUNT with benzene.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1222,7 +1222,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor ROTATABLE_BONDS_COUNT.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1276,7 +1276,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor FMF.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1331,7 +1331,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor FRACTIONAL_CSP3.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1386,7 +1386,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor HYBRIDIZATION_RATIO.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1439,7 +1439,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor KAPPA_SHAPE_INDICES.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1500,7 +1500,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor PETITJEAN_NUMBER.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1554,7 +1554,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor SPIRO_ATOM_COUNT.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1608,7 +1608,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor V_ADJ_MAT.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1662,7 +1662,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor WEIGHTED_PATH.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1723,7 +1723,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor ZAGREB_INDEX.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1777,7 +1777,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor CARBON_TYPES.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1831,7 +1831,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor A_LOG_P.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1892,7 +1892,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor X_LOG_P.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -1964,7 +1964,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor JP_LOG_P.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2018,7 +2018,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor A_POL.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2072,7 +2072,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor AUTOCORRELATION_CHARGE.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2133,7 +2133,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor AUTOCORRELATION_MASS.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2196,7 +2196,7 @@ class DescriptorTest {
      * Test method for descriptor AUTOCORRELATION_POLARIZABILITY.
      * No validated result because the descriptor itself is not validated in the CDK.
      * Result can be printed to see if descriptor calculates values.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2251,7 +2251,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor FRAGMENT_COMPLEXITY.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2305,7 +2305,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor CHI_CHAIN.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2366,7 +2366,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor CHI_CLUSTER.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2427,7 +2427,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor CHI_PATH_CLUSTER.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2488,7 +2488,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor CHI_PATH.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2550,7 +2550,7 @@ class DescriptorTest {
     /**
      * Test method for descriptor FRACTIONAL_PSA.
      * Expected results were calculated by TPSADescriptor / MolecularWeightDescriptor. TODO: nice!
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2604,7 +2604,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor LARGEST_PI_SYSTEM.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2659,7 +2659,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor SMALL_RING.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2743,7 +2743,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor BASIC_GROUP_COUNT.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2796,7 +2796,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor ACIDIC_GROUP_COUNT.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2849,7 +2849,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor AMINO_ACID_COUNT.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2915,7 +2915,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor KIER_HALL_SMARTS.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -2982,7 +2982,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor ECCENTRIC_CONNECTIVITY_INDEX.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -3036,7 +3036,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor MDE.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -3099,7 +3099,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor VABC.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -3155,7 +3155,7 @@ class DescriptorTest {
 
     /**
      * Tests PubChem fingerprint descriptor.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -3221,7 +3221,7 @@ class DescriptorTest {
 
     /**
      * Test method for descriptor MACCS_FINGERPRINTER.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -3274,7 +3274,7 @@ class DescriptorTest {
 
     /**
      * Test method for all CIRCULAR_FINGERPRINTER_ECFP descriptors of different diameters.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -3330,7 +3330,7 @@ class DescriptorTest {
 
     /**
      * Test method for all CIRCULAR_FINGERPRINTER_FCFP descriptors of different diameters.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -3392,7 +3392,7 @@ class DescriptorTest {
 
     /**
      * Tests parallelization. TODO: this test can split up into 5. And please add a bit more doc.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -3609,7 +3609,7 @@ class DescriptorTest {
 
     /**
      * Tests integrity. TODO: please add a bit more doc.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -3716,7 +3716,7 @@ class DescriptorTest {
     //<editor-fold desc="Tests preparation Methods">
     /**
      * Test method for createMoleculeWithExplicitHydrogens.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -3770,7 +3770,7 @@ class DescriptorTest {
 
     /**
      * Test method for copyMolecule method. TODO: look at my comment on the copy method and extend the test accordingly.
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
@@ -3807,7 +3807,7 @@ class DescriptorTest {
 
     /**
      * Test method for getAllFingerprints. TODO: is this test really relevant? I could, e.g., rather envision a test of the correct working of the queue for the fingerprint instances
-     * 
+     *
      * @throws Exception if anything goes wrong
      */
     @Test
