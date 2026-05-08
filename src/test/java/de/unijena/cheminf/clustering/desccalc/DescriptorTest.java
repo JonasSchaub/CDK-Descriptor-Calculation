@@ -44,7 +44,9 @@ import java.util.List;
 
 //TODO test descriptors for how they handle empty molecules and empty SMILES strings.
 /**
- * Test class for Descriptor class.
+ * Test class for Descriptor class. This class first tests all the descriptors included in the {@link Descriptor} class
+ * individually, i.e. whether they produce the expected results for some example molecules in different parallelization
+ * settings.
  * Note: For adding tests of a new descriptor goto "Add new descriptor tests here!"
  *
  * @author Achim Zielesny
@@ -61,7 +63,6 @@ class DescriptorTest {
      */
     @Test
     void test_MOLECULAR_WEIGHT() throws Exception {
-        // Acetic acid
         //TODO for CDK integration: remove tmp-prefixes
         String tmpSmiles = "CC(=O)O"; //Acetic Acid CID: 176
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
@@ -116,7 +117,6 @@ class DescriptorTest {
      */
     @Test
     void test_WIENER_NUMBER() throws Exception {
-        // Acetic acid
         String tmpSmiles = "CC(=O)O"; //Acetic Acid CID: 176
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -164,6 +164,7 @@ class DescriptorTest {
         Assertions.assertEquals(0.0, tmpMatrix[0][1]); // there are no atoms that are 3 bonds apart
     }
 
+    //TODO: the CDK definitely needs a heavy atom count descriptor or a way to configure this descriptor to only count heavy atoms. Let's discuss how to best realise this.
     /**
      * Test method for descriptor ATOM_COUNT.
      * 
@@ -171,7 +172,6 @@ class DescriptorTest {
      */
     @Test
     void test_ATOM_COUNT() throws Exception {
-        // Acetic acid
         String tmpSmiles = "CC(=O)O"; //Acetic Acid CID: 176
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
@@ -225,7 +225,8 @@ class DescriptorTest {
      */
     @Test
     void test_ATOM_COUNT_ORGANIC_SUBSET() throws Exception {
-        String tmpSmiles = "CC1=CC2=C(C=C1C)N(C=N2)C3C(C(C(O3)CO)OP(=O)([O-])OC(C)CNC(=O)CCC4(C(C5C6(C(C(C(=N6)C(=C7C(C(C(=N7)C=C8C(C(C(=N8)C(=C4[N-]5)C)CCC(=O)N)(C)C)CCC(=O)N)(C)CC(=O)N)C)CCC(=O)N)(C)CC(=O)N)C)CC(=O)N)C)O.[Co+3]"; // Cobalamin CID: 74413906
+        // Cobalamin CID: 74413906
+        String tmpSmiles = "CC1=CC2=C(C=C1C)N(C=N2)C3C(C(C(O3)CO)OP(=O)([O-])OC(C)CNC(=O)CCC4(C(C5C6(C(C(C(=N6)C(=C7C(C(C(=N7)C=C8C(C(C(=N8)C(=C4[N-]5)C)CCC(=O)N)(C)C)CCC(=O)N)(C)CC(=O)N)C)CCC(=O)N)(C)CC(=O)N)C)CC(=O)N)C)O.[Co+3]";
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         IAtomContainer tmpMolecule = tmpSmilesParser.parseSmiles(tmpSmiles);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
@@ -264,7 +265,7 @@ class DescriptorTest {
         Assertions.assertEquals(62, tmpMatrix[0][0]); // C count
         Assertions.assertEquals(88, tmpMatrix[0][1]); // H count
         Assertions.assertEquals(13, tmpMatrix[0][2]); // N count
-        Assertions.assertEquals(14, tmpMatrix[0][3]);  // O count
+        Assertions.assertEquals(14, tmpMatrix[0][3]); // O count
         Assertions.assertEquals(0, tmpMatrix[0][4]);  // S count
         Assertions.assertEquals(1, tmpMatrix[0][5]);  // P count
         Assertions.assertEquals(0, tmpMatrix[0][6]);  // F count
@@ -306,7 +307,6 @@ class DescriptorTest {
      */
     @Test
     void test_H_BOND_ACCEPTOR_COUNT() throws Exception {
-        // Acetic acid
         String tmpSmiles1 = "CC(=O)O"; //Acetic Acid CID: 176
         String tmpSmiles2 = "O=N(=O)c1cccc2cn[nH]c12"; // 7-Nitroindole CID: 1893
         SmilesParser tmpSmilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
@@ -327,6 +327,7 @@ class DescriptorTest {
             // Parse fresh molecule for each model for the first molecule
             IAtomContainer tmpMolecule1 = tmpSmilesParser.parseSmiles(tmpSmiles1);
             // Apply aromaticity with the current model to the first molecule
+            //TODO: setAromaticity clears all existing flags, right? In that case, we do not need a new instance for every iteration.
             Descriptor.setAromaticity(tmpMolecule1, model);
             // Parse fresh molecule for each model for the second molecule
             IAtomContainer tmpMolecule2 = tmpSmilesParser.parseSmiles(tmpSmiles2);
@@ -399,7 +400,7 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model for the first molecule
+            // Parse fresh molecule for each model for the first molecule TODO: see above
             IAtomContainer tmpMolecule1 = tmpSmilesParser.parseSmiles(tmpSmiles1);
             // Apply aromaticity with the current model to the first molecule
             Descriptor.setAromaticity(tmpMolecule1, model);
@@ -477,7 +478,7 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model for the first molecule
+            // Parse fresh molecule for each model for the first molecule TODO: see above
             IAtomContainer tmpMolecule1 = tmpSmilesParser.parseSmiles(tmpSmiles1);
             // Apply aromaticity with the current model to the first molecule
             Descriptor.setAromaticity(tmpMolecule1, model);
@@ -512,6 +513,7 @@ class DescriptorTest {
             );
             Assertions.assertEquals(39.39, tmpMatrix[0][0], epsilon);
             Assertions.assertEquals(45.82, tmpMatrix[1][0], epsilon);
+
             tmpMatrix = new float[][]
                     {
                             {0f}, {0f}
@@ -544,6 +546,7 @@ class DescriptorTest {
         String tmpSmiles1 = "C=CC=Cc1ccccc1"; // 1-Phenylbutadiene CID: 137048
         // Preparation of the second molecule
         String tmpSmiles2 = "C=CC=CCc2ccc(Cc1ccncc1C=C)cc2"; // Not known in the PubChem database, but a valid SMILES
+        //TODO: does this descriptor really need aromaticity info?
         ElectronDonation[] models = {
                 Aromaticity.Model.Daylight,
                 Aromaticity.Model.CDK_2x,
@@ -555,7 +558,7 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model for the first molecule
+            // Parse fresh molecule for each model for the first molecule TODO see bove
             IAtomContainer tmpMolecule1 = tmpSmilesParser.parseSmiles(tmpSmiles1);
             // Apply aromaticity with the current model to the first molecule
             Descriptor.setAromaticity(tmpMolecule1, model);
@@ -632,7 +635,7 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model for the first molecule
+            // Parse fresh molecule for each model for the first molecule TODO see above
             IAtomContainer tmpMolecule1 = tmpSmilesParser.parseSmiles(tmpSmiles1);
             // Apply aromaticity with the current model to the first molecule
             Descriptor.setAromaticity(tmpMolecule1, model);
@@ -3756,7 +3759,7 @@ class DescriptorTest {
      * @throws Exception if anything goes wrong
      */
     @Test
-    void test_getAllFingerprints() {
+    void test_getAllFingerprints() throws Exception {
         Descriptor[] allFingerprints = Descriptor.getAllFingerprints();
 
         // Check if at least one fingerprint is returned
