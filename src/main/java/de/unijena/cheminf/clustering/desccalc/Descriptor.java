@@ -159,7 +159,7 @@ import java.util.stream.IntStream;
  *     The four primary public calculation methods differ along two independent axes – the <i>input type</i>
  *     (pre-parsed {@link org.openscience.cdk.interfaces.IAtomContainer} objects vs. raw SMILES strings) and the
  *     <i>parallelization strategy</i> (molecule-level parallelization vs. batch-level parallelization) – and are
- *     summarized in the table below. Every method accepts a {@code boolean anIsParallelCalculation} flag; passing
+ *     summarized in the table below. Every method accepts a {@code boolean isParallelCalculation} flag; passing
  *     {@code false} disables parallelization and the method runs sequentially instead.
  *     <br><br>
  *     <table border="1">
@@ -180,19 +180,19 @@ import java.util.stream.IntStream;
  *             <td>{@link #setDescriptorsForMoleculesByBatchParallelization}</td>
  *             <td>{@link org.openscience.cdk.interfaces.IAtomContainer IAtomContainer[]}</td>
  *             <td>One thread per <b>batch</b> of molecules (parallel stream over batch indices)</td>
- *             <td>{@code aBatchSize} – number of molecules per batch</td>
+ *             <td>{@code batchSize} – number of molecules per batch</td>
  *         </tr>
  *         <tr>
  *             <td>{@link #setDescriptorsForMoleculesBySmilesStringParallelization}</td>
  *             <td>{@code String[]} (SMILES)</td>
  *             <td>One thread per <b>molecule</b> (Java parallel stream over all molecule indices)</td>
- *             <td>{@code anElectronDonationModel} – aromaticity model applied during SMILES parsing</td>
+ *             <td>{@code electronDonationModel} – aromaticity model applied during SMILES parsing</td>
  *         </tr>
  *         <tr>
  *             <td>{@link #setDescriptorsForMoleculeBySmilesStringsBatchParallelization}</td>
  *             <td>{@code String[]} (SMILES)</td>
  *             <td>One thread per <b>batch</b> of molecules (parallel stream over batch indices)</td>
- *             <td>{@code aBatchSize}, {@code anElectronDonationModel}</td>
+ *             <td>{@code batchSize}, {@code electronDonationModel}</td>
  *         </tr>
  *     </table>
  *     <br>
@@ -202,7 +202,7 @@ import java.util.stream.IntStream;
  *     large and individual descriptor calculations vary in cost.
  *     <br><br>
  *     <b>Batch-level parallelization</b> ({@code ...ByBatchParallelization}) first divides the molecule array into
- *     fixed-size batches of {@code aBatchSize} molecules and then submits one batch per fork-join task. Within
+ *     fixed-size batches of {@code batchSize} molecules and then submits one batch per fork-join task. Within
  *     each batch, molecules are processed sequentially. This strategy can reduce fork-join overhead for very fast
  *     descriptors or when the overhead of spawning one task per molecule would dominate.
  *     <br><br>
@@ -215,7 +215,7 @@ import java.util.stream.IntStream;
  *     <br><br>
  *     All four methods share the same result convention: they return {@code true} if every descriptor value was
  *     computed without producing {@link Float#NaN}, and {@code false} if at least one NaN was encountered. NaN
- *     positions are additionally recorded in the caller-supplied {@code aNanPositions} list as
+ *     positions are additionally recorded in the caller-supplied {@code nanPositionsList} list as
  *     {@code int[]{moleculeIndex, componentIndex}} pairs. For parallel executions this list <b>must</b> be
  *     thread-safe (e.g. {@code Collections.synchronizedList(new LinkedList<>())}).
  *     <br><br>
@@ -261,22 +261,22 @@ import java.util.stream.IntStream;
  * // 4. Create data matrix for results with appropriate size (molecules as rows, descriptors as columns)
  * float[][] matrix = new float[moleculeCount][componentCount];
  *
- * // 5. Set aStartIndex to 0 for filling the matrix with descriptor values starting at the 0th column
- * int startIndex = 0; // if the matrix is part of a larger data structure, set aStartIndex accordingly
+ * // 5. Set startIndex to 0 for filling the matrix with descriptor values starting at the 0th column
+ * int startIndex = 0; // if the matrix is part of a larger data structure, set startIndex accordingly
  *
  * // 6. Choose whether to use parallel calculation
  * boolean isParallelCalculation = true; // false for sequential calculation
  *
  * // 7. Create a synchronized List for keeping track of NaN positions
- * List<int[]> aNanPositionsSynchronized = Collections.synchronizedList(new LinkedList<>());
+ * List<int[]> nanPositionsListSynchronized = Collections.synchronizedList(new LinkedList<>());
  *
  * // For Batch Processing:
  * // Define batch size
- * int aBatchSize = 100;
+ * int batchSize = 100;
  *
  * // For SMILES Processing
  * // Define anElectronDonation model for aromaticity handling
- * ElectronDonation anElectronDonationModel = Aromaticity.Model.Daylight;
+ * ElectronDonation electronDonationModel = Aromaticity.Model.Daylight;
  *
  * // Calculate descriptors (choose one of the following methods)
  *
@@ -287,9 +287,9 @@ import java.util.stream.IntStream;
  *                      matrix,
  *                      startIndex,
  *                      isParallelCalculation,
- *                      aNanPositionsSynchronized
+ *                      nanPositionsListSynchronized
  * );
- * // you can also use Descriptor.setDescriptorsForMoleculesByBatchParallelization(...) -> aBatchSize needs to be specified accordingly
+ * // you can also use Descriptor.setDescriptorsForMoleculesByBatchParallelization(...) -> batchSize needs to be specified accordingly
  *
  * // Option B: High-Performance-Parallel Descriptor Calculation with SMILES string array
  * boolean result = Descriptor.setDescriptorsForMoleculesBySmilesStringParallelization(
@@ -297,11 +297,11 @@ import java.util.stream.IntStream;
  *                      moleculeSmilesStrings,
  *                      matrix,
  *                      startIndex,
- *                      anElectronDonationModel,
+ *                      electronDonationModel,
  *                      isParallelCalculation,
- *                      aNanPositionsSynchronized
+ *                      nanPositionsListSynchronized
  * );
- * // you can also use Descriptor.setDescriptorsForMoleculeBySmilesStringsBatchParallelization(...) -> aBatchSize needs to be specified accordingly
+ * // you can also use Descriptor.setDescriptorsForMoleculeBySmilesStringsBatchParallelization(...) -> batchSize needs to be specified accordingly
  * }</pre>
  *
  * @author Manuel Schauer
@@ -1092,44 +1092,44 @@ public enum Descriptor {
      *   <li>{@link IntegerArrayResult} - Array of integers (e.g., amino acid counts)</li>
      * </ul>
      *
-     * @param anAtomContainer the molecule to calculate descriptors for (IS NOT CHANGED);
+     * @param atomContainer the molecule to calculate descriptors for (IS NOT CHANGED);
      *                        must have aromaticity already perceived if required by the descriptor
-     * @param aVector         the result vector to store calculated values (MAY BE CHANGED);
-     *                        values are stored starting at aStartIndex
-     * @param aStartIndex     the starting index in aVector where results should be written;
-     *                        subsequent values are written to aStartIndex + 1, aStartIndex + 2, etc.
+     * @param vector         the result vector to store calculated values (MAY BE CHANGED);
+     *                        values are stored starting at startIndex
+     * @param startIndex     the starting index in vector where results should be written;
+     *                        subsequent values are written to startIndex + 1, startIndex + 2, etc.
       * @throws CDKException if the calculation fails for any reason, wrapping the original exception
      *                      with information about which descriptor failed
      * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
      *                              fingerprinter instance from the pool (only relevant for fingerprint
      *                              descriptors; propagated from {@link #calculateFingerprintFromPool})
      */
-    private void calculate(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex) throws CDKException, InterruptedException {
+    private void calculate(IAtomContainer atomContainer, float[] vector, int startIndex) throws CDKException, InterruptedException {
         try {
             if (this.isFingerprint()) {
-                this.calculateFingerprintFromPool(anAtomContainer, aVector, aStartIndex);
+                this.calculateFingerprintFromPool(atomContainer, vector, startIndex);
             } else {
                 IMolecularDescriptor cdkDescriptor = Descriptor.descriptorToCdkObjectMap.get(this);
                 if (cdkDescriptor != null) {
 
-                    IDescriptorResult result = cdkDescriptor.calculate(anAtomContainer).getValue();
+                    IDescriptorResult result = cdkDescriptor.calculate(atomContainer).getValue();
 
                     //note: we ignore all the Sonar suggestions here to keep the code compatible with Java 8
                     if (result instanceof DoubleResult) {
                         DoubleResult doubleResult = (DoubleResult) result;
-                        aVector[aStartIndex] = (float) doubleResult.doubleValue();
+                        vector[startIndex] = (float) doubleResult.doubleValue();
                     } else if (result instanceof IntegerResult) {
                         IntegerResult integerResult = (IntegerResult) result;
-                        aVector[aStartIndex] = (float) integerResult.intValue();
+                        vector[startIndex] = (float) integerResult.intValue();
                     } else if (result instanceof DoubleArrayResult) {
                         DoubleArrayResult arrayResult = (DoubleArrayResult) result;
                         for (int i = 0; i < this.descriptorComponentNumber; i++) {
-                            aVector[aStartIndex + i] = (float) arrayResult.get(i);
+                            vector[startIndex + i] = (float) arrayResult.get(i);
                         }
                     } else if (result instanceof IntegerArrayResult) {
                         IntegerArrayResult arrayResult = (IntegerArrayResult) result;
                         for (int i = 0; i < this.descriptorComponentNumber; i++) {
-                            aVector[aStartIndex + i] = (float) arrayResult.get(i);
+                            vector[startIndex + i] = (float) arrayResult.get(i);
                         }
                     } //TODO: what to do if the result is an instance of a different result type? -> log warning and return false (see above)?
                 } //TODO: what to do if the CDK descriptor instance is null? -> log warning and return false (see above)?
@@ -1181,7 +1181,7 @@ public enum Descriptor {
     /*
      * Static initializer block to populate the descriptorToCdkObjectMap and initialize the fingerprint pool.
      * Note: we use the map and initialize it here (instead of giving each descriptor constant an instance field)
-     * to be able to do error handling. TODO: where there other reasons? If yes, please document them here!
+     * to be able to do error handling. TODO: where there other reasons? If yes, please document them here! -> fingerprinter and descriptors are different object types
      */
     static {
         try {
@@ -1407,8 +1407,8 @@ public enum Descriptor {
             // Initialize fingerprint pools with configurable pool size (default: 4)
             Descriptor.initializeFingerprintPools();
 
-        } catch (Exception anException) {
-            throw new UnsupportedOperationException("Failed to initialize descriptors, this should never happen. ", anException);
+        } catch (Exception exception) {
+            throw new UnsupportedOperationException("Failed to initialize descriptors, this should never happen. ", exception);
         }
     }
     //</editor-fold>
@@ -1426,7 +1426,7 @@ public enum Descriptor {
         // PUBCHEM_FINGERPRINTER Pool
         BlockingQueue<IFingerprinter> pubchemPool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            //TODO: handle the case that false is returned by offer()? It shouldn't really happen because we only add as many fingerprinters as the pool size.
+            //TODO: handle the case that false is returned by offer()? It shouldn't really happen because we only add as many fingerprinters as the pool size. -> yes! we could log it as a warning but it should not happen
             pubchemPool.offer(new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()));
         }
         Descriptor.fingerprintPoolMap.put(Descriptor.PUBCHEM_FINGERPRINTER, pubchemPool);
@@ -1520,7 +1520,7 @@ public enum Descriptor {
     /**
      * Returns specified available descriptors.
      * Note: Fast, safe, and non-fingerprint descriptors are automatically included by default.
-     *
+     * TODO: remove is prefix aswell?
      * @param isSlowlyCalculableDescriptorInclusion True: Slowly calculable descriptors are included in the result, false: Otherwise.
      * @param isUnsafeDescriptorInclusion True: Unsafe descriptors are included in the result, false: Unsafe descriptors
      *                                     are excluded from the result, this does not mean no NaN's can be produced.
@@ -1564,36 +1564,36 @@ public enum Descriptor {
     /**
      * Returns sum of number of calculated components of an array of defined descriptors.
      *
-     * @param aDescriptors Array of descriptors (IS NOT CHANGED); if it is empty, 0 is returned;
+     * @param descriptors Array of descriptors (IS NOT CHANGED); if it is empty, 0 is returned;
      *                     may not be null (the array or one of its elements)
      * @return Sum of number of calculated components of array of descriptors
      */
     public static int getNumberOfComponents(
-        Descriptor[] aDescriptors
+        Descriptor[] descriptors
     ) {
         //<editor-fold desc="Checks">
-        if (aDescriptors == null) {
+        if (descriptors == null) {
             //TODO (just a note for Manuel, please remove after reading): many people do not declare NullPointerExceptions
             // in the method head throws clause. Because it is a 'no brainer' that passing a null parameter will cause this.
             // To appease John, we do it this way now. But in MORTAR, we do everything explicitly!
-            throw new NullPointerException("Descriptor.getNumberOfComponents: aDescriptor is null.");
+            throw new NullPointerException("Descriptor.getNumberOfComponents: descriptor is null.");
         }
-        if (aDescriptors.length == 0) {
+        if (descriptors.length == 0) {
             return 0;
         }
-        for (Descriptor tmpDescriptor : aDescriptors) {
-            if (tmpDescriptor == null) {
-                throw new NullPointerException("Descriptor.getNumberOfComponents: At least one descriptor in aDescriptors is null.");
+        for (Descriptor descriptor : descriptors) {
+            if (descriptor == null) {
+                throw new NullPointerException("Descriptor.getNumberOfComponents: At least one descriptor in descriptors is null.");
             }
         }
         //</editor-fold>
 
         //TODO for CDK integration: remove tmp- prefixes
-        int tmpTotalNumberOfComponents = 0;
-        for (Descriptor tmpDescriptor : aDescriptors) {
-            tmpTotalNumberOfComponents += tmpDescriptor.getDescriptorComponentNumber();
+        int totalNumberOfComponents = 0;
+        for (Descriptor descriptor : descriptors) {
+            totalNumberOfComponents += descriptor.getDescriptorComponentNumber();
         }
-        return tmpTotalNumberOfComponents;
+        return totalNumberOfComponents;
     }
 
     //TODO: add a test for this utility method
@@ -1610,24 +1610,24 @@ public enum Descriptor {
      *   <li>Index 8 → WIENER_NUMBER, component 1</li>
      * </ul>
      *
-     * @param aDescriptors Array of descriptors (must not be null or empty; its elements must not be null)
+     * @param descriptors Array of descriptors (must not be null or empty; its elements must not be null)
      * @param anIndex The index in the descriptor array (must be &gt;= 0 and &lt; total component count)
-     * @return A two-element int array: [descriptor index in aDescriptors, component index within that descriptor]
-     * @throws IllegalArgumentException if aDescriptors is empty, anIndex is negative,
+     * @return A two-element int array: [descriptor index in descriptors, component index within that descriptor]
+     * @throws IllegalArgumentException if descriptors is empty, anIndex is negative,
      *                                  or anIndex exceeds the total number of components
      */
-    public static int[] getDescriptorAndComponentIndex(Descriptor[] aDescriptors, int anIndex)
+    public static int[] getDescriptorAndComponentIndex(Descriptor[] descriptors, int anIndex)
             throws IllegalArgumentException {
         //TODO exchange the editor folds for checks by a comment like this everywhere for CDK integration
         // Checks
-        if (aDescriptors == null) {
+        if (descriptors == null) {
             throw new NullPointerException(
-                    "Descriptor.getDescriptorAndComponentIndex: aDescriptors must not be null."
+                    "Descriptor.getDescriptorAndComponentIndex: descriptors must not be null."
             );
         }
-        if (aDescriptors.length == 0) {
+        if (descriptors.length == 0) {
             throw new IllegalArgumentException(
-                    "Descriptor.getDescriptorAndComponentIndex: aDescriptors must not be null or empty."
+                    "Descriptor.getDescriptorAndComponentIndex: descriptors must not be null or empty."
             );
         }
         if (anIndex < 0) {
@@ -1639,14 +1639,14 @@ public enum Descriptor {
 
         // Calculate cumulative component counts and find the target descriptor
         int cumulativeCount = 0;
-        for (int i = 0; i < aDescriptors.length; i++) {
-            if (aDescriptors[i] == null) {
+        for (int i = 0; i < descriptors.length; i++) {
+            if (descriptors[i] == null) {
                 throw new NullPointerException(
-                        "Descriptor.getDescriptorAndComponentIndex: aDescriptors contains null element at index " + i
+                        "Descriptor.getDescriptorAndComponentIndex: descriptors contains null element at index " + i
                 );
             }
 
-            int componentCount = aDescriptors[i].getDescriptorComponentNumber();
+            int componentCount = descriptors[i].getDescriptorComponentNumber();
             int nextCumulativeCount = cumulativeCount + componentCount;
 
             // Check if anIndex falls within this descriptor's range
@@ -1671,16 +1671,16 @@ public enum Descriptor {
      * This is a convenience method that extends {@link #getDescriptorAndComponentIndex} by also
      * providing human-readable names for the descriptor and component.
      *
-     * @param aDescriptors Array of descriptors (must not be null or empty; its elements must not be null)
+     * @param descriptors Array of descriptors (must not be null or empty; its elements must not be null)
      * @param anIndex The index in the descriptor array (must be &gt;= 0 and &lt; total component count)
      * @return A String array: [descriptor name, component index as string]
-     * @throws IllegalArgumentException if aDescriptors is empty, anIndex is negative,
+     * @throws IllegalArgumentException if descriptors is empty, anIndex is negative,
      *                                  or anIndex exceeds the total number of components
      */
-    public static String[] getDescriptorAndComponentInfo(Descriptor[] aDescriptors, int anIndex)
+    public static String[] getDescriptorAndComponentInfo(Descriptor[] descriptors, int anIndex)
             throws IllegalArgumentException {
-        int[] indices = Descriptor.getDescriptorAndComponentIndex(aDescriptors, anIndex);
-        Descriptor descriptor = aDescriptors[indices[0]];
+        int[] indices = Descriptor.getDescriptorAndComponentIndex(descriptors, anIndex);
+        Descriptor descriptor = descriptors[indices[0]];
 
         return new String[] {
                 descriptor.getName(),
@@ -1726,7 +1726,7 @@ public enum Descriptor {
     }
 
     /**
-     * Uses a specified aromaticity model to modify aMolecule.
+     * Uses a specified aromaticity model to modify molecule.
      * The method performs a complete workflow of:
      * <ol>
      *     <li>Suppresses explicit hydrogens. TODO: why is this done here?</li>
@@ -1738,34 +1738,34 @@ public enum Descriptor {
      * </ol>
      * Note: This method changes the input molecule by applying the specified aromaticity model and reconfiguring its hydrogens.
      *
-     * @param aMolecule Molecule that will be modified (IS CHANGED)
-     * @param anAromaticityModel The aromaticity model that will be used for aromaticity detection
+     * @param molecule Molecule that will be modified (IS CHANGED)
+     * @param electronDonationModel The aromaticity model that will be used for aromaticity detection
      * @throws CDKException if adding implicit hydrogen atoms or detection of atom types fails
      */
     public static void setAromaticity(
-            IAtomContainer aMolecule,
-            ElectronDonation anAromaticityModel
+            IAtomContainer molecule,
+            ElectronDonation electronDonationModel
     ) throws CDKException {
         //<editor-fold desc="Checks">
-        if (aMolecule == null) {
+        if (molecule == null) {
             throw new NullPointerException("Input molecule must not be null");
         }
-        if (aMolecule.isEmpty()) {
+        if (molecule.isEmpty()) {
             return;
         }
-        if (anAromaticityModel == null) {
+        if (electronDonationModel == null) {
             throw new NullPointerException("Aromaticity model must not be null");
         }
         //</editor-fold>
-        AtomContainerManipulator.normalizeHydrogens(aMolecule, HydrogenState.Minimal);
+        AtomContainerManipulator.normalizeHydrogens(molecule, HydrogenState.Minimal);
         //TODO: this is only necessary now if CDK_AtomTypes is used! And for the hydrogen adding...
-        AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(aMolecule);
+        AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(molecule);
         // Clears all aromatic flags before applying the aromaticity model.
-        Aromaticity.clear(aMolecule);
-        Cycles.markRingAtomsAndBonds(aMolecule);
-        Aromaticity.apply(anAromaticityModel, aMolecule);
-        CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(aMolecule.getBuilder());
-        adder.addImplicitHydrogens(aMolecule);
+        Aromaticity.clear(molecule);
+        Cycles.markRingAtomsAndBonds(molecule);
+        Aromaticity.apply(electronDonationModel, molecule);
+        CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(molecule.getBuilder());
+        adder.addImplicitHydrogens(molecule);
     }
 
     /**
@@ -1778,8 +1778,8 @@ public enum Descriptor {
      * <b>Important:</b> The molecule must have aromaticity already perceived if required by the descriptor.
      * Use {@link #setAromaticity(IAtomContainer, ElectronDonation)} before calling this method if needed.
      *
-     * @param aDescriptor The descriptor to calculate (must not be null)
-     * @param aMolecule The molecule to calculate the descriptor for (must not be null);
+     * @param descriptor The descriptor to calculate (must not be null)
+     * @param molecule The molecule to calculate the descriptor for (must not be null);
      *                  aromaticity must be perceived beforehand if required; if it is empty, an empty array is returned
      * @return A float array containing the calculated descriptor components. Length equals
      *         {@link #getDescriptorComponentNumber()}. Contains NaN values if calculation fails.
@@ -1787,32 +1787,32 @@ public enum Descriptor {
      *                              fingerprinter instance from the pool (only relevant for fingerprint
      *                              descriptors; the thread's interrupt status is preserved)
      */
-    public static float[] calculateDescriptor(Descriptor aDescriptor, IAtomContainer aMolecule) throws InterruptedException {
+    public static float[] calculateDescriptor(Descriptor descriptor, IAtomContainer molecule) throws InterruptedException {
         // Checks
-        if (aDescriptor == null) {
-            throw new NullPointerException("Descriptor.calculateDescriptor: aDescriptor must not be null.");
+        if (descriptor == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: descriptor must not be null.");
         }
-        if (aMolecule == null) {
-            throw new NullPointerException("Descriptor.calculateDescriptor: aMolecule must not be null.");
+        if (molecule == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: molecule must not be null.");
         }
-        if (aMolecule.isEmpty()) {
+        if (molecule.isEmpty()) {
             return new float[0];
         }
 
-        float[] result = new float[aDescriptor.getDescriptorComponentNumber()];
+        float[] result = new float[descriptor.getDescriptorComponentNumber()];
         try {
-            if (aDescriptor.needsExplicitHydrogens()) {
-                IAtomContainer tmpMoleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(aMolecule);
-                aDescriptor.calculate(tmpMoleculeWithExplicitHydrogens, result, 0);
+            if (descriptor.needsExplicitHydrogens()) {
+                IAtomContainer moleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(molecule);
+                descriptor.calculate(moleculeWithExplicitHydrogens, result, 0);
             } else {
-                aDescriptor.calculate(aMolecule, result, 0);
+                descriptor.calculate(molecule, result, 0);
             }
         } catch (InterruptedException e) {
             throw e;
         } catch (Exception e) {
             // Fill with NaN on failure and log the error
             Arrays.fill(result, Float.NaN);
-            Descriptor.LOGGER.log(Level.WARNING, String.format("Failed to calculate descriptor %s: %s", aDescriptor.getName(), e.getMessage()), e);
+            Descriptor.LOGGER.log(Level.WARNING, String.format("Failed to calculate descriptor %s: %s", descriptor.getName(), e.getMessage()), e);
         }
         return result;
     }
@@ -1824,50 +1824,50 @@ public enum Descriptor {
      * The method automatically perceives aromaticity using the specified electron donation model before calculating the descriptor.
      * If aromaticity perception or calculation fails, all values in the result array will be set to {@link Float#NaN}.
      *
-     * @param aDescriptor The descriptor to calculate (must not be null)
-     * @param aMolecule The molecule to calculate the descriptor for (must not be null); if it is empty, an empty array is returned
-     * @param anElectronDonation The electron donation model to use for aromaticity perception (must not be null)
+     * @param descriptor The descriptor to calculate (must not be null)
+     * @param molecule The molecule to calculate the descriptor for (must not be null); if it is empty, an empty array is returned
+     * @param electronDonationModel The electron donation model to use for aromaticity perception (must not be null)
      * @return A float array containing the calculated descriptor components. Length equals
      *         {@link #getDescriptorComponentNumber()}. Contains NaN values if calculation fails.
      * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
      *                              fingerprinter instance from the pool (only relevant for fingerprint
      *                              descriptors; the thread's interrupt status is preserved)
      */
-    public static float[] calculateDescriptor(Descriptor aDescriptor,
-                                              IAtomContainer aMolecule,
-                                              ElectronDonation anElectronDonation
+    public static float[] calculateDescriptor(Descriptor descriptor,
+                                              IAtomContainer molecule,
+                                              ElectronDonation electronDonationModel
     ) throws InterruptedException {
         // Checks
-        if (aDescriptor == null) {
-            throw new NullPointerException("Descriptor.calculateDescriptor: aDescriptor must not be null.");
+        if (descriptor == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: descriptor must not be null.");
         }
-        if (aMolecule == null) {
-            throw new NullPointerException("Descriptor.calculateDescriptor: aMolecule must not be null.");
+        if (molecule == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: molecule must not be null.");
         }
-        if (aMolecule.isEmpty()) {
+        if (molecule.isEmpty()) {
             return new float[0];
         }
-        if (anElectronDonation == null) {
-            throw new NullPointerException("Descriptor.calculateDescriptor: anElectronDonation must not be null.");
+        if (electronDonationModel == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: electronDonationModel must not be null.");
         }
 
-        float[] result = new float[aDescriptor.getDescriptorComponentNumber()];
+        float[] result = new float[descriptor.getDescriptorComponentNumber()];
         try {
-            //TODO: createMoleculeWithExplicitHydrogens(tmpMolecule) below also creates a(nother!) copy if I see that
+            //TODO: createMoleculeWithExplicitHydrogens(molecule) below also creates a(nother!) copy if I see that
             // correctly; please avoid creating multiple copies!
-            IAtomContainer tmpMolecule = Descriptor.copyMolecule(aMolecule); // Create a copy to avoid modifying the original molecule
-            Descriptor.setAromaticity(tmpMolecule, anElectronDonation);
-            if (aDescriptor.needsExplicitHydrogens()){
-                IAtomContainer tmpMoleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(tmpMolecule);
-                aDescriptor.calculate(tmpMoleculeWithExplicitHydrogens, result, 0);
+            IAtomContainer moleculeCopy = Descriptor.copyMolecule(molecule); // Create a copy to avoid modifying the original molecule
+            Descriptor.setAromaticity(moleculeCopy, electronDonationModel);
+            if (descriptor.needsExplicitHydrogens()){
+                IAtomContainer moleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(moleculeCopy);
+                descriptor.calculate(moleculeWithExplicitHydrogens, result, 0);
             } else {
-                aDescriptor.calculate(tmpMolecule, result, 0);
+                descriptor.calculate(moleculeCopy, result, 0);
             }
         } catch (InterruptedException e) {
             throw e;
         } catch (Exception e) {
             Arrays.fill(result, Float.NaN);
-            Descriptor.LOGGER.log(Level.WARNING, String.format("Failed to calculate descriptor %s: %s", aDescriptor.getName(), e.getMessage()), e);
+            Descriptor.LOGGER.log(Level.WARNING, String.format("Failed to calculate descriptor %s: %s", descriptor.getName(), e.getMessage()), e);
         }
         return result;
     }
@@ -1886,71 +1886,66 @@ public enum Descriptor {
      * If parsing, aromaticity perception, or calculation fails, all values in the result array
      * will be set to {@link Float#NaN}.
      *
-     * @param aDescriptor The descriptor to calculate (must not be null)
-     * @param aSmilesString The SMILES string representing the molecule (must not be null); if it is blank, an empty array is returned
-     * @param anElectronDonation The electron donation model to use for aromaticity perception (must not be null)
+     * @param descriptor The descriptor to calculate (must not be null)
+     * @param smilesString The SMILES string representing the molecule (must not be null); if it is blank, an empty array is returned
+     * @param electronDonationModel The electron donation model to use for aromaticity perception (must not be null)
      * @return A float array containing the calculated descriptor components. Length equals
      *         {@link #getDescriptorComponentNumber()}. Contains NaN values if calculation fails.
      * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
      *                              fingerprinter instance from the pool (only relevant for fingerprint
      *                              descriptors; the thread's interrupt status is preserved)
      */
-    public static float[] calculateDescriptor(Descriptor aDescriptor,
-                                              String aSmilesString,
-                                              ElectronDonation anElectronDonation) throws InterruptedException {
+    public static float[] calculateDescriptor(Descriptor descriptor,
+                                              String smilesString,
+                                              ElectronDonation electronDonationModel) throws InterruptedException {
         // Checks
-        if (aDescriptor == null) {
-            throw new NullPointerException("Descriptor.calculateDescriptor: aDescriptor must not be null.");
+        if (descriptor == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: descriptor must not be null.");
         }
-        if (aSmilesString == null) {
-            throw new NullPointerException("Descriptor.calculateDescriptor: aSmilesString must not be null.");
+        if (smilesString == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: smilesString must not be null.");
         }
-        if (aSmilesString.isBlank()) {
+        if (smilesString.isBlank()) {
             return new float[0];
         }
-        if (anElectronDonation == null) {
-            throw new NullPointerException("Descriptor.calculateDescriptor: anElectronDonation must not be null.");
+        if (electronDonationModel == null) {
+            throw new NullPointerException("Descriptor.calculateDescriptor: electronDonationModel must not be null.");
         }
 
-        float[] result = new float[aDescriptor.getDescriptorComponentNumber()];
+        float[] result = new float[descriptor.getDescriptorComponentNumber()];
         try {
-            IAtomContainer tmpMolecule = Descriptor.SMILES_PARSER.parseSmiles(aSmilesString);
-            Descriptor.setAromaticity(tmpMolecule, anElectronDonation);
-            if (aDescriptor.needsExplicitHydrogens()){
-                IAtomContainer tmpMoleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(tmpMolecule);
-                aDescriptor.calculate(tmpMoleculeWithExplicitHydrogens, result, 0);
-            } else {
-                aDescriptor.calculate(tmpMolecule, result, 0);
-            }
+            IAtomContainer molecule = Descriptor.SMILES_PARSER.parseSmiles(smilesString);
+            Descriptor.setAromaticity(molecule, electronDonationModel);
+            Descriptor.calculateDescriptor(descriptor, molecule);
         } catch (InterruptedException e) {
             throw e;
         } catch (Exception e) {
             Arrays.fill(result, Float.NaN);
-            Descriptor.LOGGER.log(Level.WARNING, String.format("Failed to calculate descriptor %s: %s", aDescriptor.getName(), e.getMessage()), e);
+            Descriptor.LOGGER.log(Level.WARNING, String.format("Failed to calculate descriptor %s: %s", descriptor.getName(), e.getMessage()), e);
         }
         return result;
     }
 
 
     /**
-     * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
-     * beginning with aStartIndex by (optional) parallelization of molecule batches. If parallel computation is used, the atom
+     * Sets calculated descriptor components in vectors (rows) of a matrix (that corresponds to atomContainerArray)
+     * beginning with startIndex by (optional) parallelization of molecule batches. If parallel computation is used, the atom
      * container batches (molecules) are distributed onto parallel thread, one for each molecule batch, and they all access shared
      * descriptor instances.
      * Note: For fingerprints a blocked queue is used, because fingerprinter instances are not threadsafe.
      * The pool size can be changed via {@link #setFingerprintPoolSize(int)}.
      *
-     * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
-     * @param anAtomContainerArray Array of molecules. Note: anAtomContainerArray[i] corresponds to aMatrix[i] data
+     * @param descriptors Array of descriptors to be calculated (IS NOT CHANGED)
+     * @param atomContainerArray Array of molecules. Note: atomContainerArray[i] corresponds to matrix[i] data
      *                             vector, i.e. the molecules define the rows of the matrix (IS NOT CHANGED)
-     * @param aMatrix Matrix of component vectors of molecules. Note: Data vector aMatrix[i] corresponds to molecule
-     *                anAtomContainerArray[i]. (MAY BE CHANGED)
-     * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
+     * @param matrix Matrix of component vectors of molecules. Note: Data vector matrix[i] corresponds to molecule
+     *                atomContainerArray[i]. (MAY BE CHANGED)
+     * @param startIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
      *                    column to start filling with descriptors
-     * @param aBatchSize Number of molecules to process in each batch
-     * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
-     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
-     *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
+     * @param batchSize Number of molecules to process in each batch
+     * @param isParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
+     * @param nanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      IMPORTANT: For parallel calculations (isParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
@@ -1961,118 +1956,118 @@ public enum Descriptor {
      *                              {@link Thread#interrupt()} and the affected batch is aborted silently
      */
     public static boolean setDescriptorsForMoleculesByBatchParallelization(
-            Descriptor[] aDescriptors,
-            IAtomContainer[] anAtomContainerArray,
-            float[][] aMatrix,
-            int aStartIndex,
-            int aBatchSize,
-            boolean anIsParallelCalculation,
-            List<int[]> aNanPositionsList
+            Descriptor[] descriptors,
+            IAtomContainer[] atomContainerArray,
+            float[][] matrix,
+            int startIndex,
+            int batchSize,
+            boolean isParallelCalculation,
+            List<int[]> nanPositionsList
     ) throws IllegalArgumentException, InterruptedException {
         //<editor-fold desc="Checks">
         final String methodName = "setDescriptorsForMoleculesByMoleculeBatchParallelization";
-        if (!Descriptor.validateDescriptors(aDescriptors, methodName)) {
+        if (!Descriptor.validateDescriptors(descriptors, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
             return true;
         }
-        if (!Descriptor.validateAtomContainerArray(anAtomContainerArray, methodName)) {
+        if (!Descriptor.validateAtomContainerArray(atomContainerArray, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given atom container array is empty, calculation aborted.", methodName);
             return true;
         }
         // throws NullPointerException or IllegalArgumentException if the matrix or on eof its rows is null or its dimensions are invalid
-        Descriptor.validateMatrix(aMatrix, aDescriptors, anAtomContainerArray, aStartIndex, methodName);
+        Descriptor.validateMatrix(matrix, descriptors, atomContainerArray, startIndex, methodName);
         // throws NullPointerException if list is null
-        Descriptor.validateNanPositionsList(aNanPositionsList, methodName);
+        Descriptor.validateNanPositionsList(nanPositionsList, methodName);
         // throws IllegalArgumentException if batch size is <= 0
-        Descriptor.validateBatchSize(aBatchSize, methodName);
+        Descriptor.validateBatchSize(batchSize, methodName);
         //</editor-fold>
 
-        int tmpNumberOfMolecules = anAtomContainerArray.length;
-        int tmpNumberOfBatches = (int) Math.ceil((double) tmpNumberOfMolecules / aBatchSize);
+        int numberOfMolecules = atomContainerArray.length;
+        int numberOfBatches = (int) Math.ceil((double) numberOfMolecules / batchSize);
 
-        int[] tmpStartIndices = new int[aDescriptors.length];
-        for (int i = 0; i < aDescriptors.length; i++) {
-            tmpStartIndices[i] = aStartIndex;
-            aStartIndex += aDescriptors[i].getDescriptorComponentNumber();
+        int[] startIndices = new int[descriptors.length];
+        for (int i = 0; i < descriptors.length; i++) {
+            startIndices[i] = startIndex;
+            startIndex += descriptors[i].getDescriptorComponentNumber();
         }
 
-        AtomicBoolean tmpHasNaN = new AtomicBoolean(false);
+        AtomicBoolean hasNaN = new AtomicBoolean(false);
         try {
-            if (anIsParallelCalculation) {
+            if (isParallelCalculation) {
 
-                IntStream.range(0, tmpNumberOfBatches).parallel().forEach(batchIndex -> {
-                    int tmpBatchStart = batchIndex * aBatchSize;
-                    int tmpBatchEnd = Math.min(tmpBatchStart + aBatchSize, tmpNumberOfMolecules);
+                IntStream.range(0, numberOfBatches).parallel().forEach(batchIndex -> {
+                    int batchStart = batchIndex * batchSize;
+                    int batchEnd = Math.min(batchStart + batchSize, numberOfMolecules);
 
-                    for (int i = tmpBatchStart; i < tmpBatchEnd; i++) {
+                    for (int i = batchStart; i < batchEnd; i++) {
                         try {
-                            boolean tmpSuccess = Descriptor.setDescriptorsForSingleMolecule(
-                                    aDescriptors,
-                                    anAtomContainerArray[i],
-                                    aMatrix[i],
-                                    tmpStartIndices,
+                            boolean success = Descriptor.setDescriptorsForSingleMolecule(
+                                    descriptors,
+                                    atomContainerArray[i],
+                                    matrix[i],
+                                    startIndices,
                                     i,
-                                    aNanPositionsList
+                                    nanPositionsList
                             );
-                            if (!tmpSuccess) {
-                                tmpHasNaN.set(true);
+                            if (!success) {
+                                hasNaN.set(true);
                             }
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt(); // Preserve interrupt status
                             return;
-                        } catch (Exception anException) {
-                            tmpHasNaN.set(true);
+                        } catch (Exception exception) {
+                            hasNaN.set(true);
                             Descriptor.LOGGER.log(
                                     Level.WARNING,
                                     String.format("Descriptor.setDescriptorsForMoleculesByBatchParallelization: Exception in batch %d, molecule index: %d", batchIndex, i),
-                                    anException
+                                    exception
                             );
                         }
                     }
                 });
 
             } else {
-                for (int i = 0; i < tmpNumberOfMolecules; i++) {
+                for (int i = 0; i < numberOfMolecules; i++) {
                     //TODO: why is there no try-catch for every single descriptor calculation necessary here? Same in the methods below
-                    if (!Descriptor.setDescriptorsForSingleMolecule(aDescriptors, anAtomContainerArray[i], aMatrix[i], tmpStartIndices, i, aNanPositionsList)) {
-                        tmpHasNaN.set(true);
+                    if (!Descriptor.setDescriptorsForSingleMolecule(descriptors, atomContainerArray[i], matrix[i], startIndices, i, nanPositionsList)) {
+                        hasNaN.set(true);
                     }
                 }
             }
         } catch (InterruptedException e) {
             throw e;
-        } catch (Exception anException) {
+        } catch (Exception exception) {
             Descriptor.LOGGER.log(
                     Level.WARNING,
                     "Descriptor.setDescriptorsForMoleculesByBatchParallelization: Global exception occurred in descriptor calculation.",
-                    anException
+                    exception
             );
             return false;
         }
-        return !tmpHasNaN.get();
+        return !hasNaN.get();
     }
 
     /**
-     * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
-     * beginning with aStartIndex by (optional) parallelization of molecule batches. If parallel computation is used, the smiles string
+     * Sets calculated descriptor components in vectors (rows) of a matrix (that corresponds to atomContainerArray)
+     * beginning with startIndex by (optional) parallelization of molecule batches. If parallel computation is used, the smiles string
      * batches (molecules) are distributed onto parallel thread, one for each molecule batch, and they all access shared
      * descriptor instances.
      * Note: For fingerprints a blocked queue is used, because fingerprinter instances are not threadsafe.
      * The pool size can be changed via {@link #setFingerprintPoolSize(int)}.
      *
-     * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
-     * @param aMoleculeSmilesStringArray Array of molecule smiles strings. Note: aMoleculeSmilesStringArray[i] corresponds to aMatrix[i] data
+     * @param descriptors Array of descriptors to be calculated (IS NOT CHANGED)
+     * @param moleculeSmilesStringArray Array of molecule smiles strings. Note: moleculeSmilesStringArray[i] corresponds to matrix[i] data
      *                                   vector, i.e. the molecules define the rows of the matrix (IS NOT CHANGED)
-     * @param aMatrix Matrix of component vectors of molecules. Note: Data vector aMatrix[i] corresponds to molecule
-     *                aMoleculeSmilesStringArray[i]. (MAY BE CHANGED)
-     * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
+     * @param matrix Matrix of component vectors of molecules. Note: Data vector matrix[i] corresponds to molecule
+     *                moleculeSmilesStringArray[i]. (MAY BE CHANGED)
+     * @param startIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
      *                    column to start filling with descriptors
-     * @param aBatchSize Number of molecules to process in each batch
-     * @param anElectronDonationModel An Aromaticity model that is applied to every molecule. NOTE: Can be null, then
+     * @param batchSize Number of molecules to process in each batch
+     * @param electronDonationModel An Aromaticity model that is applied to every molecule. NOTE: Can be null, then
      *                                Aromaticity.Model.Daylight is used as default.
-     * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
-     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
-     *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
+     * @param isParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
+     * @param nanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      IMPORTANT: For parallel calculations (isParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
@@ -2083,116 +2078,116 @@ public enum Descriptor {
      *                              {@link Thread#interrupt()} and the affected batch is aborted silently
      */
     public static boolean setDescriptorsForMoleculeBySmilesStringsBatchParallelization(
-            Descriptor[] aDescriptors,
-            String[] aMoleculeSmilesStringArray,
-            float[][] aMatrix,
-            int aStartIndex,
-            int aBatchSize,
-            ElectronDonation anElectronDonationModel,
-            boolean anIsParallelCalculation,
-            List<int[]> aNanPositionsList
+            Descriptor[] descriptors,
+            String[] moleculeSmilesStringArray,
+            float[][] matrix,
+            int startIndex,
+            int batchSize,
+            ElectronDonation electronDonationModel,
+            boolean isParallelCalculation,
+            List<int[]> nanPositionsList
     ) throws IllegalArgumentException, InterruptedException {
         //<editor-fold desc="Checks">
         final String methodName = "setDescriptorsForMoleculeBySmilesStringsBatchParallelization";
-        if (!Descriptor.validateDescriptors(aDescriptors, methodName)) {
+        if (!Descriptor.validateDescriptors(descriptors, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
             return true;
         }
-        if (!Descriptor.validateSmilesStringArray(aMoleculeSmilesStringArray, methodName)) {
+        if (!Descriptor.validateSmilesStringArray(moleculeSmilesStringArray, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given SMILES string array is empty, calculation aborted.", methodName);
             return true;
         }
         // throws NullPointerException or IllegalArgumentException if the matrix or on eof its rows is null or its dimensions are invalid
-        Descriptor.validateMatrix(aMatrix, aDescriptors, aMoleculeSmilesStringArray, aStartIndex, methodName);
+        Descriptor.validateMatrix(matrix, descriptors, moleculeSmilesStringArray, startIndex, methodName);
         // throws NullPointerException if list is null
-        Descriptor.validateNanPositionsList(aNanPositionsList, methodName);
+        Descriptor.validateNanPositionsList(nanPositionsList, methodName);
         // throws IllegalArgumentException if batch size is <= 0
-        Descriptor.validateBatchSize(aBatchSize, methodName);
+        Descriptor.validateBatchSize(batchSize, methodName);
         //</editor-fold>
 
-        int tmpNumberOfMolecules = aMoleculeSmilesStringArray.length;
-        int tmpNumberOfBatches = (int) Math.ceil((double) tmpNumberOfMolecules / aBatchSize);
+        int numberOfMolecules = moleculeSmilesStringArray.length;
+        int numberOfBatches = (int) Math.ceil((double) numberOfMolecules / batchSize);
 
-        int[] tmpStartIndices = new int[aDescriptors.length];
-        for (int i = 0; i < aDescriptors.length; i++) {
-            tmpStartIndices[i] = aStartIndex;
-            aStartIndex += aDescriptors[i].getDescriptorComponentNumber();
+        int[] startIndices = new int[descriptors.length];
+        for (int i = 0; i < descriptors.length; i++) {
+            startIndices[i] = startIndex;
+            startIndex += descriptors[i].getDescriptorComponentNumber();
         }
 
-        AtomicBoolean tmpHasNaN = new AtomicBoolean(false);
+        AtomicBoolean hasNaN = new AtomicBoolean(false);
         try {
-            if (anIsParallelCalculation) {
+            if (isParallelCalculation) {
 
-                IntStream.range(0, tmpNumberOfBatches).parallel().forEach(batchIndex -> {
-                    int tmpBatchStart = batchIndex * aBatchSize;
-                    int tmpBatchEnd = Math.min(tmpBatchStart + aBatchSize, tmpNumberOfMolecules);
+                IntStream.range(0, numberOfBatches).parallel().forEach(batchIndex -> {
+                    int batchStart = batchIndex * batchSize;
+                    int batchEnd = Math.min(batchStart + batchSize, numberOfMolecules);
 
-                    for (int i = tmpBatchStart; i < tmpBatchEnd; i++) {
+                    for (int i = batchStart; i < batchEnd; i++) {
                         try {
-                            boolean tmpSuccess = Descriptor.setDescriptorsForSingleMoleculeSmilesString(
-                                    aDescriptors,
-                                    aMoleculeSmilesStringArray[i],
-                                    aMatrix[i],
-                                    tmpStartIndices,
+                            boolean success = Descriptor.setDescriptorsForSingleMoleculeSmilesString(
+                                    descriptors,
+                                    moleculeSmilesStringArray[i],
+                                    matrix[i],
+                                    startIndices,
                                     i,
-                                    anElectronDonationModel,
-                                    aNanPositionsList
+                                    electronDonationModel,
+                                    nanPositionsList
                             );
-                            if (!tmpSuccess) {
-                                tmpHasNaN.set(true);
+                            if (!success) {
+                                hasNaN.set(true);
                             }
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt(); // Preserve interrupt status
                             return;
-                        } catch (Exception anException) {
-                            tmpHasNaN.set(true);
+                        } catch (Exception exception) {
+                            hasNaN.set(true);
                             Descriptor.LOGGER.log(
                                     Level.WARNING,
                                     String.format("Descriptor.setDescriptorsForMoleculeBySmilesStringsBatchParallelization: Exception in batch %d, molecule index: %d", batchIndex, i),
-                                    anException
+                                    exception
                             );
                         }
                     }
                 });
 
             } else {
-                for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                    if (!Descriptor.setDescriptorsForSingleMoleculeSmilesString(aDescriptors, aMoleculeSmilesStringArray[i], aMatrix[i], tmpStartIndices, i, anElectronDonationModel, aNanPositionsList)) {
-                        tmpHasNaN.set(true);
+                for (int i = 0; i < numberOfMolecules; i++) {
+                    if (!Descriptor.setDescriptorsForSingleMoleculeSmilesString(descriptors, moleculeSmilesStringArray[i], matrix[i], startIndices, i, electronDonationModel, nanPositionsList)) {
+                        hasNaN.set(true);
                     }
                 }
             }
         } catch (InterruptedException e) {
             throw e;
-        } catch (Exception anException) {
+        } catch (Exception exception) {
             Descriptor.LOGGER.log(
                     Level.WARNING,
                     "Descriptor.setDescriptorsForMoleculeBySmilesStringsBatchParallelization: Global exception occurred in descriptor calculation.",
-                    anException
+                    exception
             );
             return false;
         }
-        return !tmpHasNaN.get();
+        return !hasNaN.get();
     }
 
     /**
-     * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
-     * beginning with aStartIndex by (optional) parallelization of molecules. If parallel computation is used, the atom
+     * Sets calculated descriptor components in vectors (rows) of a matrix (that corresponds to atomContainerArray)
+     * beginning with startIndex by (optional) parallelization of molecules. If parallel computation is used, the atom
      * containers (molecules) are distributed onto parallel thread, one for each molecule, and they all access shared
      * descriptor instances.
      * Note: For fingerprints a blocked queue is used, because fingerprinter instances are not threadsafe.
      * The pool size can be changed via {@link #setFingerprintPoolSize(int)}
      *
-     * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
-     * @param anAtomContainerArray Array of molecules. Note: anAtomContainerArray[i] corresponds to aMatrix[i] data
+     * @param descriptors Array of descriptors to be calculated (IS NOT CHANGED)
+     * @param atomContainerArray Array of molecules. Note: atomContainerArray[i] corresponds to matrix[i] data
      *                             vector, i.e. the molecules define the rows of the matrix (IS NOT CHANGED)
-     * @param aMatrix Matrix of component vectors of molecules. Note: Data vector aMatrix[i] corresponds to molecule
-     *                anAtomContainerArray[i]. (MAY BE CHANGED)
-     * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
+     * @param matrix Matrix of component vectors of molecules. Note: Data vector matrix[i] corresponds to molecule
+     *                atomContainerArray[i]. (MAY BE CHANGED)
+     * @param startIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
      *                    column to start filling with descriptors
-     * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
-     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
-     *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
+     * @param isParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
+     * @param nanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      IMPORTANT: For parallel calculations (isParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
@@ -2203,111 +2198,111 @@ public enum Descriptor {
      *                              {@link Thread#interrupt()} and the affected molecule is skipped silently
      */
     public static boolean setDescriptorsForMoleculesByMoleculeParallelization(
-            Descriptor[] aDescriptors,
-            IAtomContainer[] anAtomContainerArray,
-            float[][] aMatrix,
-            int aStartIndex,
-            boolean anIsParallelCalculation,
-            List<int[]> aNanPositionsList
+            Descriptor[] descriptors,
+            IAtomContainer[] atomContainerArray,
+            float[][] matrix,
+            int startIndex,
+            boolean isParallelCalculation,
+            List<int[]> nanPositionsList
     ) throws IllegalArgumentException, InterruptedException {
         //<editor-fold desc="Checks">
         final String methodName = "setDescriptorsForMoleculesByMoleculeParallelization";
-        if (!Descriptor.validateDescriptors(aDescriptors, methodName)) {
+        if (!Descriptor.validateDescriptors(descriptors, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
             return true;
         }
-        if (!Descriptor.validateAtomContainerArray(anAtomContainerArray, methodName)) {
+        if (!Descriptor.validateAtomContainerArray(atomContainerArray, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given atom container array is empty, calculation aborted.", methodName);
             return true;
         }
         // throws NullPointerException or IllegalArgumentException if the matrix or on eof its rows is null or its dimensions are invalid
-        Descriptor.validateMatrix(aMatrix, aDescriptors, anAtomContainerArray, aStartIndex, methodName);
+        Descriptor.validateMatrix(matrix, descriptors, atomContainerArray, startIndex, methodName);
         // throws NullPointerException if list is null
-        Descriptor.validateNanPositionsList(aNanPositionsList, methodName);
+        Descriptor.validateNanPositionsList(nanPositionsList, methodName);
         //</editor-fold>
 
-        int[] tmpStartIndices = new int[aDescriptors.length];
-        for (int i = 0; i < aDescriptors.length; i++) {
-            tmpStartIndices[i] = aStartIndex;
-            aStartIndex += aDescriptors[i].getDescriptorComponentNumber();
+        int[] startIndices = new int[descriptors.length];
+        for (int i = 0; i < descriptors.length; i++) {
+            startIndices[i] = startIndex;
+            startIndex += descriptors[i].getDescriptorComponentNumber();
         }
 
-        AtomicBoolean tmpHasNaN = new AtomicBoolean(false);
+        AtomicBoolean hasNaN = new AtomicBoolean(false);
         try {
-            if (anIsParallelCalculation) {
+            if (isParallelCalculation) {
 
                 // Advise by Oracle: Parallel streams should use the common Fork-join pool
-                IntStream.range(0, anAtomContainerArray.length).parallel().forEach(
+                IntStream.range(0, atomContainerArray.length).parallel().forEach(
                         i ->
                         {
                             try {
-                                boolean tmpSuccess = Descriptor.setDescriptorsForSingleMolecule(
-                                        aDescriptors,
-                                        anAtomContainerArray[i],
-                                        aMatrix[i],
-                                        tmpStartIndices,
+                                boolean success = Descriptor.setDescriptorsForSingleMolecule(
+                                        descriptors,
+                                        atomContainerArray[i],
+                                        matrix[i],
+                                        startIndices,
                                         i,
-                                        aNanPositionsList
+                                        nanPositionsList
                                 );
-                                if (!tmpSuccess) {
-                                    tmpHasNaN.set(true);
+                                if (!success) {
+                                    hasNaN.set(true);
                                 }
                             } catch (InterruptedException e) {
                                 Thread.currentThread().interrupt(); // Preserve interrupt status
-                            } catch (Exception anException) {
-                                tmpHasNaN.set(true);
+                            } catch (Exception exception) {
+                                hasNaN.set(true);
                                 Descriptor.LOGGER.log(
                                         Level.WARNING,
                                         String.format("Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: One descriptor calculation caused an exception, molecule index: %d.", i),
-                                        anException
+                                        exception
                                 );
                             }
                         }
                 );
-                return !tmpHasNaN.get();
+                return !hasNaN.get();
 
             } else {
                 //TODO: why this extra boolean here?
-                boolean tmpIsSuccessful = true;
-                for (int i = 0; i < anAtomContainerArray.length; i++) {
-                    if (!Descriptor.setDescriptorsForSingleMolecule(aDescriptors, anAtomContainerArray[i], aMatrix[i], tmpStartIndices, i, aNanPositionsList)) {
-                        tmpIsSuccessful = false;
+                boolean isSuccessful = true;
+                for (int i = 0; i < atomContainerArray.length; i++) {
+                    if (!Descriptor.setDescriptorsForSingleMolecule(descriptors, atomContainerArray[i], matrix[i], startIndices, i, nanPositionsList)) {
+                        isSuccessful = false;
                     }
                 }
-                return tmpIsSuccessful;
+                return isSuccessful;
             }
         } catch (InterruptedException e) {
             throw e;
-        } catch (Exception anException) {
+        } catch (Exception exception) {
             Descriptor.LOGGER.log(
                     Level.WARNING,
                     "Descriptor.setDescriptorsForMoleculesByMoleculeParallelization: Global exception occurred in descriptor calculation: ",
-                    anException
+                    exception
             );
             return false;
         }
     }
 
     /**
-     * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
-     * beginning with aStartIndex by (optional) parallelization of molecules. If parallel computation is used, the smiles strings
+     * Sets calculated descriptor components in vectors (rows) of a matrix (that corresponds to atomContainerArray)
+     * beginning with startIndex by (optional) parallelization of molecules. If parallel computation is used, the smiles strings
      * (molecules) are distributed onto parallel thread, one for each molecule, and they all access shared
      * descriptor instances.
      * Note: For fingerprints a blocked queue is used, because fingerprinter instances are not threadsafe.
      * The pool size can be changed via {@link #setFingerprintPoolSize(int)}
      *
-     * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
-     * @param aMoleculeSmilesStringArray Array of molecule smiles strings. Note: aMoleculeSmilesStringArray[i] corresponds to aMatrix[i] data
+     * @param descriptors Array of descriptors to be calculated (IS NOT CHANGED)
+     * @param moleculeSmilesStringArray Array of molecule smiles strings. Note: moleculeSmilesStringArray[i] corresponds to matrix[i] data
      *                                   vector, i.e. the molecules define the rows of the matrix (IS NOT CHANGED)
-     * @param aMatrix Matrix of component vectors of molecules. Note: Data vector aMatrix[i] corresponds to molecule
-     *                aMoleculeSmilesStringArray[i]. (MAY BE CHANGED)
-     * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
+     * @param matrix Matrix of component vectors of molecules. Note: Data vector matrix[i] corresponds to molecule
+     *                moleculeSmilesStringArray[i]. (MAY BE CHANGED)
+     * @param startIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
      *                    column to start filling with descriptors
-     * @param anElectronDonationModel An Aromaticity model that is applied to every molecule. NOTE: Can be null, then
+     * @param electronDonationModel An Aromaticity model that is applied to every molecule. NOTE: Can be null, then
      *                                Aromaticity.Model.Daylight is used as default.
-     * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
-     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
-     *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
+     * @param isParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
+     * @param nanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      IMPORTANT: For parallel calculations (isParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
@@ -2318,192 +2313,192 @@ public enum Descriptor {
      *                              {@link Thread#interrupt()} and the affected molecule is skipped silently
      */
     public static boolean setDescriptorsForMoleculesBySmilesStringParallelization(
-            Descriptor[] aDescriptors,
-            String[] aMoleculeSmilesStringArray,
-            float[][] aMatrix,
-            int aStartIndex,
-            ElectronDonation anElectronDonationModel,
-            boolean anIsParallelCalculation,
-            List<int[]> aNanPositionsList
+            Descriptor[] descriptors,
+            String[] moleculeSmilesStringArray,
+            float[][] matrix,
+            int startIndex,
+            ElectronDonation electronDonationModel,
+            boolean isParallelCalculation,
+            List<int[]> nanPositionsList
     ) throws IllegalArgumentException, InterruptedException {
         //<editor-fold desc="Checks">
         final String methodName = "setDescriptorsForMoleculesBySmilesStringParallelization";
-        if (!Descriptor.validateDescriptors(aDescriptors, methodName)) {
+        if (!Descriptor.validateDescriptors(descriptors, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
             return true;
         }
-        if (!Descriptor.validateSmilesStringArray(aMoleculeSmilesStringArray, methodName)) {
+        if (!Descriptor.validateSmilesStringArray(moleculeSmilesStringArray, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given SMILES string array is empty, calculation aborted.", methodName);
             return true;
         }
         // throws NullPointerException or IllegalArgumentException if the matrix or on eof its rows is null or its dimensions are invalid
-        Descriptor.validateMatrix(aMatrix, aDescriptors, aMoleculeSmilesStringArray, aStartIndex, methodName);
+        Descriptor.validateMatrix(matrix, descriptors, moleculeSmilesStringArray, startIndex, methodName);
         // throws NullPointerException if list is null
-        Descriptor.validateNanPositionsList(aNanPositionsList, methodName);
+        Descriptor.validateNanPositionsList(nanPositionsList, methodName);
         //</editor-fold>
 
-        int tmpNumberOfMolecules = aMoleculeSmilesStringArray.length;
-        int[] tmpStartIndices = new int[aDescriptors.length];
-        for (int i = 0; i < aDescriptors.length; i++) {
-            tmpStartIndices[i] = aStartIndex;
-            aStartIndex += aDescriptors[i].getDescriptorComponentNumber();
+        int numberOfMolecules = moleculeSmilesStringArray.length;
+        int[] startIndices = new int[descriptors.length];
+        for (int i = 0; i < descriptors.length; i++) {
+            startIndices[i] = startIndex;
+            startIndex += descriptors[i].getDescriptorComponentNumber();
         }
-        AtomicBoolean tmpHasNaN = new AtomicBoolean(false);
+        AtomicBoolean hasNaN = new AtomicBoolean(false);
         try {
-            if (anIsParallelCalculation) {
+            if (isParallelCalculation) {
 
                 // Advise by Oracle: Parallel streams should use the common Fork-join pool
-                IntStream.range(0, aMoleculeSmilesStringArray.length).parallel().forEach(
+                IntStream.range(0, moleculeSmilesStringArray.length).parallel().forEach(
                         i ->
                         {
                             try {
-                                boolean tmpSuccess = Descriptor.setDescriptorsForSingleMoleculeSmilesString(
-                                        aDescriptors,
-                                        aMoleculeSmilesStringArray[i],
-                                        aMatrix[i],
-                                        tmpStartIndices,
+                                boolean success = Descriptor.setDescriptorsForSingleMoleculeSmilesString(
+                                        descriptors,
+                                        moleculeSmilesStringArray[i],
+                                        matrix[i],
+                                        startIndices,
                                         i,
-                                        anElectronDonationModel,
-                                        aNanPositionsList
+                                        electronDonationModel,
+                                        nanPositionsList
                                 );
-                                if (!tmpSuccess) {
-                                    tmpHasNaN.set(true);
+                                if (!success) {
+                                    hasNaN.set(true);
                                 }
                             } catch (InterruptedException e) {
                                 Thread.currentThread().interrupt(); // Preserve interrupt status
-                            } catch (Exception anException) {
-                                tmpHasNaN.set(true);
+                            } catch (Exception exception) {
+                                hasNaN.set(true);
                                 Descriptor.LOGGER.log(
                                         Level.WARNING,
                                         String.format("Descriptor.setDescriptorsForMoleculesBySmilesStringParallelization: Exception in molecule index: %d", i),
-                                        anException
+                                        exception
                                 );
                             }
 
                         });
 
             } else {
-                for (int i = 0; i < tmpNumberOfMolecules; i++) {
-                    if (!Descriptor.setDescriptorsForSingleMoleculeSmilesString(aDescriptors, aMoleculeSmilesStringArray[i], aMatrix[i], tmpStartIndices, i, anElectronDonationModel, aNanPositionsList)) {
-                        tmpHasNaN.set(true);
+                for (int i = 0; i < numberOfMolecules; i++) {
+                    if (!Descriptor.setDescriptorsForSingleMoleculeSmilesString(descriptors, moleculeSmilesStringArray[i], matrix[i], startIndices, i, electronDonationModel, nanPositionsList)) {
+                        hasNaN.set(true);
                     }
                 }
             }
         } catch (InterruptedException e) {
             throw e;
-        } catch (Exception anException) {
+        } catch (Exception exception) {
             Descriptor.LOGGER.log(
                     Level.WARNING,
                     "Descriptor.setDescriptorsForMoleculesBySmilesStringParallelization: Global exception occurred in descriptor calculation.",
-                    anException
+                    exception
             );
             return false;
         }
-        return !tmpHasNaN.get();
+        return !hasNaN.get();
     }
 
     //TODO: remove/retire this method, right? Move it to test class?
     /**
-     * Sets calculated descriptor components in vectors (rows) of a aMatrix (that corresponds to anAtomContainerArray)
-     * beginning with aStartIndex by (optional) parallelization of molecules. If parallel computation is used, the atom
+     * Sets calculated descriptor components in vectors (rows) of a matrix (that corresponds to atomContainerArray)
+     * beginning with startIndex by (optional) parallelization of molecules. If parallel computation is used, the atom
      * containers (molecules) are distributed onto parallel thread, one for each molecule, and they all access shared
      * descriptor instances.
      * Note: Uses a new descriptor instance for EVERY descriptor calculation which slows down the calculation.
      * Note: For fingerprints a blocked queue is used, because fingerprinter instances are not threadsafe.
      * The pool size can be changed via {@link #setFingerprintPoolSize(int)}
      *
-     * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
-     * @param anAtomContainerArray Array of molecules. Note: anAtomContainerArray[i] corresponds to aMatrix[i] data
+     * @param descriptors Array of descriptors to be calculated (IS NOT CHANGED)
+     * @param atomContainerArray Array of molecules. Note: atomContainerArray[i] corresponds to matrix[i] data
      *                             vector. (IS NOT CHANGED)
-     * @param aMatrix Matrix of component vectors of molecules. Note: Data vector aMatrix[i] corresponds to molecule
-     *                anAtomContainerArray[i], i.e. the molecules define the rows of the matrix. (MAY BE CHANGED)
-     * @param aStartIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
+     * @param matrix Matrix of component vectors of molecules. Note: Data vector matrix[i] corresponds to molecule
+     *                atomContainerArray[i], i.e. the molecules define the rows of the matrix. (MAY BE CHANGED)
+     * @param startIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
      *                    column to start filling with descriptors
-     * @param anIsParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
-     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
-     *                      IMPORTANT: For parallel calculations (anIsParallelCalculation=true), this must be thread-safe.
+     * @param isParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
+     * @param nanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      IMPORTANT: For parallel calculations (isParallelCalculation=true), this must be thread-safe.
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
      * @throws IllegalArgumentException Thrown if an argument is illegal
      */
     public static boolean setDescriptorsForMoleculesByMoleculeParallelizationNew(
-            Descriptor[] aDescriptors,
-            IAtomContainer[] anAtomContainerArray,
-            float[][] aMatrix,
-            int aStartIndex,
-            boolean anIsParallelCalculation,
-            List<int[]> aNanPositionsList
+            Descriptor[] descriptors,
+            IAtomContainer[] atomContainerArray,
+            float[][] matrix,
+            int startIndex,
+            boolean isParallelCalculation,
+            List<int[]> nanPositionsList
     ) throws IllegalArgumentException {
         //<editor-fold desc="Checks">
         final String methodName = "setDescriptorsForMoleculesByMoleculeParallelizationNew";
-        if (!Descriptor.validateDescriptors(aDescriptors, methodName)) {
+        if (!Descriptor.validateDescriptors(descriptors, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
             return true;
         }
-        if (!Descriptor.validateAtomContainerArray(anAtomContainerArray, methodName)) {
+        if (!Descriptor.validateAtomContainerArray(atomContainerArray, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given atom container array is empty, calculation aborted.", methodName);
             return true;
         }
         // throws NullPointerException or IllegalArgumentException if the matrix or on eof its rows is null or its dimensions are invalid
-        Descriptor.validateMatrix(aMatrix, aDescriptors, anAtomContainerArray, aStartIndex, methodName);
+        Descriptor.validateMatrix(matrix, descriptors, atomContainerArray, startIndex, methodName);
         // throws NullPointerException if list is null
-        Descriptor.validateNanPositionsList(aNanPositionsList, methodName);
+        Descriptor.validateNanPositionsList(nanPositionsList, methodName);
         //</editor-fold>
 
-        int[] tmpStartIndices = new int[aDescriptors.length];
-        for (int i = 0; i < aDescriptors.length; i++) {
-            tmpStartIndices[i] = aStartIndex;
-            aStartIndex += aDescriptors[i].getDescriptorComponentNumber();
+        int[] startIndices = new int[descriptors.length];
+        for (int i = 0; i < descriptors.length; i++) {
+            startIndices[i] = startIndex;
+            startIndex += descriptors[i].getDescriptorComponentNumber();
         }
 
-        AtomicBoolean tmpHasNaN = new AtomicBoolean(false);
+        AtomicBoolean hasNaN = new AtomicBoolean(false);
         try {
-            if (anIsParallelCalculation) {
+            if (isParallelCalculation) {
 
                 // Advise by Oracle: Parallel streams should use the common Fork-join pool
-                IntStream.range(0, anAtomContainerArray.length).parallel().forEach(
+                IntStream.range(0, atomContainerArray.length).parallel().forEach(
                         i ->
                         {
                             try {
-                                boolean tmpSuccess = Descriptor.setDescriptorsForSingleMoleculeNew(
-                                        aDescriptors,
-                                        anAtomContainerArray[i],
-                                        aMatrix[i],
-                                        tmpStartIndices,
+                                boolean success = Descriptor.setDescriptorsForSingleMoleculeNew(
+                                        descriptors,
+                                        atomContainerArray[i],
+                                        matrix[i],
+                                        startIndices,
                                         i,
-                                        aNanPositionsList
+                                        nanPositionsList
                                 );
-                                if (!tmpSuccess) {
-                                    tmpHasNaN.set(true);
+                                if (!success) {
+                                    hasNaN.set(true);
                                 }
-                            } catch (Exception anException) {
-                                tmpHasNaN.set(true);
+                            } catch (Exception exception) {
+                                hasNaN.set(true);
                                 Descriptor.LOGGER.log(
                                         Level.WARNING,
                                         String.format("Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: One descriptor calculation caused an exception, molecule index: %d.", i),
-                                        anException
+                                        exception
                                 );
                             }
                         }
                 );
-                return !tmpHasNaN.get();
+                return !hasNaN.get();
 
             } else {
                 //TODO: again, why the extra variable here?
-                boolean tmpIsSuccessful = true;
-                for (int i = 0; i < anAtomContainerArray.length; i++) {
-                    if (!Descriptor.setDescriptorsForSingleMoleculeNew(aDescriptors, anAtomContainerArray[i], aMatrix[i], tmpStartIndices, i, aNanPositionsList)) {
-                        tmpIsSuccessful = false;
+                boolean isSuccessful = true;
+                for (int i = 0; i < atomContainerArray.length; i++) {
+                    if (!Descriptor.setDescriptorsForSingleMoleculeNew(descriptors, atomContainerArray[i], matrix[i], startIndices, i, nanPositionsList)) {
+                        isSuccessful = false;
                     }
                 }
-                return tmpIsSuccessful;
+                return isSuccessful;
             }
-        } catch (Exception anException) {
+        } catch (Exception exception) {
             Descriptor.LOGGER.log(
                     Level.WARNING,
                     "Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew: Global exception occurred in descriptor calculation: ",
-                    anException
+                    exception
             );
             return false;
         }
@@ -2512,17 +2507,17 @@ public enum Descriptor {
 
     //<editor-fold desc="Private static methods">
     /**
-     * Sets calculated descriptor components in aVector (that corresponds to anAtomContainer, a row in the data matrix)
+     * Sets calculated descriptor components in vector (that corresponds to atomContainer, a row in the data matrix)
      * at aStartIndices.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
-     * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
-     * @param anAtomContainer Molecule (IS NOT CHANGED)
-     * @param aVector Component vector of molecule (MAY BE CHANGED)
-     * @param aStartIndices Start indices in aVector to be filled with calculated components of descriptors (each
-     *                      descriptor in aDescriptors has its dedicated start index here)
-     * @param aMoleculeIndex Index of the current molecule being processed
-     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @param descriptors Array of descriptors to be calculated (IS NOT CHANGED)
+     * @param atomContainer Molecule (IS NOT CHANGED)
+     * @param vector Component vector of molecule (MAY BE CHANGED)
+     * @param aStartIndices Start indices in vector to be filled with calculated components of descriptors (each
+     *                      descriptor in descriptors has its dedicated start index here)
+     * @param moleculeIndex Index of the current molecule being processed
+     * @param nanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation result is NaN
      * @throws CloneNotSupportedException if copying the molecule fails
@@ -2530,43 +2525,43 @@ public enum Descriptor {
      *                              (propagated from {@link #setDescriptor})
      */
     private static boolean setDescriptorsForSingleMolecule (
-            Descriptor[] aDescriptors,
-            IAtomContainer anAtomContainer,
-            float[] aVector,
+            Descriptor[] descriptors,
+            IAtomContainer atomContainer,
+            float[] vector,
             int[] aStartIndices,
-            int aMoleculeIndex,
-            List<int[]> aNanPositions
+            int moleculeIndex,
+            List<int[]> nanPositionsList
     ) throws CloneNotSupportedException, InterruptedException {
-        IAtomContainer tmpMoleculeWithExplicitHydrogens = null;
-        for (Descriptor aDescriptor : aDescriptors) {
-            if (aDescriptor.needsExplicitHydrogens()){
-                tmpMoleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(anAtomContainer);
+        IAtomContainer moleculeWithExplicitHydrogens = null;
+        for (Descriptor descriptor : descriptors) {
+            if (descriptor.needsExplicitHydrogens()){
+                moleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(atomContainer);
                 break;
             }
         }
-        boolean tmpIsSuccessful = true;
-        for (int i = 0; i < aDescriptors.length; i++) {
-            IAtomContainer moleculeToUse = aDescriptors[i].needsExplicitHydrogens() ? tmpMoleculeWithExplicitHydrogens : anAtomContainer;
-            if (!Descriptor.setDescriptor(aDescriptors[i], moleculeToUse, aVector, aStartIndices[i], aMoleculeIndex, aNanPositions)) {
-                tmpIsSuccessful = false;
+        boolean isSuccessful = true;
+        for (int i = 0; i < descriptors.length; i++) {
+            IAtomContainer moleculeToUse = descriptors[i].needsExplicitHydrogens() ? moleculeWithExplicitHydrogens : atomContainer;
+            if (!Descriptor.setDescriptor(descriptors[i], moleculeToUse, vector, aStartIndices[i], moleculeIndex, nanPositionsList)) {
+                isSuccessful = false;
             }
         }
-        return tmpIsSuccessful;
+        return isSuccessful;
     }
 
     /**
-     * Sets calculated descriptor components in aVector (that corresponds to anAtomContainer, a row in the data matrix)
+     * Sets calculated descriptor components in vector (that corresponds to atomContainer, a row in the data matrix)
      * at aStartIndices.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
-     * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
-     * @param aMoleculeSmilesString Molecule SMILES String (IS NOT CHANGED)
-     * @param aVector Component vector of molecule (MAY BE CHANGED)
-     * @param aStartIndices Start indices in aVector to be filled with calculated components of descriptors (each
-     *                      descriptor in aDescriptors has its dedicated start index here)
-     * @param aMoleculeIndex Index of the current molecule being processed
-     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
-     * @param anElectronDonationModel An Aromaticity model that is applied to every molecule. NOTE: Can be null, then
+     * @param descriptors Array of descriptors to be calculated (IS NOT CHANGED)
+     * @param moleculeSmilesString Molecule SMILES String (IS NOT CHANGED)
+     * @param vector Component vector of molecule (MAY BE CHANGED)
+     * @param aStartIndices Start indices in vector to be filled with calculated components of descriptors (each
+     *                      descriptor in descriptors has its dedicated start index here)
+     * @param moleculeIndex Index of the current molecule being processed
+     * @param nanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @param electronDonationModel An Aromaticity model that is applied to every molecule. NOTE: Can be null, then
      * Aromaticity.Model.Daylight is used as default.
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation result is NaN
@@ -2576,127 +2571,127 @@ public enum Descriptor {
      *                              (propagated from {@link #setDescriptor})
      */
     private static boolean setDescriptorsForSingleMoleculeSmilesString (
-            Descriptor[] aDescriptors,
-            String aMoleculeSmilesString,
-            float[] aVector,
+            Descriptor[] descriptors,
+            String moleculeSmilesString,
+            float[] vector,
             int[] aStartIndices,
-            int aMoleculeIndex,
-            ElectronDonation anElectronDonationModel,
-            List<int[]> aNanPositions
+            int moleculeIndex,
+            ElectronDonation electronDonationModel,
+            List<int[]> nanPositionsList
     ) throws CDKException, CloneNotSupportedException, InterruptedException {
-        IAtomContainer tmpMolecule = Descriptor.SMILES_PARSER.parseSmiles(aMoleculeSmilesString);
-        if (anElectronDonationModel == null) {
-            Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
+        IAtomContainer molecule = Descriptor.SMILES_PARSER.parseSmiles(moleculeSmilesString);
+        if (electronDonationModel == null) {
+            Descriptor.setAromaticity(molecule, Aromaticity.Model.Daylight);
         } else {
-            Descriptor.setAromaticity(tmpMolecule, anElectronDonationModel);
+            Descriptor.setAromaticity(molecule, electronDonationModel);
         }
 
-        IAtomContainer tmpMoleculeWithExplicitHydrogens = null;
-        for (Descriptor aDescriptor : aDescriptors) {
-            if (aDescriptor.needsExplicitHydrogens()){
-                tmpMoleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(tmpMolecule);
+        IAtomContainer moleculeWithExplicitHydrogens = null;
+        for (Descriptor descriptor : descriptors) {
+            if (descriptor.needsExplicitHydrogens()){
+                moleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(molecule);
                 break;
             }
         }
-        boolean tmpIsSuccessful = true;
-        for (int i = 0; i < aDescriptors.length; i++) {
-            IAtomContainer moleculeToUse = aDescriptors[i].needsExplicitHydrogens() ? tmpMoleculeWithExplicitHydrogens : tmpMolecule;
-            if (!Descriptor.setDescriptor(aDescriptors[i], moleculeToUse, aVector, aStartIndices[i], aMoleculeIndex, aNanPositions)) {
-                tmpIsSuccessful = false;
+        boolean isSuccessful = true;
+        for (int i = 0; i < descriptors.length; i++) {
+            IAtomContainer moleculeToUse = descriptors[i].needsExplicitHydrogens() ? moleculeWithExplicitHydrogens : molecule;
+            if (!Descriptor.setDescriptor(descriptors[i], moleculeToUse, vector, aStartIndices[i], moleculeIndex, nanPositionsList)) {
+                isSuccessful = false;
             }
         }
-        return tmpIsSuccessful;
+        return isSuccessful;
     }
 
     /**
-     * Sets calculated descriptor components in aVector (that corresponds to anAtomContainer, a row in the data matrix)
+     * Sets calculated descriptor components in vector (that corresponds to atomContainer, a row in the data matrix)
      * at aStartIndices.
      * Note: Uses a new descriptor instance for EVERY descriptor calculation.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
-     * @param aDescriptors Array of descriptors to be calculated (IS NOT CHANGED)
-     * @param anAtomContainer Molecule (IS NOT CHANGED)
-     * @param aVector Component vector of molecule (MAY BE CHANGED)
-     * @param aStartIndices Start indices in aVector to be filled with calculated components of descriptor (each descriptor
-     *                      in aDescriptors has its dedicated start index here)
-     * @param aMoleculeIndex Index of the current molecule being processed
-     * @param aNanPositions List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @param descriptors Array of descriptors to be calculated (IS NOT CHANGED)
+     * @param atomContainer Molecule (IS NOT CHANGED)
+     * @param vector Component vector of molecule (MAY BE CHANGED)
+     * @param aStartIndices Start indices in vector to be filled with calculated components of descriptor (each descriptor
+     *                      in descriptors has its dedicated start index here)
+     * @param moleculeIndex Index of the current molecule being processed
+     * @param nanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation result is NaN
      * @throws CloneNotSupportedException if copying the molecule fails
      */
     private static boolean setDescriptorsForSingleMoleculeNew(
-        Descriptor[] aDescriptors,
-        IAtomContainer anAtomContainer,
-        float[] aVector,
+        Descriptor[] descriptors,
+        IAtomContainer atomContainer,
+        float[] vector,
         int[] aStartIndices,
-        int aMoleculeIndex,
-        List<int[]> aNanPositions
+        int moleculeIndex,
+        List<int[]> nanPositionsList
     ) throws CloneNotSupportedException {
-        IAtomContainer tmpMoleculeWithExplicitHydrogens = null;
-        for (Descriptor aDescriptor : aDescriptors) {
-            if (aDescriptor.needsExplicitHydrogens()){
-                tmpMoleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(anAtomContainer);
+        IAtomContainer moleculeWithExplicitHydrogens = null;
+        for (Descriptor descriptor : descriptors) {
+            if (descriptor.needsExplicitHydrogens()){
+                moleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(atomContainer);
                 break;
             }
         }
-        boolean tmpIsSuccessful = true;
-        for (int i = 0; i < aDescriptors.length; i++) {
-            IAtomContainer moleculeToUse = aDescriptors[i].needsExplicitHydrogens() ? tmpMoleculeWithExplicitHydrogens : anAtomContainer;
-            if (!Descriptor.setDescriptorNew(aDescriptors[i], moleculeToUse, aVector, aStartIndices[i], aMoleculeIndex, aNanPositions)) {
-                tmpIsSuccessful = false;
+        boolean isSuccessful = true;
+        for (int i = 0; i < descriptors.length; i++) {
+            IAtomContainer moleculeToUse = descriptors[i].needsExplicitHydrogens() ? moleculeWithExplicitHydrogens : atomContainer;
+            if (!Descriptor.setDescriptorNew(descriptors[i], moleculeToUse, vector, aStartIndices[i], moleculeIndex, nanPositionsList)) {
+                isSuccessful = false;
             }
         }
-        return tmpIsSuccessful;
+        return isSuccessful;
     }
 
     /**
-     * Sets component values of aDescriptor for anAtomContainer in aVector beginning with aStartIndex.
+     * Sets component values of descriptor for atomContainer in vector beginning with startIndex.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
-     * @param aDescriptor Descriptor to be calculated (IS NOT CHANGED)
-     * @param anAtomContainer Molecule (IS NOT CHANGED)
-     * @param aVector Vector of molecule (row of data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
-     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
-     * @param aMoleculeIndex Index of the current molecule being processed (row index in data matrix)
-     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @param descriptor Descriptor to be calculated (IS NOT CHANGED)
+     * @param atomContainer Molecule (IS NOT CHANGED)
+     * @param vector Vector of molecule (row of data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param startIndex Start index in vector to be filled with calculated components of descriptors
+     * @param moleculeIndex Index of the current molecule being processed (row index in data matrix)
+     * @param nanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation result is NaN
      * @throws InterruptedException if the current thread is interrupted during fingerprint calculation
      *                              (propagated from {@link #calculate}); all other exceptions are caught,
-     *                              logged, and converted to NaN values in aVector
+     *                              logged, and converted to NaN values in vector
      */
     private static boolean setDescriptor(
-            Descriptor aDescriptor,
-            IAtomContainer anAtomContainer,
-            float[] aVector,
-            int aStartIndex,
-            int aMoleculeIndex,
-            List<int[]> aNanPositionsList
+            Descriptor descriptor,
+            IAtomContainer atomContainer,
+            float[] vector,
+            int startIndex,
+            int moleculeIndex,
+            List<int[]> nanPositionsList
     ) throws InterruptedException {
         try {
-            aDescriptor.calculate(anAtomContainer, aVector, aStartIndex);
+            descriptor.calculate(atomContainer, vector, startIndex);
 
             // Check for NaN values in the calculated result and track them
-            int numComponents = aDescriptor.getDescriptorComponentNumber();
-            return !Descriptor.checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositionsList);
+            int numComponents = descriptor.getDescriptorComponentNumber();
+            return !Descriptor.checkAndTrackNaNValues(vector, startIndex, numComponents, moleculeIndex, nanPositionsList);
         } catch (InterruptedException e) {
             throw e;
-        } catch (Exception anException) {
-            int numComponents = aDescriptor.getDescriptorComponentNumber();
+        } catch (Exception exception) {
+            int numComponents = descriptor.getDescriptorComponentNumber();
             for (int i = 0; i < numComponents; i++) {
-                aVector[aStartIndex + i] = Float.NaN;
-                // Track NaN position if aNanPositionsList is provided
-                if (aNanPositionsList != null) {
-                    aNanPositionsList.add(new int[]{aMoleculeIndex, aStartIndex + i});
+                vector[startIndex + i] = Float.NaN;
+                // Track NaN position if nanPositionsList is provided
+                if (nanPositionsList != null) {
+                    nanPositionsList.add(new int[]{moleculeIndex, startIndex + i});
                 }
             }
             Descriptor.LOGGER.log(
                     Level.WARNING,
                     String.format("Descriptor.setDescriptor: An exception occurred while calculating descriptor %s for molecule index %d.",
-                            aDescriptor,
-                            aMoleculeIndex),
-                    anException
+                            descriptor,
+                            moleculeIndex),
+                    exception
             );
             return false;
         }
@@ -2705,467 +2700,467 @@ public enum Descriptor {
     //TODO: we decided to move this to the test class, right?
     //TODO: since this method is only used in setDescriptorsForSingleMoleculeNew() which only adds a brief preprocessing, the two methods could be combined
     /**
-     * Sets component values of aDescriptor for anAtomContainer in aVector beginning with aStartIndex.
+     * Sets component values of descriptor for atomContainer in vector beginning with startIndex.
      * Note: This method instantiates a new CDK descriptor instance for EVERY calculation and is therefore thread-safe in
      * concurrent computing.
      * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
      *
-     * @param aDescriptor Descriptor to be calculated (IS NOT CHANGED)
-     * @param anAtomContainer Molecule (IS NOT CHANGED)
-     * @param aVector Vector of molecule (row in data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
-     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
-     * @param aMoleculeIndex Index of the current molecule being processed
-     * @param aNanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @param descriptor Descriptor to be calculated (IS NOT CHANGED)
+     * @param atomContainer Molecule (IS NOT CHANGED)
+     * @param vector Vector of molecule (row in data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param startIndex Start index in vector to be filled with calculated components of descriptors
+     * @param moleculeIndex Index of the current molecule being processed
+     * @param nanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
      * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
      * descriptor calculation result is NaN
      */
     private static boolean setDescriptorNew(
-            Descriptor aDescriptor,
-            IAtomContainer anAtomContainer,
-            float[] aVector,
-            int aStartIndex,
-            int aMoleculeIndex,
-            List<int[]> aNanPositionsList
+            Descriptor descriptor,
+            IAtomContainer atomContainer,
+            float[] vector,
+            int startIndex,
+            int moleculeIndex,
+            List<int[]> nanPositionsList
     ) {
         try {
-            switch (aDescriptor) {
+            switch (descriptor) {
                 //note: the initializations here should be the same as in the descriptorToCdkObjectMap!
                 case Descriptor.MOLECULAR_WEIGHT:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new WeightDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new WeightDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.WIENER_NUMBER:
-                    DoubleArrayResult tmpResult = (DoubleArrayResult) (new WienerNumbersDescriptor()).calculate(anAtomContainer).getValue();
-                    aVector[aStartIndex] = (float) tmpResult.get(0); //Wiener path number
-                    aVector[aStartIndex + 1] = (float) tmpResult.get(1); //Wiener polarity number
+                    DoubleArrayResult result = (DoubleArrayResult) (new WienerNumbersDescriptor()).calculate(atomContainer).getValue();
+                    vector[startIndex] = (float) result.get(0); //Wiener path number
+                    vector[startIndex + 1] = (float) result.get(1); //Wiener polarity number
                     break;
                 case Descriptor.ATOM_COUNT:
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new AtomCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) (new AtomCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.ATOM_COUNT_C:
                     AtomCountDescriptor atomCountCDesc = new AtomCountDescriptor();
                     //set parameter to count carbon atoms
                     atomCountCDesc.setParameters(new String[]{"C"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountCDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) atomCountCDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.ATOM_COUNT_H:
                     AtomCountDescriptor atomCountHDesc = new AtomCountDescriptor();
                     //set parameter to count hydrogen atoms
                     atomCountHDesc.setParameters(new String[]{"H"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountHDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) atomCountHDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.ATOM_COUNT_N:
                     AtomCountDescriptor atomCountNDesc = new AtomCountDescriptor();
                     //set parameter to count nitrogen atoms
                     atomCountNDesc.setParameters(new String[]{"N"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountNDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) atomCountNDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.ATOM_COUNT_O:
                     AtomCountDescriptor atomCountODesc = new AtomCountDescriptor();
                     //set parameter to count oxygen atoms
                     atomCountODesc.setParameters(new String[]{"O"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountODesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) atomCountODesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.ATOM_COUNT_S:
                     AtomCountDescriptor atomCountSDesc = new AtomCountDescriptor();
                     //set parameter to count sulfur atoms
                     atomCountSDesc.setParameters(new String[]{"S"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountSDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) atomCountSDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.ATOM_COUNT_P:
                     AtomCountDescriptor atomCountPDesc = new AtomCountDescriptor();
                     //set parameter to count phosphorus atoms
                     atomCountPDesc.setParameters(new Object[]{"P"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountPDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) atomCountPDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.ATOM_COUNT_F:
                     AtomCountDescriptor atomCountFDesc = new AtomCountDescriptor();
                     //set parameter to count fluorine atoms
                     atomCountFDesc.setParameters(new String[]{"F"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountFDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) atomCountFDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.ATOM_COUNT_BR:
                     AtomCountDescriptor atomCountBrDesc = new AtomCountDescriptor();
                     //set parameter to count bromine atoms
                     atomCountBrDesc.setParameters(new String[]{"Br"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountBrDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) atomCountBrDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.ATOM_COUNT_CL:
                     AtomCountDescriptor atomCountClDesc = new AtomCountDescriptor();
                     //set parameter to count chlorine atoms
                     atomCountClDesc.setParameters(new String[]{"Cl"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountClDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) atomCountClDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.ATOM_COUNT_I:
                     AtomCountDescriptor atomCountIDesc = new AtomCountDescriptor();
                     //set parameter to count iodine atoms
                     atomCountIDesc.setParameters(new String[]{"I"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) atomCountIDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) atomCountIDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.H_BOND_ACCEPTOR_COUNT:
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new HBondAcceptorCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) (new HBondAcceptorCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.H_BOND_DONOR_COUNT:
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new HBondDonorCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) (new HBondDonorCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.TPSA:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new TPSADescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new TPSADescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.LARGEST_CHAIN:
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new LargestChainDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) (new LargestChainDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.LONGEST_ALIPHATIC_CHAIN:
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new LongestAliphaticChainDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) (new LongestAliphaticChainDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.MANNHOLD_LOGP:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new MannholdLogPDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new MannholdLogPDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.BCUT:
                     BCUTDescriptor bcutDescriptor = new BCUTDescriptor();
                     // Change parameters so that we can use our own setAromaticity method default: checkAromaticity = true
                     bcutDescriptor.setParameters(new Object[] {1, 1, false}); // nhigh = 1, nlow = 1, checkAromaticity = false
-                    DoubleArrayResult bcutResult = (DoubleArrayResult) bcutDescriptor.calculate(anAtomContainer).getValue();
+                    DoubleArrayResult bcutResult = (DoubleArrayResult) bcutDescriptor.calculate(atomContainer).getValue();
                     for (int i = 0; i < 6; i++) {
-                        aVector[aStartIndex + i] = (float) bcutResult.get(i);
+                        vector[startIndex + i] = (float) bcutResult.get(i);
                     }
                     break;
                 case Descriptor.BOND_COUNT_ALL:
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new BondCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) (new BondCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.BOND_COUNT_SINGLE:
                     BondCountDescriptor bondCountSingleDesc = new BondCountDescriptor();
                     //set parameter to count single bonds
                     bondCountSingleDesc.setParameters(new String[]{"s"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) bondCountSingleDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) bondCountSingleDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.BOND_COUNT_DOUBLE:
                     BondCountDescriptor bondCountDoubleDesc = new BondCountDescriptor();
                     //set parameter to count double bonds
                     bondCountDoubleDesc.setParameters(new String[]{"d"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) bondCountDoubleDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) bondCountDoubleDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.BOND_COUNT_TRIPLE:
                     BondCountDescriptor bondCountTripleDesc = new BondCountDescriptor();
                     //set parameter to count triple bonds
                     bondCountTripleDesc.setParameters(new String[]{"t"});
-                    aVector[aStartIndex] = (float) ((IntegerResult) bondCountTripleDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) bondCountTripleDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.B_POL:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new BPolDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new BPolDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.RULE_OF_FIVE:
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new RuleOfFiveDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) (new RuleOfFiveDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.AROMATIC_ATOMS_COUNT:
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new AromaticAtomsCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) (new AromaticAtomsCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.AROMATIC_BONDS_COUNT:
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new AromaticBondsCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) (new AromaticBondsCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.ROTATABLE_BONDS_COUNT:
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new RotatableBondsCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) (new RotatableBondsCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.FMF:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new FMFDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new FMFDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.FRACTIONAL_CSP3:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new FractionalCSP3Descriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new FractionalCSP3Descriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.HYBRIDIZATION_RATIO:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new HybridizationRatioDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new HybridizationRatioDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.KAPPA_SHAPE_INDICES:
-                    DoubleArrayResult kappaResult = (DoubleArrayResult) (new KappaShapeIndicesDescriptor()).calculate(anAtomContainer).getValue();
+                    DoubleArrayResult kappaResult = (DoubleArrayResult) (new KappaShapeIndicesDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 3; i++) {
-                        aVector[aStartIndex + i] = (float) kappaResult.get(i);
+                        vector[startIndex + i] = (float) kappaResult.get(i);
                     }
                     break;
                 case Descriptor.PETITJEAN_NUMBER:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new PetitjeanNumberDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new PetitjeanNumberDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.SPIRO_ATOM_COUNT:
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new SpiroAtomCountDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) (new SpiroAtomCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.V_ADJ_MAT:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new VAdjMaDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new VAdjMaDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.WEIGHTED_PATH:
-                    DoubleArrayResult tmpWeightedPathResultNew = (DoubleArrayResult) (new WeightedPathDescriptor()).calculate(anAtomContainer).getValue();
+                    DoubleArrayResult weightedPathResultNew = (DoubleArrayResult) (new WeightedPathDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 5; i++) {
-                        aVector[aStartIndex + i] = (float) tmpWeightedPathResultNew.get(i);
+                        vector[startIndex + i] = (float) weightedPathResultNew.get(i);
                     }
                     break;
                 case Descriptor.ZAGREB_INDEX:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new ZagrebIndexDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new ZagrebIndexDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.CARBON_TYPES:
-                    IntegerArrayResult carbonTypesResultNew = (IntegerArrayResult) (new CarbonTypesDescriptor()).calculate(anAtomContainer).getValue();
+                    IntegerArrayResult carbonTypesResultNew = (IntegerArrayResult) (new CarbonTypesDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 9; i++) {
-                        aVector[aStartIndex + i] = carbonTypesResultNew.get(i);
+                        vector[startIndex + i] = carbonTypesResultNew.get(i);
                     }
                     break;
                 case Descriptor.A_LOG_P:
-                    DoubleArrayResult aLogPResult = (DoubleArrayResult) (new ALOGPDescriptor()).calculate(anAtomContainer).getValue();
-                    aVector[aStartIndex] = (float) aLogPResult.get(0);// ALogP
-                    aVector[aStartIndex + 1] = (float) aLogPResult.get(1);  // ALogP squared
-                    aVector[aStartIndex + 2] = (float) aLogPResult.get(2);  // Molar Refractivity
+                    DoubleArrayResult aLogPResult = (DoubleArrayResult) (new ALOGPDescriptor()).calculate(atomContainer).getValue();
+                    vector[startIndex] = (float) aLogPResult.get(0);// ALogP
+                    vector[startIndex + 1] = (float) aLogPResult.get(1);  // ALogP squared
+                    vector[startIndex + 2] = (float) aLogPResult.get(2);  // Molar Refractivity
                     break;
                 case Descriptor.X_LOG_P:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new XLogPDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new XLogPDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.JP_LOG_P:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new JPlogPDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new JPlogPDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.A_POL:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new APolDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new APolDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.AUTOCORRELATION_CHARGE:
-                    DoubleArrayResult tmpAutocorrelationChargeResult = (DoubleArrayResult) (new AutocorrelationDescriptorCharge()).calculate(anAtomContainer).getValue();
+                    DoubleArrayResult autocorrelationChargeResult = (DoubleArrayResult) (new AutocorrelationDescriptorCharge()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 5; i++) {
-                        aVector[aStartIndex + i] = (float) tmpAutocorrelationChargeResult.get(i);
+                        vector[startIndex + i] = (float) autocorrelationChargeResult.get(i);
                     }
                     break;
                 case Descriptor.AUTOCORRELATION_MASS:
-                    DoubleArrayResult tmpAutocorrelationMassResult = (DoubleArrayResult) (new AutocorrelationDescriptorMass()).calculate(anAtomContainer).getValue();
+                    DoubleArrayResult autocorrelationMassResult = (DoubleArrayResult) (new AutocorrelationDescriptorMass()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 5; i++) {
-                        aVector[aStartIndex + i] = (float) tmpAutocorrelationMassResult.get(i);
+                        vector[startIndex + i] = (float) autocorrelationMassResult.get(i);
                     }
                     break;
                 case Descriptor.AUTOCORRELATION_POLARIZABILITY:
-                    DoubleArrayResult tmpAutocorrelationPolarizabilityResult = (DoubleArrayResult) (new AutocorrelationDescriptorPolarizability()).calculate(anAtomContainer).getValue();
+                    DoubleArrayResult autocorrelationPolarizabilityResult = (DoubleArrayResult) (new AutocorrelationDescriptorPolarizability()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 5; i++) {
-                        aVector[aStartIndex + i] = (float) tmpAutocorrelationPolarizabilityResult.get(i);
+                        vector[startIndex + i] = (float) autocorrelationPolarizabilityResult.get(i);
                     }
                     break;
                 case Descriptor.FRAGMENT_COMPLEXITY:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new FragmentComplexityDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new FragmentComplexityDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.CHI_CHAIN:
-                    DoubleArrayResult tmpChiChainResult = (DoubleArrayResult) new ChiChainDescriptor().calculate(anAtomContainer).getValue();
+                    DoubleArrayResult chiChainResult = (DoubleArrayResult) new ChiChainDescriptor().calculate(atomContainer).getValue();
                     for (int i = 0; i < 10; i++) {
-                        aVector[aStartIndex + i] = (float) tmpChiChainResult.get(i);
+                        vector[startIndex + i] = (float) chiChainResult.get(i);
                     }
                     break;
                 case Descriptor.CHI_CLUSTER:
-                    DoubleArrayResult tmpChiClusterResult = (DoubleArrayResult) (new ChiClusterDescriptor()).calculate(anAtomContainer).getValue();
+                    DoubleArrayResult chiClusterResult = (DoubleArrayResult) (new ChiClusterDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 8; i++) {
-                        aVector[aStartIndex + i] = (float) tmpChiClusterResult.get(i);
+                        vector[startIndex + i] = (float) chiClusterResult.get(i);
                     }
                     break;
                 case Descriptor.CHI_PATH_CLUSTER:
-                    DoubleArrayResult chiPathClusterResult = (DoubleArrayResult) new ChiPathClusterDescriptor().calculate(anAtomContainer).getValue();
+                    DoubleArrayResult chiPathClusterResult = (DoubleArrayResult) new ChiPathClusterDescriptor().calculate(atomContainer).getValue();
                     for (int i = 0; i < 6; i++) {
-                        aVector[aStartIndex + i] = (float) chiPathClusterResult.get(i);
+                        vector[startIndex + i] = (float) chiPathClusterResult.get(i);
                     }
                     break;
                 case Descriptor.CHI_PATH:
-                    DoubleArrayResult tmpArrayResultChiPath = (DoubleArrayResult) (new ChiPathDescriptor()).calculate(anAtomContainer).getValue();
+                    DoubleArrayResult chiPathResult = (DoubleArrayResult) (new ChiPathDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 16; i++) {
-                        aVector[aStartIndex + i] = (float) tmpArrayResultChiPath.get(i);
+                        vector[startIndex + i] = (float) chiPathResult.get(i);
                     }
                     break;
                 case Descriptor.FRACTIONAL_PSA:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new FractionalPSADescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new FractionalPSADescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.LARGEST_PI_SYSTEM:
                     LargestPiSystemDescriptor largestPiSystemDescriptor = new LargestPiSystemDescriptor();
                     // Change parameters so that we can use our own setAromaticity method
                     largestPiSystemDescriptor.setParameters(new Boolean[] {false}); // checkAromaticity = false
-                    aVector[aStartIndex] = (float) ((IntegerResult) largestPiSystemDescriptor.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) largestPiSystemDescriptor.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.SMALL_RING:
-                    IntegerArrayResult smallRingResult = (IntegerArrayResult) (new SmallRingDescriptor()).calculate(anAtomContainer).getValue();
+                    IntegerArrayResult smallRingResult = (IntegerArrayResult) (new SmallRingDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 11; i++) {
-                        aVector[aStartIndex + i] = (float) smallRingResult.get(i);
+                        vector[startIndex + i] = (float) smallRingResult.get(i);
                     }
                     break;
                 case Descriptor.BASIC_GROUP_COUNT:
                     BasicGroupCountDescriptor basicGroupCountDesc = new BasicGroupCountDescriptor();
                     basicGroupCountDesc.initialise(SilentChemObjectBuilder.getInstance());
-                    aVector[aStartIndex] = (float) ((IntegerResult) basicGroupCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) basicGroupCountDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.ACIDIC_GROUP_COUNT:
                     AcidicGroupCountDescriptor acidicGroupCountDesc = new AcidicGroupCountDescriptor();
                     acidicGroupCountDesc.initialise(SilentChemObjectBuilder.getInstance());
-                    aVector[aStartIndex] = (float) ((IntegerResult) acidicGroupCountDesc.calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) acidicGroupCountDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.AMINO_ACID_COUNT:
-                    IntegerArrayResult aminoAcidCountResult = (IntegerArrayResult) (new AminoAcidCountDescriptor()).calculate(anAtomContainer).getValue();
+                    IntegerArrayResult aminoAcidCountResult = (IntegerArrayResult) (new AminoAcidCountDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 20; i++) {
-                        aVector[aStartIndex + i] = (float) aminoAcidCountResult.get(i);
+                        vector[startIndex + i] = (float) aminoAcidCountResult.get(i);
                     }
                     break;
                 case Descriptor.KIER_HALL_SMARTS:
-                    IntegerArrayResult kierHallSmartsResult = (IntegerArrayResult) (new KierHallSmartsDescriptor()).calculate(anAtomContainer).getValue();
+                    IntegerArrayResult kierHallSmartsResult = (IntegerArrayResult) (new KierHallSmartsDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 79; i++) {
-                        aVector[aStartIndex + i] = (float) kierHallSmartsResult.get(i);
+                        vector[startIndex + i] = (float) kierHallSmartsResult.get(i);
                     }
                     break;
                 case Descriptor.ECCENTRIC_CONNECTIVITY_INDEX:
-                    aVector[aStartIndex] = (float) ((IntegerResult) (new EccentricConnectivityIndexDescriptor()).calculate(anAtomContainer).getValue()).intValue();
+                    vector[startIndex] = (float) ((IntegerResult) (new EccentricConnectivityIndexDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
                 case Descriptor.MDE:
-                    DoubleArrayResult aDoubleArrayResult = (DoubleArrayResult) (new MDEDescriptor()).calculate(anAtomContainer).getValue();
+                    DoubleArrayResult aDoubleArrayResult = (DoubleArrayResult) (new MDEDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 19; i++) {
-                        aVector[aStartIndex + i] = (float) aDoubleArrayResult.get(i);
+                        vector[startIndex + i] = (float) aDoubleArrayResult.get(i);
                     }
                     break;
                 case Descriptor.VABC:
-                    aVector[aStartIndex] = (float) ((DoubleResult) (new VABCDescriptor()).calculate(anAtomContainer).getValue()).doubleValue();
+                    vector[startIndex] = (float) ((DoubleResult) (new VABCDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
                 case Descriptor.PUBCHEM_FINGERPRINTER:
                     //TODO: why do the fingerprints have their own try-catch block? It does the same as the general one below, right? So, can we remove them?
                     try {
-                        IBitFingerprint fingerprint = new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()).getBitFingerprint(anAtomContainer);
+                        IBitFingerprint fingerprint = new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.PUBCHEM_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
-                    } catch (Exception anException) {
+                    } catch (Exception exception) {
                         for (int i = 0; i < Descriptor.PUBCHEM_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = Float.NaN;
+                            vector[startIndex + i] = Float.NaN;
                         }
-                        Descriptor.LOGGER.log(Level.WARNING, anException.toString(), anException);
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
                 case Descriptor.CIRCULAR_FINGERPRINTER_ECFP_0:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(anAtomContainer);
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
-                    } catch (Exception anException) {
+                    } catch (Exception exception) {
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = Float.NaN;
+                            vector[startIndex + i] = Float.NaN;
                         }
-                        Descriptor.LOGGER.log(Level.WARNING, anException.toString(), anException);
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
                 case Descriptor.CIRCULAR_FINGERPRINTER_FCFP_0:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(anAtomContainer);
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
-                    } catch (Exception anException) {
+                    } catch (Exception exception) {
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = Float.NaN;
+                            vector[startIndex + i] = Float.NaN;
                         }
-                        Descriptor.LOGGER.log(Level.WARNING, anException.toString(), anException);
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
                 case Descriptor.CIRCULAR_FINGERPRINTER_ECFP_2:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(anAtomContainer);
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
-                    } catch (Exception anException) {
+                    } catch (Exception exception) {
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = Float.NaN;
+                            vector[startIndex + i] = Float.NaN;
                         }
-                        Descriptor.LOGGER.log(Level.WARNING, anException.toString(), anException);
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
                 case Descriptor.CIRCULAR_FINGERPRINTER_FCFP_2:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(anAtomContainer);
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
-                    } catch (Exception anException) {
+                    } catch (Exception exception) {
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = Float.NaN;
+                            vector[startIndex + i] = Float.NaN;
                         }
-                        Descriptor.LOGGER.log(Level.WARNING, anException.toString(), anException);
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
                 case Descriptor.CIRCULAR_FINGERPRINTER_ECFP_4:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(anAtomContainer);
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
-                    } catch (Exception anException) {
+                    } catch (Exception exception) {
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = Float.NaN;
+                            vector[startIndex + i] = Float.NaN;
                         }
-                        Descriptor.LOGGER.log(Level.WARNING, anException.toString(), anException);
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
                 case Descriptor.CIRCULAR_FINGERPRINTER_FCFP_4:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(anAtomContainer);
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
-                    } catch (Exception anException) {
+                    } catch (Exception exception) {
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = Float.NaN;
+                            vector[startIndex + i] = Float.NaN;
                         }
-                        Descriptor.LOGGER.log(Level.WARNING, anException.toString(), anException);
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
                 case Descriptor.CIRCULAR_FINGERPRINTER_ECFP_6:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(anAtomContainer);
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
-                    } catch (Exception anException) {
+                    } catch (Exception exception) {
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = Float.NaN;
+                            vector[startIndex + i] = Float.NaN;
                         }
-                        Descriptor.LOGGER.log(Level.WARNING, anException.toString(), anException);
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
                 case Descriptor.CIRCULAR_FINGERPRINTER_FCFP_6:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(anAtomContainer);
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
-                    } catch (Exception anException) {
+                    } catch (Exception exception) {
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
-                            aVector[aStartIndex + i] = Float.NaN;
+                            vector[startIndex + i] = Float.NaN;
                         }
-                        Descriptor.LOGGER.log(Level.WARNING, anException.toString(), anException);
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
                 case Descriptor.MACCS_FINGERPRINTER:
                     try {
-                        IBitFingerprint fingerprint = new MACCSFingerprinter(SilentChemObjectBuilder.getInstance()).getBitFingerprint(anAtomContainer);
+                        IBitFingerprint fingerprint = new MACCSFingerprinter(SilentChemObjectBuilder.getInstance()).getBitFingerprint(atomContainer);
                         for (int i = 0; i < MACCS_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
-                    } catch (Exception anException) {
+                    } catch (Exception exception) {
                         for (int i = 0; i < MACCS_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
-                            aVector[aStartIndex + i] = Float.NaN;
+                            vector[startIndex + i] = Float.NaN;
                         }
-                        Descriptor.LOGGER.log(Level.WARNING, anException.toString(), anException);
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
 
                 // Add new descriptor information here!
                 default:
-                    throw new UnsupportedOperationException(aDescriptor + ": This descriptor does not have a routine yet!");
+                    throw new UnsupportedOperationException(descriptor + ": This descriptor does not have a routine yet!");
             }
             // Check for NaN values in the calculated result and track them
-            int numComponents = aDescriptor.getDescriptorComponentNumber();
-            return !Descriptor.checkAndTrackNaNValues(aVector, aStartIndex, numComponents, aMoleculeIndex, aNanPositionsList);
-        } catch (Exception anException) {
-            int numComponents = aDescriptor.getDescriptorComponentNumber();
+            int numComponents = descriptor.getDescriptorComponentNumber();
+            return !Descriptor.checkAndTrackNaNValues(vector, startIndex, numComponents, moleculeIndex, nanPositionsList);
+        } catch (Exception exception) {
+            int numComponents = descriptor.getDescriptorComponentNumber();
             for (int i = 0; i < numComponents; i++) {
-                aVector[aStartIndex + i] = Float.NaN;
-                // Track NaN position if aNanPositionsList is provided
-                if (aNanPositionsList != null) {
-                    aNanPositionsList.add(new int[]{aMoleculeIndex, aStartIndex + i});
+                vector[startIndex + i] = Float.NaN;
+                // Track NaN position if nanPositionsList is provided
+                if (nanPositionsList != null) {
+                    nanPositionsList.add(new int[]{moleculeIndex, startIndex + i});
                 }
             }
             Descriptor.LOGGER.log(
                     Level.WARNING,
                     String.format("Descriptor.setDescriptorNew: An exception occurred while calculating descriptor %s for molecule index %d.",
-                            aDescriptor,
-                            aMoleculeIndex),
-                    anException
+                            descriptor,
+                            moleculeIndex),
+                    exception
             );
             return false;
         }
@@ -3176,11 +3171,11 @@ public enum Descriptor {
     //TODO: I would move this up to the other private, non-static calculate method (and not label this as a "helper method")
     //TODO: see my comment on calculate(), this method could as well return a boolean instead of throwing an exception (only the InterruptedException should still be thrown)
     /**
-     * Sets fingerprint component values in aVector.
+     * Sets fingerprint component values in vector.
      *
-     * @param anAtomContainer Molecule (IS NOT CHANGED)
-     * @param aVector Vector of molecule (row in data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
-     * @param aStartIndex Start index in aVector to be filled with calculated components of descriptors
+     * @param atomContainer Molecule (IS NOT CHANGED)
+     * @param vector Vector of molecule (row in data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param startIndex Start index in vector to be filled with calculated components of descriptors
      * @throws CDKException if the fingerprint calculation fails
      * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
      *                              fingerprinter instance from the pool; this is the root source of
@@ -3188,7 +3183,7 @@ public enum Descriptor {
      *                              throws it if the thread is interrupted while blocked waiting for an
      *                              available fingerprinter, or if it is already interrupted when called
      */
-    private void calculateFingerprintFromPool(IAtomContainer anAtomContainer, float[] aVector, int aStartIndex)
+    private void calculateFingerprintFromPool(IAtomContainer atomContainer, float[] vector, int startIndex)
             throws CDKException, InterruptedException {
         IFingerprinter fingerprinter = null;
         try {
@@ -3198,12 +3193,12 @@ public enum Descriptor {
             // neither CDKException nor RuntimeException, so it is not caught below and propagates naturally.
             fingerprinter = pool.take();
 
-            IBitFingerprint bitFingerprint = fingerprinter.getBitFingerprint(anAtomContainer);
+            IBitFingerprint bitFingerprint = fingerprinter.getBitFingerprint(atomContainer);
             for (int i = 0; i < this.getDescriptorComponentNumber(); i++) {
-                aVector[aStartIndex + i] = bitFingerprint.get(i) ? 1.0f : 0.0f;
+                vector[startIndex + i] = bitFingerprint.get(i) ? 1.0f : 0.0f;
             }
-        } catch (CDKException | RuntimeException anException) {
-            throw new CDKException("Failed to calculate: " + this.name(), anException);
+        } catch (CDKException | RuntimeException exception) {
+            throw new CDKException("Failed to calculate: " + this.name(), exception);
         } finally {
             // Only return the fingerprinter if it was successfully taken from the pool.
             // If take() threw InterruptedException, fingerprinter is still null and offer(null)
@@ -3218,33 +3213,33 @@ public enum Descriptor {
     /**
      * Helper method to check for NaN values in a calculated descriptor result and track their positions.
      * This method is thread-safe when used with a synchronized LinkedList. Note that not the entire data vector is
-     * checked but only the positions [aStartIndex, aStartIndex + numComponents].
+     * checked but only the positions [startIndex, startIndex + numComponents].
      *
-     * @param aVector The vector containing calculated descriptor values
-     * @param aStartIndex The start index in the vector for this descriptor
+     * @param vector The vector containing calculated descriptor values
+     * @param startIndex The start index in the vector for this descriptor
      * @param numComponents The number of components for this descriptor
-     * @param aMoleculeIndex The index of the current molecule
-     * @param aNanPositionsList List to track NaN positions (can be null if NaN positions should not be tracked);
+     * @param moleculeIndex The index of the current molecule
+     * @param nanPositionsList List to track NaN positions (can be null if NaN positions should not be tracked);
      *                      must be thread-safe for parallel access; will be filled with int[] {[moleculeIndex, componentIndex]}
      *                      pairs of NaN value positions (i.e. row and column index in the data matrix)
      * @return true if any NaN values were found, false otherwise
      */
     private static boolean checkAndTrackNaNValues(
-            float[] aVector,
-            int aStartIndex,
+            float[] vector,
+            int startIndex,
             int numComponents,
-            int aMoleculeIndex,
-            List<int[]> aNanPositionsList
+            int moleculeIndex,
+            List<int[]> nanPositionsList
     ) {
         boolean foundNaN = false;
         for (int i = 0; i < numComponents; i++) {
-            if (Float.isNaN(aVector[aStartIndex + i])) {
+            if (Float.isNaN(vector[startIndex + i])) {
                 foundNaN = true;
-                // Track NaN position if aNanPositionsList is provided
-                // Note: aNanPositionsList must be thread-safe for parallel access
-                if (aNanPositionsList != null) {
+                // Track NaN position if nanPositionsList is provided
+                // Note: nanPositionsList must be thread-safe for parallel access
+                if (nanPositionsList != null) {
                     // Synchronize the add operation to ensure thread safety
-                    aNanPositionsList.add(new int[]{aMoleculeIndex, aStartIndex + i});
+                    nanPositionsList.add(new int[]{moleculeIndex, startIndex + i});
                 }
             }
         }
@@ -3256,21 +3251,21 @@ public enum Descriptor {
      * Validates descriptor array input. Throws NullPointerExceptions if the array or one of its elements is null.
      * Returns false if the array is empty.
      *
-     * @param aDescriptorArray the descriptor array to validate
+     * @param descriptorArray the descriptor array to validate
      * @param methodName the calling method name for error messages
      * @throws NullPointerException if descriptor array or one of its elements is null
      * @return false if descriptor array is empty; true otherwise
      */
-    private static boolean validateDescriptors(Descriptor[] aDescriptorArray, String methodName) {
-        if (aDescriptorArray == null) {
+    private static boolean validateDescriptors(Descriptor[] descriptorArray, String methodName) {
+        if (descriptorArray == null) {
             throw new NullPointerException(methodName + ": Given descriptor array is null");
         }
-        if (aDescriptorArray.length == 0) {
+        if (descriptorArray.length == 0) {
             return false;
         }
-        for (Descriptor tmpDescriptor : aDescriptorArray) {
-            if (tmpDescriptor == null) {
-                throw new NullPointerException(methodName + ": A single descriptor in aDescriptors is null.");
+        for (Descriptor descriptor : descriptorArray) {
+            if (descriptor == null) {
+                throw new NullPointerException(methodName + ": A single descriptor in descriptors is null.");
             }
         }
         return true;
@@ -3280,21 +3275,21 @@ public enum Descriptor {
      * Validates an atom container array input and its contents. Throws NullPointerExceptions if the array or one of
      * its elements is null. Returns false if the array is empty. Note that the molecules in the array are allowed to be empty.
      *
-     * @param anAtomContainerArray the atom container array to validate
+     * @param atomContainerArray the atom container array to validate
      * @param methodName the calling method name for error messages
      * @throws NullPointerException if molecule array or one of its elements is null
      * @return false if the atom container array is empty; true otherwise
      */
-    private static boolean validateAtomContainerArray(IAtomContainer[] anAtomContainerArray, String methodName) {
-        if (anAtomContainerArray == null) {
-            throw new NullPointerException(methodName + ": anAtomContainerArray is null.");
+    private static boolean validateAtomContainerArray(IAtomContainer[] atomContainerArray, String methodName) {
+        if (atomContainerArray == null) {
+            throw new NullPointerException(methodName + ": atomContainerArray is null.");
         }
-        if (anAtomContainerArray.length == 0) {
+        if (atomContainerArray.length == 0) {
             return false;
         }
-        for (IAtomContainer tmpMolecule : anAtomContainerArray) {
-            if (tmpMolecule == null) {
-                throw new NullPointerException(methodName + ": A single molecule in anAtomContainerArray is null.");
+        for (IAtomContainer molecule : atomContainerArray) {
+            if (molecule == null) {
+                throw new NullPointerException(methodName + ": A single molecule in atomContainerArray is null.");
             }
             //do nothing if a molecule is empty
         }
@@ -3305,21 +3300,21 @@ public enum Descriptor {
      * Validates a SMILES string array input and its content. Throws NullPointerExceptions if the array or one of
      * its elements is null. Returns false if the array is empty.
      *
-     * @param aMoleculeSmilesStringArray the molecule SMILES string array to validate
+     * @param moleculeSmilesStringArray the molecule SMILES string array to validate
      * @param methodName the calling method name for error messages
      * @throws NullPointerException if the SMILES string array or one of its elements is null
      * @return false if the SMILES string array is empty; true otherwise
      */
-    private static boolean validateSmilesStringArray(String[] aMoleculeSmilesStringArray, String methodName) {
-        if (aMoleculeSmilesStringArray == null) {
-            throw new NullPointerException(methodName + ": aMoleculeSmilesStringArray is null.");
+    private static boolean validateSmilesStringArray(String[] moleculeSmilesStringArray, String methodName) {
+        if (moleculeSmilesStringArray == null) {
+            throw new NullPointerException(methodName + ": moleculeSmilesStringArray is null.");
         }
-        if (aMoleculeSmilesStringArray.length == 0) {
+        if (moleculeSmilesStringArray.length == 0) {
             return false;
         }
-        for (String tmpMolecule : aMoleculeSmilesStringArray) {
-            if (tmpMolecule == null) {
-                throw new NullPointerException(methodName + ": A single SMILES string in aMoleculeSmilesStringArray is null.");
+        for (String molecule : moleculeSmilesStringArray) {
+            if (molecule == null) {
+                throw new NullPointerException(methodName + ": A single SMILES string in moleculeSmilesStringArray is null.");
             }
             //do nothing if a String is empty
         }
@@ -3330,13 +3325,13 @@ public enum Descriptor {
     /**
      * Validates NaN positions list. Throws a NullPointerException if the list is null.
      *
-     * @param aNanPositionsList the NaN positions list (must not be null)
+     * @param nanPositionsList the NaN positions list (must not be null)
      * @param methodName the calling method name for error messages
-     * @throws NullPointerException if aNanPositionsList is null
+     * @throws NullPointerException if nanPositionsList is null
      */
-    private static void validateNanPositionsList(List<int[]> aNanPositionsList, String methodName) {
-        if (aNanPositionsList == null) {
-            throw new NullPointerException(methodName + ": aNanPositionsList is null.");
+    private static void validateNanPositionsList(List<int[]> nanPositionsList, String methodName) {
+        if (nanPositionsList == null) {
+            throw new NullPointerException(methodName + ": nanPositionsList is null.");
         }
     }
 
@@ -3344,67 +3339,67 @@ public enum Descriptor {
     /**
      * Validates batch size.
      *
-     * @param aBatchSize a batch size (must be &gt; 0)
+     * @param batchSize a batch size (must be &gt; 0)
      * @param methodName the calling method name for error messages
-     * @throws IllegalArgumentException if aBatchSize is &lt;= 0
+     * @throws IllegalArgumentException if batchSize is &lt;= 0
      */
-    private static void validateBatchSize(int aBatchSize, String methodName) {
-        if (aBatchSize <= 0) {
-            throw new IllegalArgumentException(methodName + ": aBatchSize must be greater than 0 but was " + aBatchSize + ".");
+    private static void validateBatchSize(int batchSize, String methodName) {
+        if (batchSize <= 0) {
+            throw new IllegalArgumentException(methodName + ": batchSize must be greater than 0 but was " + batchSize + ".");
         }
     }
 
     /**
      * Validates matrix dimensions and start index. Throws a NullPointerException if the matrix or one of its rows is
-     * null. Returns false if the matrix is empty. Note that some parameters like {@code aDescriptors} have their own validation methods.
+     * null. Returns false if the matrix is empty. Note that some parameters like {@code descriptors} have their own validation methods.
      *
-     * @param aMatrix the matrix to validate
-     * @param aDescriptors the descriptors intended to be calculated for validating the matrix dimensions (min. nr. of columns)
-     * @param aMoleculeArray the input molecule array (either an {@code IAtomContainer[]} or a {@code String[]}) for
+     * @param matrix the matrix to validate
+     * @param descriptors the descriptors intended to be calculated for validating the matrix dimensions (min. nr. of columns)
+     * @param moleculeArray the input molecule array (either an {@code IAtomContainer[]} or a {@code String[]}) for
      *                       validating the matrix dimensions (exact(!) nr. of rows)
-     * @param aStartIndex the start index in the matrix (starting there, enough columns must be left to fit all descriptor results)
+     * @param startIndex the start index in the matrix (starting there, enough columns must be left to fit all descriptor results)
      * @param methodName the calling method name for error messages
      * @throws NullPointerException if the matrix or one of its rows is null
      * @throws IllegalArgumentException if matrix dimensions are invalid
      */
     private static void validateMatrix(
-            float[][] aMatrix,
-            Descriptor[] aDescriptors,
-            Object[] aMoleculeArray,
-            int aStartIndex,
+            float[][] matrix,
+            Descriptor[] descriptors,
+            Object[] moleculeArray,
+            int startIndex,
             String methodName
     ) {
-        if (aMatrix == null) {
-            throw new NullPointerException(methodName + ": aMatrix is null.");
+        if (matrix == null) {
+            throw new NullPointerException(methodName + ": matrix is null.");
         }
-        if (aMatrix.length == 0) {
-            throw new IllegalArgumentException(methodName + ": aMatrix is of length 0.");
+        if (matrix.length == 0) {
+            throw new IllegalArgumentException(methodName + ": matrix is of length 0.");
         }
-        if (aMatrix.length != aMoleculeArray.length) {
-            throw new IllegalArgumentException(methodName + ": aMatrix and aMoleculeArray must have the same length.");
+        if (matrix.length != moleculeArray.length) {
+            throw new IllegalArgumentException(methodName + ": matrix and moleculeArray must have the same length.");
         }
-        if (!(aMoleculeArray instanceof IAtomContainer[]) && !(aMoleculeArray instanceof String[])) {
-            throw new IllegalArgumentException(methodName + ": aMoleculeArray must be an IAtomContainer[] or a String[].");
+        if (!(moleculeArray instanceof IAtomContainer[]) && !(moleculeArray instanceof String[])) {
+            throw new IllegalArgumentException(methodName + ": moleculeArray must be an IAtomContainer[] or a String[].");
         }
         int colNum = -1;
-        for (float[] tmpVector : aMatrix) {
-            if (tmpVector == null) {
-                throw new NullPointerException(methodName + ": A vector in aMatrix is null.");
+        for (float[] vector : matrix) {
+            if (vector == null) {
+                throw new NullPointerException(methodName + ": A vector in matrix is null.");
             }
-            if (tmpVector.length == 0) {
-                throw new IllegalArgumentException(methodName + ": A vector in aMatrix has length 0.");
+            if (vector.length == 0) {
+                throw new IllegalArgumentException(methodName + ": A vector in matrix has length 0.");
             }
             if (colNum == -1) {
-                colNum = tmpVector.length;
+                colNum = vector.length;
             }
-            if (tmpVector.length != colNum) {
-                throw new IllegalArgumentException(methodName + ": All vectors in aMatrix must have the same length.");
+            if (vector.length != colNum) {
+                throw new IllegalArgumentException(methodName + ": All vectors in matrix must have the same length.");
             }
-            if (aStartIndex > tmpVector.length) {
-                throw new IllegalArgumentException(methodName + ": aStartIndex is greater than or equal to vector length.");
+            if (startIndex > vector.length) {
+                throw new IllegalArgumentException(methodName + ": startIndex is greater than or equal to vector length.");
             }
-            int tmpNumberOfComponents = Descriptor.getNumberOfComponents(aDescriptors);
-            if (aStartIndex + tmpNumberOfComponents > tmpVector.length) {
+            int numberOfComponents = Descriptor.getNumberOfComponents(descriptors);
+            if (startIndex + numberOfComponents > vector.length) {
                 throw new IllegalArgumentException(methodName + ": Not enough space in vector for descriptors.");
             }
         }
@@ -3420,98 +3415,98 @@ public enum Descriptor {
      * without affecting implicit hydrogen atoms.
      * Note: If necessary, atom types must be perceived and configured manually after creation.
      *
-     * @param aMolecule Source molecule to be copied (NOT MODIFIED)
+     * @param molecule Source molecule to be copied (NOT MODIFIED)
      * @return New instance of the molecule
      * @throws CloneNotSupportedException If the molecule cannot be properly copied
      */
-    static IAtomContainer copyMolecule(IAtomContainer aMolecule)
+    static IAtomContainer copyMolecule(IAtomContainer molecule)
             throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
         //<editor-fold desc="Checks">
-        if (aMolecule == null) {
+        if (molecule == null) {
             throw new NullPointerException("Input molecule must not be null");
         }
         //</editor-fold>
         try {
             // Create a new empty atom container with the same properties
-            IAtomContainer tmpMoleculeCopy = aMolecule.getBuilder().newInstance(IAtomContainer.class);
-            if (aMolecule.isEmpty()) {
-                return tmpMoleculeCopy;
+            IAtomContainer moleculeCopy = molecule.getBuilder().newInstance(IAtomContainer.class);
+            if (molecule.isEmpty()) {
+                return moleculeCopy;
             }
             // Copy atoms
-            for (IAtom tmpAtom : aMolecule.atoms()) {
+            for (IAtom atom : molecule.atoms()) {
                 //TODO: copy.newAtom(element, implicitHCount) would be faster
-                IAtom tmpNewAtom = tmpAtom.getBuilder().newInstance(IAtom.class);
+                IAtom newAtom = atom.getBuilder().newInstance(IAtom.class);
                 // Copy atom properties
-                tmpNewAtom.setSymbol(tmpAtom.getSymbol());
-                tmpNewAtom.setAtomicNumber(tmpAtom.getAtomicNumber());
-                tmpNewAtom.setMassNumber(tmpAtom.getMassNumber());
-                tmpNewAtom.setFormalCharge(tmpAtom.getFormalCharge());
-                tmpNewAtom.setImplicitHydrogenCount(tmpAtom.getImplicitHydrogenCount());
-                tmpNewAtom.setCharge(tmpAtom.getCharge());
+                newAtom.setSymbol(atom.getSymbol());
+                newAtom.setAtomicNumber(atom.getAtomicNumber());
+                newAtom.setMassNumber(atom.getMassNumber());
+                newAtom.setFormalCharge(atom.getFormalCharge());
+                newAtom.setImplicitHydrogenCount(atom.getImplicitHydrogenCount());
+                newAtom.setCharge(atom.getCharge());
                 // Copy atom flags
-                if (tmpAtom.isAromatic()) {
-                    tmpNewAtom.setIsAromatic(true);
+                if (atom.isAromatic()) {
+                    newAtom.setIsAromatic(true);
                 }
-                if (tmpAtom.isInRing()) {
-                    tmpNewAtom.setIsInRing(true);
+                if (atom.isInRing()) {
+                    newAtom.setIsInRing(true);
                 }
                 // Add atom to new container
-                tmpMoleculeCopy.addAtom(tmpNewAtom);
+                moleculeCopy.addAtom(newAtom);
             }
             // Copy bonds
-            for (IBond tmpBond : aMolecule.bonds()) {
+            for (IBond bond : molecule.bonds()) {
                 //TODO: copy.newBond(begin, end, order) would be faster
-                IBond tmpNewBond = tmpBond.getBuilder().newInstance(IBond.class);
+                IBond newBond = bond.getBuilder().newInstance(IBond.class);
                 // Get atoms for this bond in the new molecule
                 //TODO: this concerns me; you are assuming that the atoms in the copy have the same index as in the original; I don't know whether we can safely assume that.
-                IAtom tmpAtom1 = tmpMoleculeCopy.getAtom(aMolecule.indexOf(tmpBond.getBegin()));
-                IAtom tmpAtom2 = tmpMoleculeCopy.getAtom(aMolecule.indexOf(tmpBond.getEnd()));
+                IAtom atom1 = moleculeCopy.getAtom(molecule.indexOf(bond.getBegin()));
+                IAtom atom2 = moleculeCopy.getAtom(molecule.indexOf(bond.getEnd()));
                 // Set bond properties
-                tmpNewBond.setOrder(tmpBond.getOrder());
-                tmpNewBond.setAtoms(new IAtom[]{tmpAtom1, tmpAtom2});
+                newBond.setOrder(bond.getOrder());
+                newBond.setAtoms(new IAtom[]{atom1, atom2});
                 // Copy bond flags
-                if (tmpBond.isAromatic()) {
-                    tmpNewBond.setIsAromatic(true);
+                if (bond.isAromatic()) {
+                    newBond.setIsAromatic(true);
                 }
-                if (tmpBond.isInRing()) {
-                    tmpNewBond.setIsInRing(true);
+                if (bond.isInRing()) {
+                    newBond.setIsInRing(true);
                 }
                 // Add bond to new container
-                tmpMoleculeCopy.addBond(tmpNewBond);
+                moleculeCopy.addBond(newBond);
             }
-            return tmpMoleculeCopy;
-        } catch (Exception anException) {
-            throw new CloneNotSupportedException("Could not clone molecule: " + anException.getMessage());
+            return moleculeCopy;
+        } catch (Exception exception) {
+            throw new CloneNotSupportedException("Could not clone molecule: " + exception.getMessage());
         }
     }
 
     /**
      * Creates a molecule copy with all implicit hydrogen atoms made explicit.
      *
-     * @param aMolecule Source molecule with implicit hydrogens (NOT MODIFIED)
+     * @param molecule Source molecule with implicit hydrogens (NOT MODIFIED)
      * @return New molecule (copy of the parameter) with all hydrogens made explicit
      * @throws CloneNotSupportedException If the molecule cannot be properly processed
      */
     static IAtomContainer createMoleculeWithExplicitHydrogens(
-            IAtomContainer aMolecule
+            IAtomContainer molecule
     ) throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
         //<editor-fold desc="Checks">
-        if (aMolecule == null) {
+        if (molecule == null) {
             throw new NullPointerException("Input molecule must not be null");
         }
-        if (aMolecule.isEmpty()) {
+        if (molecule.isEmpty()) {
             //returns empty atom container
-            return Descriptor.copyMolecule(aMolecule);
+            return Descriptor.copyMolecule(molecule);
         }
         //</editor-fold>
         try {
             // Create a deep copy of the molecule first
-            IAtomContainer tmpMoleculeCopy = Descriptor.copyMolecule(aMolecule);
+            IAtomContainer moleculeCopy = Descriptor.copyMolecule(molecule);
             // Add explicit hydrogen atoms
-            AtomContainerManipulator.normalizeHydrogens(tmpMoleculeCopy, HydrogenState.Explicit);
-            return tmpMoleculeCopy;
-        } catch (Exception anException) {
-            throw new CloneNotSupportedException("Could not create molecule with explicit hydrogens: " + anException.getMessage());
+            AtomContainerManipulator.normalizeHydrogens(moleculeCopy, HydrogenState.Explicit);
+            return moleculeCopy;
+        } catch (Exception exception) {
+            throw new CloneNotSupportedException("Could not create molecule with explicit hydrogens: " + exception.getMessage());
         }
     }
     //</editor-fold>
