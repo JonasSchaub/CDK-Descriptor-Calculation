@@ -130,7 +130,7 @@ import java.util.stream.IntStream;
  *             fingerprint bit vector rather than a set of numerical descriptor values. Fingerprint
  *             descriptors (e.g., {@link #PUBCHEM_FINGERPRINTER}, {@link #MACCS_FINGERPRINTER},
  *             all {@code CIRCULAR_FINGERPRINTER_*} variants) are handled via a thread-safe pool of
- *             {@link org.openscience.cdk.fingerprint.IFingerprinter} instances internally.
+ *             {@link IFingerprinter} instances internally.
  *             Use {@link #isFingerprint()} to query this field.</li>
  *         <li><b>needsExplicitHydrogens</b> ({@code boolean}) – whether this descriptor requires
  *             explicit hydrogen atoms to be present in the molecule before calculation.
@@ -157,7 +157,7 @@ import java.util.stream.IntStream;
  * </p>
  * <p>
  *     The four primary public calculation methods differ along two independent axes – the <i>input type</i>
- *     (pre-parsed {@link org.openscience.cdk.interfaces.IAtomContainer} objects vs. raw SMILES strings) and the
+ *     (pre-parsed {@link IAtomContainer} objects vs. raw SMILES strings) and the
  *     <i>parallelization strategy</i> (molecule-level parallelization vs. batch-level parallelization) – and are
  *     summarized in the table below. Every method accepts a {@code boolean isParallelCalculation} flag; passing
  *     {@code false} disables parallelization and the method runs sequentially instead.
@@ -172,13 +172,13 @@ import java.util.stream.IntStream;
  *         </tr>
  *         <tr>
  *             <td>{@link #setDescriptorsForMoleculesByMoleculeParallelization}</td>
- *             <td>{@link org.openscience.cdk.interfaces.IAtomContainer IAtomContainer[]}</td>
+ *             <td>{@link IAtomContainer IAtomContainer[]}</td>
  *             <td>One thread per <b>molecule</b> (Java parallel stream over all molecule indices)</td>
  *             <td>–</td>
  *         </tr>
  *         <tr>
  *             <td>{@link #setDescriptorsForMoleculesByBatchParallelization}</td>
- *             <td>{@link org.openscience.cdk.interfaces.IAtomContainer IAtomContainer[]}</td>
+ *             <td>{@link IAtomContainer IAtomContainer[]}</td>
  *             <td>One thread per <b>batch</b> of molecules (parallel stream over batch indices)</td>
  *             <td>{@code batchSize} – number of molecules per batch</td>
  *         </tr>
@@ -197,7 +197,7 @@ import java.util.stream.IntStream;
  *     </table>
  *     <br>
  *     <b>Molecule-level parallelization</b> ({@code ...ByMoleculeParallelization}) dispatches every molecule as an
- *     independent work item to Java's common fork-join pool via {@link java.util.stream.IntStream#parallel()}.
+ *     independent work item to Java's common fork-join pool via {@link IntStream#parallel()}.
  *     This provides fine-grained load balancing and is generally the preferred choice when the molecule set is
  *     large and individual descriptor calculations vary in cost.
  *     <br><br>
@@ -207,8 +207,8 @@ import java.util.stream.IntStream;
  *     descriptors or when the overhead of spawning one task per molecule would dominate.
  *     <br><br>
  *     <b>SMILES-based methods</b> additionally parse each SMILES string into an
- *     {@link org.openscience.cdk.interfaces.IAtomContainer} and apply aromaticity perception (using the supplied
- *     {@link org.openscience.cdk.aromaticity.ElectronDonation} model, or {@code Daylight} by default if
+ *     {@link IAtomContainer} and apply aromaticity perception (using the supplied
+ *     {@link ElectronDonation} model, or {@code Daylight} by default if
  *     {@code null} is passed) before descriptor calculation. Pre-parsed {@code IAtomContainer} methods skip this
  *     step; aromaticity must have been perceived on the containers beforehand (e.g. via
  *     {@link #setAromaticity(IAtomContainer, ElectronDonation)}).
@@ -220,7 +220,7 @@ import java.util.stream.IntStream;
  *     thread-safe (e.g. {@code Collections.synchronizedList(new LinkedList<>())}).
  *     <br><br>
  *     Thread safety for fingerprints is handled internally via a pool of
- *     {@link org.openscience.cdk.fingerprint.IFingerprinter} instances (one pool per fingerprint descriptor),
+ *     {@link IFingerprinter} instances (one pool per fingerprint descriptor),
  *     because CDK fingerprinter objects are not thread-safe. The pool size defaults to 4 and can be adjusted
  *     with {@link #setFingerprintPoolSize(int)}.
  * <p>
@@ -1066,7 +1066,6 @@ public enum Descriptor {
         return this.name;
     }
 
-    //TODO for CDK integration: remove a/an prefixes of method parameters
     //TODO: since this method returns void right now, we can have it return boolean to indicate whether the calculation
     // was successful or not and hence remove th exception throwing (John will like that); the exception thrown in the
     // try-catch block could then be logged as a warning
@@ -1098,16 +1097,13 @@ public enum Descriptor {
      *                        values are stored starting at startIndex
      * @param startIndex     the starting index in vector where results should be written;
      *                        subsequent values are written to startIndex + 1, startIndex + 2, etc.
-      * @throws CDKException if the calculation fails for any reason, wrapping the original exception
-     *                      with information about which descriptor failed
-     * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
-     *                              fingerprinter instance from the pool (only relevant for fingerprint
-     *                              descriptors; propagated from {@link #calculateFingerprintFromPool})
+     * @return Returns true if the calculation was successful and results were stored in the vector, false otherwise.
      */
-    private void calculate(IAtomContainer atomContainer, float[] vector, int startIndex) throws CDKException, InterruptedException {
+    private boolean calculate(IAtomContainer atomContainer, float[] vector, int startIndex) throws InterruptedException {
+        boolean success = false;
         try {
             if (this.isFingerprint()) {
-                this.calculateFingerprintFromPool(atomContainer, vector, startIndex);
+                return this.calculateFingerprintFromPool(atomContainer, vector, startIndex);
             } else {
                 IMolecularDescriptor cdkDescriptor = Descriptor.descriptorToCdkObjectMap.get(this);
                 if (cdkDescriptor != null) {
@@ -1118,27 +1114,38 @@ public enum Descriptor {
                     if (result instanceof DoubleResult) {
                         DoubleResult doubleResult = (DoubleResult) result;
                         vector[startIndex] = (float) doubleResult.doubleValue();
+                        success = true;
                     } else if (result instanceof IntegerResult) {
                         IntegerResult integerResult = (IntegerResult) result;
                         vector[startIndex] = (float) integerResult.intValue();
+                        success = true;
                     } else if (result instanceof DoubleArrayResult) {
                         DoubleArrayResult arrayResult = (DoubleArrayResult) result;
                         for (int i = 0; i < this.descriptorComponentNumber; i++) {
                             vector[startIndex + i] = (float) arrayResult.get(i);
                         }
+                        success = true;
                     } else if (result instanceof IntegerArrayResult) {
                         IntegerArrayResult arrayResult = (IntegerArrayResult) result;
                         for (int i = 0; i < this.descriptorComponentNumber; i++) {
                             vector[startIndex + i] = (float) arrayResult.get(i);
                         }
-                    } //TODO: what to do if the result is an instance of a different result type? -> log warning and return false (see above)?
-                } //TODO: what to do if the CDK descriptor instance is null? -> log warning and return false (see above)?
+                        success = true;
+                    } else {
+                        LOGGER.log(Level.WARNING, () -> "Unexpected result type " + result.getClass().getName() + " for descriptor " + this.name() + ". Expected DoubleResult, IntegerResult, DoubleArrayResult or IntegerArrayResult.");
+                    }
+                } else {
+                    LOGGER.log(Level.WARNING, () -> "Descriptor " + this.name() + " not found in descriptorToCdkObjectMap. This should not happen.");
+                }
             }
         } catch (InterruptedException e) {
+            LOGGER.log(Level.WARNING, e, () -> "Interrupted while waiting for fingerprinter instance from pool. This should not happen.");
             throw e;
         } catch (Exception e) {
-            throw new CDKException("Calculation failed for " + this.name(), e);
+            LOGGER.log(Level.SEVERE, e, () -> "Descriptor " + this.name() + " failed to calculate.");
+            return false;
         }
+        return success;
     }
     //</editor-fold>
 
@@ -1180,7 +1187,7 @@ public enum Descriptor {
     private static final int CIRCULAR_FINGERPRINT_DEFAULT_SIZE = 1024;
     /*
      * Static initializer block to populate the descriptorToCdkObjectMap and initialize the fingerprint pool.
-     * Note: we use the map and initialize it here (instead of giving each descriptor constant an instance field)
+     * Note: We use the map and initialize it here (instead of giving each descriptor constant an instance field)
      * to be able to do error handling. TODO: where there other reasons? If yes, please document them here! -> fingerprinter and descriptors are different object types
      */
     static {
@@ -1418,81 +1425,116 @@ public enum Descriptor {
      * Initializes all fingerprint pools with the current {@link #fingerprintPoolSize}.
      * This method creates new BlockingQueues for each fingerprint type and populates them
      * with fingerprinter instances. Thread-safe for concurrent access.
+     *
+     * @return true if all pools were successfully initialized, false if any pool failed to initialize properly
+     * (e.g., due to offer() failure, which should not happen under normal circumstances).
      */
-    private static synchronized void initializeFingerprintPools() {
+    private static synchronized boolean initializeFingerprintPools() {
+        boolean success = true;
         // Clear existing pools
         Descriptor.fingerprintPoolMap.clear();
 
         // PUBCHEM_FINGERPRINTER Pool
         BlockingQueue<IFingerprinter> pubchemPool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            //TODO: handle the case that false is returned by offer()? It shouldn't really happen because we only add as many fingerprinters as the pool size. -> yes! we could log it as a warning but it should not happen
-            pubchemPool.offer(new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()));
+            if (!pubchemPool.offer(new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()))){
+                LOGGER.log(Level.WARNING, () -> "Failed to add PubchemFingerprinter instance to pool. This should not happen.");
+                success = false;
+            }
         }
         Descriptor.fingerprintPoolMap.put(Descriptor.PUBCHEM_FINGERPRINTER, pubchemPool);
 
         // CIRCULAR_FINGERPRINTER_ECFP_0 Pool
         BlockingQueue<IFingerprinter> ecfp0Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            ecfp0Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE));
+            if (!ecfp0Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+                LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter ECFP0 instance to pool. This should not happen.");
+                success = false;
+            }
         }
         Descriptor.fingerprintPoolMap.put(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_0, ecfp0Pool);
 
         // CIRCULAR_FINGERPRINTER_FCFP_0 Pool
         BlockingQueue<IFingerprinter> fcfp0Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            fcfp0Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE));
+            if (!fcfp0Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+                LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter FCFP0 instance to pool. This should not happen.");
+                success = false;
+            }
         }
         Descriptor.fingerprintPoolMap.put(Descriptor.CIRCULAR_FINGERPRINTER_FCFP_0, fcfp0Pool);
 
         // CIRCULAR_FINGERPRINTER_ECFP_2 Pool
         BlockingQueue<IFingerprinter> ecfp2Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            ecfp2Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE));
+            if (!ecfp2Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+                LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter ECFP2 instance to pool. This should not happen.");
+                success = false;
+            }
         }
         Descriptor.fingerprintPoolMap.put(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_2, ecfp2Pool);
 
         // CIRCULAR_FINGERPRINTER_FCFP_2 Pool
         BlockingQueue<IFingerprinter> fcfp2Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            fcfp2Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE));
+            if (!fcfp2Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+                LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter FCFP2 instance to pool. This should not happen.");
+                success = false;
+            }
         }
         Descriptor.fingerprintPoolMap.put(Descriptor.CIRCULAR_FINGERPRINTER_FCFP_2, fcfp2Pool);
 
         // CIRCULAR_FINGERPRINTER_ECFP_4 Pool
         BlockingQueue<IFingerprinter> ecfp4Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            ecfp4Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE));
+            if (!ecfp4Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+                LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter ECFP4 instance to pool. This should not happen.");
+                success = false;
+            }
         }
         Descriptor.fingerprintPoolMap.put(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_4, ecfp4Pool);
 
         // CIRCULAR_FINGERPRINTER_FCFP_4 Pool
         BlockingQueue<IFingerprinter> fcfp4Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            fcfp4Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE));
+            if (!fcfp4Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+                LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter FCFP4 instance to pool. This should not happen.");
+                success = false;
+            }
         }
         Descriptor.fingerprintPoolMap.put(Descriptor.CIRCULAR_FINGERPRINTER_FCFP_4, fcfp4Pool);
 
         // CIRCULAR_FINGERPRINTER_ECFP_6 Pool
         BlockingQueue<IFingerprinter> ecfp6Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            ecfp6Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE));
+            if (!ecfp6Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+                LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter ECFP6 instance to pool. This should not happen.");
+                success = false;
+            }
         }
         Descriptor.fingerprintPoolMap.put(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_6, ecfp6Pool);
 
         // CIRCULAR_FINGERPRINTER_FCFP_6 Pool
         BlockingQueue<IFingerprinter> fcfp6Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            fcfp6Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE));
+            if (!fcfp6Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+                LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter FCFP6 instance to pool. This should not happen.");
+                success = false;
+            }
         }
         Descriptor.fingerprintPoolMap.put(Descriptor.CIRCULAR_FINGERPRINTER_FCFP_6, fcfp6Pool);
 
         // MACCS_FINGERPRINTER Pool
         BlockingQueue<IFingerprinter> maccsPool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            maccsPool.offer(new MACCSFingerprinter(SilentChemObjectBuilder.getInstance()));
+            if (!maccsPool.offer(new MACCSFingerprinter(SilentChemObjectBuilder.getInstance()))) {
+                LOGGER.log(Level.WARNING, () -> "Failed to add MACCSFingerprinter instance to pool. This should not happen.");
+                success = false;
+            }
         }
         Descriptor.fingerprintPoolMap.put(Descriptor.MACCS_FINGERPRINTER, maccsPool);
+
+        return success;
     }
     //</editor-fold>
 
@@ -1520,7 +1562,7 @@ public enum Descriptor {
     /**
      * Returns specified available descriptors.
      * Note: Fast, safe, and non-fingerprint descriptors are automatically included by default.
-     * TODO: remove is prefix aswell?
+     *
      * @param isSlowlyCalculableDescriptorInclusion True: Slowly calculable descriptors are included in the result, false: Otherwise.
      * @param isUnsafeDescriptorInclusion True: Unsafe descriptors are included in the result, false: Unsafe descriptors
      *                                     are excluded from the result, this does not mean no NaN's can be produced.
@@ -1588,7 +1630,6 @@ public enum Descriptor {
         }
         //</editor-fold>
 
-        //TODO for CDK integration: remove tmp- prefixes
         int totalNumberOfComponents = 0;
         for (Descriptor descriptor : descriptors) {
             totalNumberOfComponents += descriptor.getDescriptorComponentNumber();
@@ -1635,10 +1676,16 @@ public enum Descriptor {
                     "Descriptor.getDescriptorAndComponentIndex: anIndex must be >= 0."
             );
         }
-        //note: find check that index < total component count below (to avoid pre-computing the total component count
+        if (anIndex >= Descriptor.getNumberOfComponents(descriptors)) {
+            throw new IllegalArgumentException(
+                    "Descriptor.getDescriptorAndComponentIndex: anIndex (" + anIndex +
+                            ") exceeds total component count (" + Descriptor.getNumberOfComponents(descriptors) + ")."
+            );
+        }
 
         // Calculate cumulative component counts and find the target descriptor
         int cumulativeCount = 0;
+        int[] result = new int[2];
         for (int i = 0; i < descriptors.length; i++) {
             if (descriptors[i] == null) {
                 throw new NullPointerException(
@@ -1651,18 +1698,14 @@ public enum Descriptor {
 
             // Check if anIndex falls within this descriptor's range
             if (anIndex < nextCumulativeCount) {
-                int componentIndex = anIndex - cumulativeCount;
-                return new int[] { i, componentIndex };
+                result[0] = i;
+                result[1] = anIndex - cumulativeCount;
+                break;
             }
 
             cumulativeCount = nextCumulativeCount;
         }
-
-        // If we reach here, anIndex is out of bounds
-        throw new IllegalArgumentException(
-                "Descriptor.getDescriptorAndComponentIndex: anIndex (" + anIndex +
-                        ") exceeds total component count (" + cumulativeCount + ")."
-        );
+        return result;
     }
 
     /**
@@ -1704,16 +1747,19 @@ public enum Descriptor {
      * @param aPoolSize The new pool size for fingerprinter instances (must be greater than 0)
      * @throws IllegalArgumentException if aPoolSize is less than or equal to 0
      */
-    public static synchronized void setFingerprintPoolSize(int aPoolSize) throws IllegalArgumentException {
+    public static synchronized boolean setFingerprintPoolSize(int aPoolSize) throws IllegalArgumentException {
         if (aPoolSize <= 0) {
             throw new IllegalArgumentException("Descriptor.setFingerprintPoolSize: aPoolSize must be greater than 0.");
         }
-        Descriptor.fingerprintPoolSize = aPoolSize;
-        Descriptor.initializeFingerprintPools();
-        Descriptor.LOGGER.log(
-            Level.INFO,
-            () -> "Fingerprint pool size changed to: " + aPoolSize + ". All fingerprint pools have been reinitialized."
-        );
+        try {
+            Descriptor.fingerprintPoolSize = aPoolSize;
+            Descriptor.initializeFingerprintPools();
+            return true;
+        } catch (Exception e){
+            LOGGER.log(Level.SEVERE,e , () ->"Failed to set fingerprint pool size and reinitialize pools: " + e.getMessage());
+            return false;
+        }
+
     }
 
     /**
@@ -1729,12 +1775,11 @@ public enum Descriptor {
      * Uses a specified aromaticity model to modify molecule.
      * The method performs a complete workflow of:
      * <ol>
-     *     <li>Suppresses explicit hydrogens. TODO: why is this done here?</li>
-     *     <li>Perceives atom types and configures atoms. TODO: this is only necessary now if CDK_AtomTypes is used! Ok, and for the hydrogen adding...</li>
+     *     <li>Suppresses explicit hydrogens.</li>
+     *     <li>Perceives atom types and configures atoms.</li>
      *     <li>Clears existing aromaticity flags.</li>
      *     <li>Detects rings.</li>
      *     <li>Applies the specified {@link ElectronDonation} model.</li>
-     *     <li>Adds implicit hydrogen's. TODO: why is this done here?</li>
      * </ol>
      * Note: This method changes the input molecule by applying the specified aromaticity model and reconfiguring its hydrogens.
      *
@@ -1758,14 +1803,12 @@ public enum Descriptor {
         }
         //</editor-fold>
         AtomContainerManipulator.normalizeHydrogens(molecule, HydrogenState.Minimal);
-        //TODO: this is only necessary now if CDK_AtomTypes is used! And for the hydrogen adding...
+        // Needed for VABC Descriptor and CDK_AtomTypes
         AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(molecule);
         // Clears all aromatic flags before applying the aromaticity model.
         Aromaticity.clear(molecule);
         Cycles.markRingAtomsAndBonds(molecule);
         Aromaticity.apply(electronDonationModel, molecule);
-        CDKHydrogenAdder adder = CDKHydrogenAdder.getInstance(molecule.getBuilder());
-        adder.addImplicitHydrogens(molecule);
     }
 
     /**
@@ -1783,11 +1826,8 @@ public enum Descriptor {
      *                  aromaticity must be perceived beforehand if required; if it is empty, an empty array is returned
      * @return A float array containing the calculated descriptor components. Length equals
      *         {@link #getDescriptorComponentNumber()}. Contains NaN values if calculation fails.
-     * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
-     *                              fingerprinter instance from the pool (only relevant for fingerprint
-     *                              descriptors; the thread's interrupt status is preserved)
      */
-    public static float[] calculateDescriptor(Descriptor descriptor, IAtomContainer molecule) throws InterruptedException {
+    public static float[] calculateDescriptor(Descriptor descriptor, IAtomContainer molecule)  {
         // Checks
         if (descriptor == null) {
             throw new NullPointerException("Descriptor.calculateDescriptor: descriptor must not be null.");
@@ -1801,14 +1841,20 @@ public enum Descriptor {
 
         float[] result = new float[descriptor.getDescriptorComponentNumber()];
         try {
+            boolean success;
             if (descriptor.needsExplicitHydrogens()) {
                 IAtomContainer moleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(molecule);
-                descriptor.calculate(moleculeWithExplicitHydrogens, result, 0);
+                success = descriptor.calculate(moleculeWithExplicitHydrogens, result, 0);
             } else {
-                descriptor.calculate(molecule, result, 0);
+                success = descriptor.calculate(molecule, result, 0);
+            }
+            if (!success) {
+                Arrays.fill(result, Float.NaN);
             }
         } catch (InterruptedException e) {
-            throw e;
+            Thread.currentThread().interrupt();
+            Arrays.fill(result, Float.NaN);
+            Descriptor.LOGGER.log(Level.WARNING,e , () -> "Interrupted while calculating descriptor " + descriptor.getName());
         } catch (Exception e) {
             // Fill with NaN on failure and log the error
             Arrays.fill(result, Float.NaN);
@@ -1829,14 +1875,11 @@ public enum Descriptor {
      * @param electronDonationModel The electron donation model to use for aromaticity perception (must not be null)
      * @return A float array containing the calculated descriptor components. Length equals
      *         {@link #getDescriptorComponentNumber()}. Contains NaN values if calculation fails.
-     * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
-     *                              fingerprinter instance from the pool (only relevant for fingerprint
-     *                              descriptors; the thread's interrupt status is preserved)
      */
     public static float[] calculateDescriptor(Descriptor descriptor,
                                               IAtomContainer molecule,
                                               ElectronDonation electronDonationModel
-    ) throws InterruptedException {
+    )   {
         // Checks
         if (descriptor == null) {
             throw new NullPointerException("Descriptor.calculateDescriptor: descriptor must not be null.");
@@ -1851,32 +1894,17 @@ public enum Descriptor {
             throw new NullPointerException("Descriptor.calculateDescriptor: electronDonationModel must not be null.");
         }
 
-        float[] result = new float[descriptor.getDescriptorComponentNumber()];
         try {
-            //TODO: createMoleculeWithExplicitHydrogens(molecule) below also creates a(nother!) copy if I see that
-            // correctly; please avoid creating multiple copies!
-            IAtomContainer moleculeCopy = Descriptor.copyMolecule(molecule); // Create a copy to avoid modifying the original molecule
-            Descriptor.setAromaticity(moleculeCopy, electronDonationModel);
-            if (descriptor.needsExplicitHydrogens()){
-                IAtomContainer moleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(moleculeCopy);
-                descriptor.calculate(moleculeWithExplicitHydrogens, result, 0);
-            } else {
-                descriptor.calculate(moleculeCopy, result, 0);
-            }
-        } catch (InterruptedException e) {
-            throw e;
+            Descriptor.setAromaticity(molecule, electronDonationModel);
+            return Descriptor.calculateDescriptor(descriptor, molecule);
         } catch (Exception e) {
+            float[] result = new float[descriptor.getDescriptorComponentNumber()];
             Arrays.fill(result, Float.NaN);
             Descriptor.LOGGER.log(Level.WARNING, String.format("Failed to calculate descriptor %s: %s", descriptor.getName(), e.getMessage()), e);
+            return result;
         }
-        return result;
     }
 
-    //TODO: these are three overloaded methods, so one would expect that 2 of them are just wrappers for the third one, i.e. calling the third method internally.
-    // This would usually be the one with the most parameters (the other 2 using defaults for the params they don't have) but here,
-    // the best solution seems to me that the first method should be the work horse and the others should do the necessary preprocessing
-    // (parsing SMILES and detecting aromaticity) and then call the first method.
-    //TODO: add a test for one of these methods
     /**
      * Calculates a single descriptor for the given SMILES string with automatic parsing and aromaticity perception.
      * <p>
@@ -1891,13 +1919,11 @@ public enum Descriptor {
      * @param electronDonationModel The electron donation model to use for aromaticity perception (must not be null)
      * @return A float array containing the calculated descriptor components. Length equals
      *         {@link #getDescriptorComponentNumber()}. Contains NaN values if calculation fails.
-     * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
-     *                              fingerprinter instance from the pool (only relevant for fingerprint
-     *                              descriptors; the thread's interrupt status is preserved)
      */
     public static float[] calculateDescriptor(Descriptor descriptor,
                                               String smilesString,
-                                              ElectronDonation electronDonationModel) throws InterruptedException {
+                                              ElectronDonation electronDonationModel
+    )   {
         // Checks
         if (descriptor == null) {
             throw new NullPointerException("Descriptor.calculateDescriptor: descriptor must not be null.");
@@ -1912,18 +1938,17 @@ public enum Descriptor {
             throw new NullPointerException("Descriptor.calculateDescriptor: electronDonationModel must not be null.");
         }
 
-        float[] result = new float[descriptor.getDescriptorComponentNumber()];
         try {
             IAtomContainer molecule = Descriptor.SMILES_PARSER.parseSmiles(smilesString);
             Descriptor.setAromaticity(molecule, electronDonationModel);
-            Descriptor.calculateDescriptor(descriptor, molecule);
-        } catch (InterruptedException e) {
-            throw e;
+            return Descriptor.calculateDescriptor(descriptor, molecule);
         } catch (Exception e) {
+            float[] result = new float[descriptor.getDescriptorComponentNumber()];
             Arrays.fill(result, Float.NaN);
             Descriptor.LOGGER.log(Level.WARNING, String.format("Failed to calculate descriptor %s: %s", descriptor.getName(), e.getMessage()), e);
+            return result;
         }
-        return result;
+
     }
 
 
@@ -2670,13 +2695,23 @@ public enum Descriptor {
             List<int[]> nanPositionsList
     ) throws InterruptedException {
         try {
-            descriptor.calculate(atomContainer, vector, startIndex);
+            boolean success = descriptor.calculate(atomContainer, vector, startIndex);
+            if (!success) {
+                int numComponents = descriptor.getDescriptorComponentNumber();
+                for (int i = 0; i < numComponents; i++) {
+                    vector[startIndex + i] = Float.NaN;
+                    if (nanPositionsList != null) {
+                        nanPositionsList.add(new int[]{moleculeIndex, startIndex + i});
+                    }
+                }
+                return false;
+            }
 
             // Check for NaN values in the calculated result and track them
             int numComponents = descriptor.getDescriptorComponentNumber();
             return !Descriptor.checkAndTrackNaNValues(vector, startIndex, numComponents, moleculeIndex, nanPositionsList);
-        } catch (InterruptedException e) {
-            throw e;
+        } catch (InterruptedException exception) {
+            throw exception;
         } catch (Exception exception) {
             int numComponents = descriptor.getDescriptorComponentNumber();
             for (int i = 0; i < numComponents; i++) {
@@ -2725,96 +2760,96 @@ public enum Descriptor {
         try {
             switch (descriptor) {
                 //note: the initializations here should be the same as in the descriptorToCdkObjectMap!
-                case Descriptor.MOLECULAR_WEIGHT:
+                case MOLECULAR_WEIGHT:
                     vector[startIndex] = (float) ((DoubleResult) (new WeightDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.WIENER_NUMBER:
+                case WIENER_NUMBER:
                     DoubleArrayResult result = (DoubleArrayResult) (new WienerNumbersDescriptor()).calculate(atomContainer).getValue();
                     vector[startIndex] = (float) result.get(0); //Wiener path number
                     vector[startIndex + 1] = (float) result.get(1); //Wiener polarity number
                     break;
-                case Descriptor.ATOM_COUNT:
+                case ATOM_COUNT:
                     vector[startIndex] = (float) ((IntegerResult) (new AtomCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.ATOM_COUNT_C:
+                case ATOM_COUNT_C:
                     AtomCountDescriptor atomCountCDesc = new AtomCountDescriptor();
                     //set parameter to count carbon atoms
                     atomCountCDesc.setParameters(new String[]{"C"});
                     vector[startIndex] = (float) ((IntegerResult) atomCountCDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.ATOM_COUNT_H:
+                case ATOM_COUNT_H:
                     AtomCountDescriptor atomCountHDesc = new AtomCountDescriptor();
                     //set parameter to count hydrogen atoms
                     atomCountHDesc.setParameters(new String[]{"H"});
                     vector[startIndex] = (float) ((IntegerResult) atomCountHDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.ATOM_COUNT_N:
+                case ATOM_COUNT_N:
                     AtomCountDescriptor atomCountNDesc = new AtomCountDescriptor();
                     //set parameter to count nitrogen atoms
                     atomCountNDesc.setParameters(new String[]{"N"});
                     vector[startIndex] = (float) ((IntegerResult) atomCountNDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.ATOM_COUNT_O:
+                case ATOM_COUNT_O:
                     AtomCountDescriptor atomCountODesc = new AtomCountDescriptor();
                     //set parameter to count oxygen atoms
                     atomCountODesc.setParameters(new String[]{"O"});
                     vector[startIndex] = (float) ((IntegerResult) atomCountODesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.ATOM_COUNT_S:
+                case ATOM_COUNT_S:
                     AtomCountDescriptor atomCountSDesc = new AtomCountDescriptor();
                     //set parameter to count sulfur atoms
                     atomCountSDesc.setParameters(new String[]{"S"});
                     vector[startIndex] = (float) ((IntegerResult) atomCountSDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.ATOM_COUNT_P:
+                case ATOM_COUNT_P:
                     AtomCountDescriptor atomCountPDesc = new AtomCountDescriptor();
                     //set parameter to count phosphorus atoms
                     atomCountPDesc.setParameters(new Object[]{"P"});
                     vector[startIndex] = (float) ((IntegerResult) atomCountPDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.ATOM_COUNT_F:
+                case ATOM_COUNT_F:
                     AtomCountDescriptor atomCountFDesc = new AtomCountDescriptor();
                     //set parameter to count fluorine atoms
                     atomCountFDesc.setParameters(new String[]{"F"});
                     vector[startIndex] = (float) ((IntegerResult) atomCountFDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.ATOM_COUNT_BR:
+                case ATOM_COUNT_BR:
                     AtomCountDescriptor atomCountBrDesc = new AtomCountDescriptor();
                     //set parameter to count bromine atoms
                     atomCountBrDesc.setParameters(new String[]{"Br"});
                     vector[startIndex] = (float) ((IntegerResult) atomCountBrDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.ATOM_COUNT_CL:
+                case ATOM_COUNT_CL:
                     AtomCountDescriptor atomCountClDesc = new AtomCountDescriptor();
                     //set parameter to count chlorine atoms
                     atomCountClDesc.setParameters(new String[]{"Cl"});
                     vector[startIndex] = (float) ((IntegerResult) atomCountClDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.ATOM_COUNT_I:
+                case ATOM_COUNT_I:
                     AtomCountDescriptor atomCountIDesc = new AtomCountDescriptor();
                     //set parameter to count iodine atoms
                     atomCountIDesc.setParameters(new String[]{"I"});
                     vector[startIndex] = (float) ((IntegerResult) atomCountIDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.H_BOND_ACCEPTOR_COUNT:
+                case H_BOND_ACCEPTOR_COUNT:
                     vector[startIndex] = (float) ((IntegerResult) (new HBondAcceptorCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.H_BOND_DONOR_COUNT:
+                case H_BOND_DONOR_COUNT:
                     vector[startIndex] = (float) ((IntegerResult) (new HBondDonorCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.TPSA:
+                case TPSA:
                     vector[startIndex] = (float) ((DoubleResult) (new TPSADescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.LARGEST_CHAIN:
+                case LARGEST_CHAIN:
                     vector[startIndex] = (float) ((IntegerResult) (new LargestChainDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.LONGEST_ALIPHATIC_CHAIN:
+                case LONGEST_ALIPHATIC_CHAIN:
                     vector[startIndex] = (float) ((IntegerResult) (new LongestAliphaticChainDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.MANNHOLD_LOGP:
+                case MANNHOLD_LOGP:
                     vector[startIndex] = (float) ((DoubleResult) (new MannholdLogPDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.BCUT:
+                case BCUT:
                     BCUTDescriptor bcutDescriptor = new BCUTDescriptor();
                     // Change parameters so that we can use our own setAromaticity method default: checkAromaticity = true
                     bcutDescriptor.setParameters(new Object[] {1, 1, false}); // nhigh = 1, nlow = 1, checkAromaticity = false
@@ -2823,191 +2858,191 @@ public enum Descriptor {
                         vector[startIndex + i] = (float) bcutResult.get(i);
                     }
                     break;
-                case Descriptor.BOND_COUNT_ALL:
+                case BOND_COUNT_ALL:
                     vector[startIndex] = (float) ((IntegerResult) (new BondCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.BOND_COUNT_SINGLE:
+                case BOND_COUNT_SINGLE:
                     BondCountDescriptor bondCountSingleDesc = new BondCountDescriptor();
                     //set parameter to count single bonds
                     bondCountSingleDesc.setParameters(new String[]{"s"});
                     vector[startIndex] = (float) ((IntegerResult) bondCountSingleDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.BOND_COUNT_DOUBLE:
+                case BOND_COUNT_DOUBLE:
                     BondCountDescriptor bondCountDoubleDesc = new BondCountDescriptor();
                     //set parameter to count double bonds
                     bondCountDoubleDesc.setParameters(new String[]{"d"});
                     vector[startIndex] = (float) ((IntegerResult) bondCountDoubleDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.BOND_COUNT_TRIPLE:
+                case BOND_COUNT_TRIPLE:
                     BondCountDescriptor bondCountTripleDesc = new BondCountDescriptor();
                     //set parameter to count triple bonds
                     bondCountTripleDesc.setParameters(new String[]{"t"});
                     vector[startIndex] = (float) ((IntegerResult) bondCountTripleDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.B_POL:
+                case B_POL:
                     vector[startIndex] = (float) ((DoubleResult) (new BPolDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.RULE_OF_FIVE:
+                case RULE_OF_FIVE:
                     vector[startIndex] = (float) ((IntegerResult) (new RuleOfFiveDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.AROMATIC_ATOMS_COUNT:
+                case AROMATIC_ATOMS_COUNT:
                     vector[startIndex] = (float) ((IntegerResult) (new AromaticAtomsCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.AROMATIC_BONDS_COUNT:
+                case AROMATIC_BONDS_COUNT:
                     vector[startIndex] = (float) ((IntegerResult) (new AromaticBondsCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.ROTATABLE_BONDS_COUNT:
+                case ROTATABLE_BONDS_COUNT:
                     vector[startIndex] = (float) ((IntegerResult) (new RotatableBondsCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.FMF:
+                case FMF:
                     vector[startIndex] = (float) ((DoubleResult) (new FMFDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.FRACTIONAL_CSP3:
+                case FRACTIONAL_CSP3:
                     vector[startIndex] = (float) ((DoubleResult) (new FractionalCSP3Descriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.HYBRIDIZATION_RATIO:
+                case HYBRIDIZATION_RATIO:
                     vector[startIndex] = (float) ((DoubleResult) (new HybridizationRatioDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.KAPPA_SHAPE_INDICES:
+                case KAPPA_SHAPE_INDICES:
                     DoubleArrayResult kappaResult = (DoubleArrayResult) (new KappaShapeIndicesDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 3; i++) {
                         vector[startIndex + i] = (float) kappaResult.get(i);
                     }
                     break;
-                case Descriptor.PETITJEAN_NUMBER:
+                case PETITJEAN_NUMBER:
                     vector[startIndex] = (float) ((DoubleResult) (new PetitjeanNumberDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.SPIRO_ATOM_COUNT:
+                case SPIRO_ATOM_COUNT:
                     vector[startIndex] = (float) ((IntegerResult) (new SpiroAtomCountDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.V_ADJ_MAT:
+                case V_ADJ_MAT:
                     vector[startIndex] = (float) ((DoubleResult) (new VAdjMaDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.WEIGHTED_PATH:
+                case WEIGHTED_PATH:
                     DoubleArrayResult weightedPathResultNew = (DoubleArrayResult) (new WeightedPathDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 5; i++) {
                         vector[startIndex + i] = (float) weightedPathResultNew.get(i);
                     }
                     break;
-                case Descriptor.ZAGREB_INDEX:
+                case ZAGREB_INDEX:
                     vector[startIndex] = (float) ((DoubleResult) (new ZagrebIndexDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.CARBON_TYPES:
+                case CARBON_TYPES:
                     IntegerArrayResult carbonTypesResultNew = (IntegerArrayResult) (new CarbonTypesDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 9; i++) {
                         vector[startIndex + i] = carbonTypesResultNew.get(i);
                     }
                     break;
-                case Descriptor.A_LOG_P:
+                case A_LOG_P:
                     DoubleArrayResult aLogPResult = (DoubleArrayResult) (new ALOGPDescriptor()).calculate(atomContainer).getValue();
                     vector[startIndex] = (float) aLogPResult.get(0);// ALogP
                     vector[startIndex + 1] = (float) aLogPResult.get(1);  // ALogP squared
                     vector[startIndex + 2] = (float) aLogPResult.get(2);  // Molar Refractivity
                     break;
-                case Descriptor.X_LOG_P:
+                case X_LOG_P:
                     vector[startIndex] = (float) ((DoubleResult) (new XLogPDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.JP_LOG_P:
+                case JP_LOG_P:
                     vector[startIndex] = (float) ((DoubleResult) (new JPlogPDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.A_POL:
+                case A_POL:
                     vector[startIndex] = (float) ((DoubleResult) (new APolDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.AUTOCORRELATION_CHARGE:
+                case AUTOCORRELATION_CHARGE:
                     DoubleArrayResult autocorrelationChargeResult = (DoubleArrayResult) (new AutocorrelationDescriptorCharge()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 5; i++) {
                         vector[startIndex + i] = (float) autocorrelationChargeResult.get(i);
                     }
                     break;
-                case Descriptor.AUTOCORRELATION_MASS:
+                case AUTOCORRELATION_MASS:
                     DoubleArrayResult autocorrelationMassResult = (DoubleArrayResult) (new AutocorrelationDescriptorMass()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 5; i++) {
                         vector[startIndex + i] = (float) autocorrelationMassResult.get(i);
                     }
                     break;
-                case Descriptor.AUTOCORRELATION_POLARIZABILITY:
+                case AUTOCORRELATION_POLARIZABILITY:
                     DoubleArrayResult autocorrelationPolarizabilityResult = (DoubleArrayResult) (new AutocorrelationDescriptorPolarizability()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 5; i++) {
                         vector[startIndex + i] = (float) autocorrelationPolarizabilityResult.get(i);
                     }
                     break;
-                case Descriptor.FRAGMENT_COMPLEXITY:
+                case FRAGMENT_COMPLEXITY:
                     vector[startIndex] = (float) ((DoubleResult) (new FragmentComplexityDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.CHI_CHAIN:
+                case CHI_CHAIN:
                     DoubleArrayResult chiChainResult = (DoubleArrayResult) new ChiChainDescriptor().calculate(atomContainer).getValue();
                     for (int i = 0; i < 10; i++) {
                         vector[startIndex + i] = (float) chiChainResult.get(i);
                     }
                     break;
-                case Descriptor.CHI_CLUSTER:
+                case CHI_CLUSTER:
                     DoubleArrayResult chiClusterResult = (DoubleArrayResult) (new ChiClusterDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 8; i++) {
                         vector[startIndex + i] = (float) chiClusterResult.get(i);
                     }
                     break;
-                case Descriptor.CHI_PATH_CLUSTER:
+                case CHI_PATH_CLUSTER:
                     DoubleArrayResult chiPathClusterResult = (DoubleArrayResult) new ChiPathClusterDescriptor().calculate(atomContainer).getValue();
                     for (int i = 0; i < 6; i++) {
                         vector[startIndex + i] = (float) chiPathClusterResult.get(i);
                     }
                     break;
-                case Descriptor.CHI_PATH:
+                case CHI_PATH:
                     DoubleArrayResult chiPathResult = (DoubleArrayResult) (new ChiPathDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 16; i++) {
                         vector[startIndex + i] = (float) chiPathResult.get(i);
                     }
                     break;
-                case Descriptor.FRACTIONAL_PSA:
+                case FRACTIONAL_PSA:
                     vector[startIndex] = (float) ((DoubleResult) (new FractionalPSADescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.LARGEST_PI_SYSTEM:
+                case LARGEST_PI_SYSTEM:
                     LargestPiSystemDescriptor largestPiSystemDescriptor = new LargestPiSystemDescriptor();
                     // Change parameters so that we can use our own setAromaticity method
                     largestPiSystemDescriptor.setParameters(new Boolean[] {false}); // checkAromaticity = false
                     vector[startIndex] = (float) ((IntegerResult) largestPiSystemDescriptor.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.SMALL_RING:
+                case SMALL_RING:
                     IntegerArrayResult smallRingResult = (IntegerArrayResult) (new SmallRingDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 11; i++) {
                         vector[startIndex + i] = (float) smallRingResult.get(i);
                     }
                     break;
-                case Descriptor.BASIC_GROUP_COUNT:
+                case BASIC_GROUP_COUNT:
                     BasicGroupCountDescriptor basicGroupCountDesc = new BasicGroupCountDescriptor();
                     basicGroupCountDesc.initialise(SilentChemObjectBuilder.getInstance());
                     vector[startIndex] = (float) ((IntegerResult) basicGroupCountDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.ACIDIC_GROUP_COUNT:
+                case ACIDIC_GROUP_COUNT:
                     AcidicGroupCountDescriptor acidicGroupCountDesc = new AcidicGroupCountDescriptor();
                     acidicGroupCountDesc.initialise(SilentChemObjectBuilder.getInstance());
                     vector[startIndex] = (float) ((IntegerResult) acidicGroupCountDesc.calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.AMINO_ACID_COUNT:
+                case AMINO_ACID_COUNT:
                     IntegerArrayResult aminoAcidCountResult = (IntegerArrayResult) (new AminoAcidCountDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 20; i++) {
                         vector[startIndex + i] = (float) aminoAcidCountResult.get(i);
                     }
                     break;
-                case Descriptor.KIER_HALL_SMARTS:
+                case KIER_HALL_SMARTS:
                     IntegerArrayResult kierHallSmartsResult = (IntegerArrayResult) (new KierHallSmartsDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 79; i++) {
                         vector[startIndex + i] = (float) kierHallSmartsResult.get(i);
                     }
                     break;
-                case Descriptor.ECCENTRIC_CONNECTIVITY_INDEX:
+                case ECCENTRIC_CONNECTIVITY_INDEX:
                     vector[startIndex] = (float) ((IntegerResult) (new EccentricConnectivityIndexDescriptor()).calculate(atomContainer).getValue()).intValue();
                     break;
-                case Descriptor.MDE:
+                case MDE:
                     DoubleArrayResult aDoubleArrayResult = (DoubleArrayResult) (new MDEDescriptor()).calculate(atomContainer).getValue();
                     for (int i = 0; i < 19; i++) {
                         vector[startIndex + i] = (float) aDoubleArrayResult.get(i);
                     }
                     break;
-                case Descriptor.VABC:
+                case VABC:
                     vector[startIndex] = (float) ((DoubleResult) (new VABCDescriptor()).calculate(atomContainer).getValue()).doubleValue();
                     break;
-                case Descriptor.PUBCHEM_FINGERPRINTER:
+                case PUBCHEM_FINGERPRINTER:
                     //TODO: why do the fingerprints have their own try-catch block? It does the same as the general one below, right? So, can we remove them?
                     try {
                         IBitFingerprint fingerprint = new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()).getBitFingerprint(atomContainer);
@@ -3021,7 +3056,7 @@ public enum Descriptor {
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
-                case Descriptor.CIRCULAR_FINGERPRINTER_ECFP_0:
+                case CIRCULAR_FINGERPRINTER_ECFP_0:
                     try {
                         IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
@@ -3034,7 +3069,7 @@ public enum Descriptor {
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
-                case Descriptor.CIRCULAR_FINGERPRINTER_FCFP_0:
+                case CIRCULAR_FINGERPRINTER_FCFP_0:
                     try {
                         IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
@@ -3047,7 +3082,7 @@ public enum Descriptor {
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
-                case Descriptor.CIRCULAR_FINGERPRINTER_ECFP_2:
+                case CIRCULAR_FINGERPRINTER_ECFP_2:
                     try {
                         IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
@@ -3060,7 +3095,7 @@ public enum Descriptor {
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
-                case Descriptor.CIRCULAR_FINGERPRINTER_FCFP_2:
+                case CIRCULAR_FINGERPRINTER_FCFP_2:
                     try {
                         IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
@@ -3073,7 +3108,7 @@ public enum Descriptor {
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
-                case Descriptor.CIRCULAR_FINGERPRINTER_ECFP_4:
+                case CIRCULAR_FINGERPRINTER_ECFP_4:
                     try {
                         IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
@@ -3086,7 +3121,7 @@ public enum Descriptor {
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
-                case Descriptor.CIRCULAR_FINGERPRINTER_FCFP_4:
+                case CIRCULAR_FINGERPRINTER_FCFP_4:
                     try {
                         IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
@@ -3099,7 +3134,7 @@ public enum Descriptor {
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
-                case Descriptor.CIRCULAR_FINGERPRINTER_ECFP_6:
+                case CIRCULAR_FINGERPRINTER_ECFP_6:
                     try {
                         IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
@@ -3112,7 +3147,7 @@ public enum Descriptor {
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
-                case Descriptor.CIRCULAR_FINGERPRINTER_FCFP_6:
+                case CIRCULAR_FINGERPRINTER_FCFP_6:
                     try {
                         IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
                         for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
@@ -3125,7 +3160,7 @@ public enum Descriptor {
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
                     }
                     break;
-                case Descriptor.MACCS_FINGERPRINTER:
+                case MACCS_FINGERPRINTER:
                     try {
                         IBitFingerprint fingerprint = new MACCSFingerprinter(SilentChemObjectBuilder.getInstance()).getBitFingerprint(atomContainer);
                         for (int i = 0; i < MACCS_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
@@ -3183,9 +3218,10 @@ public enum Descriptor {
      *                              throws it if the thread is interrupted while blocked waiting for an
      *                              available fingerprinter, or if it is already interrupted when called
      */
-    private void calculateFingerprintFromPool(IAtomContainer atomContainer, float[] vector, int startIndex)
-            throws CDKException, InterruptedException {
+    private boolean calculateFingerprintFromPool(IAtomContainer atomContainer, float[] vector, int startIndex)
+            throws InterruptedException {
         IFingerprinter fingerprinter = null;
+        boolean success;
         try {
             BlockingQueue<IFingerprinter> pool = Descriptor.fingerprintPoolMap.get(this);
             // take() blocks until a fingerprinter is available in the pool; throws InterruptedException
@@ -3197,17 +3233,23 @@ public enum Descriptor {
             for (int i = 0; i < this.getDescriptorComponentNumber(); i++) {
                 vector[startIndex + i] = bitFingerprint.get(i) ? 1.0f : 0.0f;
             }
+            success = true;
         } catch (CDKException | RuntimeException exception) {
-            throw new CDKException("Failed to calculate: " + this.name(), exception);
+            LOGGER.log(Level.WARNING, exception, () -> "Failed to calculate: " + this.name());
+            return false;
         } finally {
             // Only return the fingerprinter if it was successfully taken from the pool.
             // If take() threw InterruptedException, fingerprinter is still null and offer(null)
             // would throw NullPointerException.
             //TODO: offer() should always return true here because we only put back what we took; log a warning if it returns false?
             if (fingerprinter != null) {
-                Descriptor.fingerprintPoolMap.get(this).offer(fingerprinter);
+                if(!Descriptor.fingerprintPoolMap.get(this).offer(fingerprinter)){
+                    LOGGER.log(Level.WARNING, () -> "Failed to return fingerprinter to pool: " + this.name());
+                    success = false;
+                }
             }
         }
+        return success;
     }
 
     /**
