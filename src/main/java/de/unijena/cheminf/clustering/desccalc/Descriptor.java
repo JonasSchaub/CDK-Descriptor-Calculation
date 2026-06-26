@@ -1176,7 +1176,7 @@ public enum Descriptor {
     /*
      * Static initializer block to populate the descriptorToCdkObjectMap and initialize the fingerprint pool.
      * Note: We use the map and initialize it here (instead of giving each descriptor constant an instance field)
-     * to be able to do error handling. TODO: where there other reasons? If yes, please document them here! -> fingerprinter and descriptors are different object types
+     * to be able to do error handling, and because IFingerprinter and IMolecularDescriptor are different object types.
      */
     static {
         try {
@@ -1618,7 +1618,7 @@ public enum Descriptor {
         return totalNumberOfComponents;
     }
 
-    //TODO: add a test for this utility method
+
     /**
      * Returns the descriptor and component index for a given position in a descriptor array.
      * <p>
@@ -1991,7 +1991,7 @@ public enum Descriptor {
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
-     * @throws IllegalArgumentException Thrown if an argument is illegal TODO: add more info! Here and in the other methods below as well
+     * @throws IllegalArgumentException if the matrix dimensions are invalid or if batch size is &lt;= 0
      * @throws InterruptedException if the current thread is interrupted during sequential fingerprint
      *                              calculation; in parallel mode, interruption is handled internally
      *                              by restoring the thread's interrupt flag via
@@ -2112,7 +2112,7 @@ public enum Descriptor {
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
-     * @throws IllegalArgumentException Thrown if an argument is illegal
+     * @throws IllegalArgumentException if the matrix dimensions are invalid or if batch size is &lt;= 0
      * @throws InterruptedException if the current thread is interrupted during sequential fingerprint
      *                              calculation; in parallel mode, interruption is handled internally
      *                              by restoring the thread's interrupt flag via
@@ -2231,7 +2231,7 @@ public enum Descriptor {
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
-     * @throws IllegalArgumentException Thrown if an argument is illegal
+     * @throws IllegalArgumentException if the matrix dimensions are invalid
      * @throws InterruptedException if the current thread is interrupted during sequential fingerprint
      *                              calculation; in parallel mode, interruption is handled internally
      *                              by restoring the thread's interrupt flag via
@@ -2345,7 +2345,7 @@ public enum Descriptor {
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
-     * @throws IllegalArgumentException Thrown if an argument is illegal
+     * @throws IllegalArgumentException if the matrix dimensions are invalid
      * @throws InterruptedException if the current thread is interrupted during sequential fingerprint
      *                              calculation; in parallel mode, interruption is handled internally
      *                              by restoring the thread's interrupt flag via
@@ -2458,7 +2458,7 @@ public enum Descriptor {
      *                      Use Collections.synchronizedList() to avoid race conditions.
      * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
      *         calculation is NaN or a global exception occurred
-     * @throws IllegalArgumentException Thrown if an argument is illegal
+     * @throws IllegalArgumentException if the matrix dimensions are invalid
      */
     public static boolean setDescriptorsForMoleculesByMoleculeParallelizationNew(
             Descriptor[] descriptors,

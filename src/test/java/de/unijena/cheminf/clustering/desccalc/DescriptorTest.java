@@ -3800,33 +3800,52 @@ class DescriptorTest {
     }
 
     /**
-     * Test method for getAllFingerprints. TODO: is this test really relevant? I could, e.g., rather envision a test of the correct working of the queue for the fingerprint instances
+     * Test method for getDescriptorAndComponentIndex and getDescriptorAndComponentInfo methods.
      *
      * @throws Exception if anything goes wrong
      */
     @Test
-    void test_getAllFingerprints() throws Exception {
-        Descriptor[] allFingerprints = Descriptor.getAllFingerprints();
+    void test_getDescriptorAndComponentIndexAndInfo() throws Exception {
+        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.MOLECULAR_WEIGHT, Descriptor.BCUT, Descriptor.WIENER_NUMBER};
+        // MOLECULAR_WEIGHT (1 component), BCUT (6 components), WIENER_NUMBER (2 components)
 
-        // Check if at least one fingerprint is returned
-        Assertions.assertTrue(allFingerprints.length > 0);
+        int[] resultIndex = Descriptor.getDescriptorAndComponentIndex(tmpDescriptors, 0);
+        Assertions.assertArrayEquals(new int[]{0, 0}, resultIndex);
+        String[] resultInfo = Descriptor.getDescriptorAndComponentInfo(tmpDescriptors, 0);
+        Assertions.assertArrayEquals(new String[]{Descriptor.MOLECULAR_WEIGHT.getName(), "0"}, resultInfo);
 
-        // Check if all returned descriptors are indeed fingerprints
-        for (Descriptor descriptor : allFingerprints) {
-            Assertions.assertTrue(descriptor.isFingerprint());
-        }
+        resultIndex = Descriptor.getDescriptorAndComponentIndex(tmpDescriptors, 1);
+        Assertions.assertArrayEquals(new int[]{1, 0}, resultIndex);
+        resultInfo = Descriptor.getDescriptorAndComponentInfo(tmpDescriptors, 1);
+        Assertions.assertArrayEquals(new String[]{Descriptor.BCUT.getName(), "0"}, resultInfo);
 
-        // Check for presence of specific known fingerprints
-        List<Descriptor> fingerprintList = Arrays.asList(allFingerprints);
-        Assertions.assertTrue(fingerprintList.contains(Descriptor.PUBCHEM_FINGERPRINTER));
-        Assertions.assertTrue(fingerprintList.contains(Descriptor.MACCS_FINGERPRINTER));
-        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_0));
-        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_FCFP_0));
-        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_2));
-        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_FCFP_2));
-        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_4));
-        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_FCFP_4));
-        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_6));
-        Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_FCFP_6));
+        resultIndex = Descriptor.getDescriptorAndComponentIndex(tmpDescriptors, 6);
+        Assertions.assertArrayEquals(new int[]{1, 5}, resultIndex);
+        resultInfo = Descriptor.getDescriptorAndComponentInfo(tmpDescriptors, 6);
+        Assertions.assertArrayEquals(new String[]{Descriptor.BCUT.getName(), "5"}, resultInfo);
+
+        resultIndex = Descriptor.getDescriptorAndComponentIndex(tmpDescriptors, 7);
+        Assertions.assertArrayEquals(new int[]{2, 0}, resultIndex);
+        resultInfo = Descriptor.getDescriptorAndComponentInfo(tmpDescriptors, 7);
+        Assertions.assertArrayEquals(new String[]{Descriptor.WIENER_NUMBER.getName(), "0"}, resultInfo);
+
+        resultIndex = Descriptor.getDescriptorAndComponentIndex(tmpDescriptors, 8);
+        Assertions.assertArrayEquals(new int[]{2, 1}, resultIndex);
+        resultInfo = Descriptor.getDescriptorAndComponentInfo(tmpDescriptors, 8);
+        Assertions.assertArrayEquals(new String[]{Descriptor.WIENER_NUMBER.getName(), "1"}, resultInfo);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            Descriptor.getDescriptorAndComponentIndex(tmpDescriptors, -1);
+        });
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            Descriptor.getDescriptorAndComponentInfo(tmpDescriptors, -1);
+        });
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            Descriptor.getDescriptorAndComponentIndex(tmpDescriptors, 9);
+        });
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            Descriptor.getDescriptorAndComponentInfo(tmpDescriptors, 9);
+        });
     }
 }
