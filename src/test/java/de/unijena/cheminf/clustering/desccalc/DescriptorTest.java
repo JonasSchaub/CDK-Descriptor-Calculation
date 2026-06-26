@@ -26,13 +26,70 @@
 package de.unijena.cheminf.clustering.desccalc;
 
 
+import static de.unijena.cheminf.clustering.desccalc.Descriptor.MACCS_FINGERPRINTER;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openscience.cdk.aromaticity.Aromaticity;
 import org.openscience.cdk.aromaticity.ElectronDonation;
+import org.openscience.cdk.fingerprint.CircularFingerprinter;
+import org.openscience.cdk.fingerprint.IBitFingerprint;
+import org.openscience.cdk.fingerprint.MACCSFingerprinter;
 import org.openscience.cdk.fingerprint.PubchemFingerprinter;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.qsar.descriptors.molecular.ALOGPDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.APolDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.AcidicGroupCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.AminoAcidCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.AromaticAtomsCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.AromaticBondsCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.AtomCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.AutocorrelationDescriptorCharge;
+import org.openscience.cdk.qsar.descriptors.molecular.AutocorrelationDescriptorMass;
+import org.openscience.cdk.qsar.descriptors.molecular.AutocorrelationDescriptorPolarizability;
+import org.openscience.cdk.qsar.descriptors.molecular.BCUTDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.BPolDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.BasicGroupCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.BondCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.CarbonTypesDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.ChiChainDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.ChiClusterDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.ChiPathClusterDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.ChiPathDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.EccentricConnectivityIndexDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.FMFDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.FractionalCSP3Descriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.FractionalPSADescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.FragmentComplexityDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.HBondAcceptorCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.HBondDonorCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.HybridizationRatioDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.JPlogPDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.KappaShapeIndicesDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.KierHallSmartsDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.LargestChainDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.LargestPiSystemDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.LongestAliphaticChainDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.MDEDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.MannholdLogPDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.PetitjeanNumberDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.RotatableBondsCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.RuleOfFiveDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.SmallRingDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.SpiroAtomCountDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.TPSADescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.VABCDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.VAdjMaDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.WeightDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.WeightedPathDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.WienerNumbersDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.XLogPDescriptor;
+import org.openscience.cdk.qsar.descriptors.molecular.ZagrebIndexDescriptor;
+import org.openscience.cdk.qsar.result.DoubleArrayResult;
+import org.openscience.cdk.qsar.result.DoubleResult;
+import org.openscience.cdk.qsar.result.IntegerArrayResult;
+import org.openscience.cdk.qsar.result.IntegerResult;
 import org.openscience.cdk.silent.SilentChemObjectBuilder;
 import org.openscience.cdk.smiles.SmilesParser;
 
@@ -41,6 +98,9 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.stream.IntStream;
 
 //TODO test descriptors for how they handle empty molecules and empty SMILES strings.
 /**
@@ -80,7 +140,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -134,7 +194,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -191,7 +251,7 @@ class DescriptorTest {
 
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -268,7 +328,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -348,7 +408,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                    DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -427,7 +487,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                    DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -510,7 +570,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                    DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -592,7 +652,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                    DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -673,7 +733,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                    DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -730,7 +790,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -785,7 +845,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -852,7 +912,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -916,7 +976,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -974,7 +1034,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -1045,7 +1105,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                    DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -1117,7 +1177,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                    DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -1188,7 +1248,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                    DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -1243,7 +1303,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -1298,7 +1358,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -1353,7 +1413,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -1406,7 +1466,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -1461,7 +1521,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -1521,7 +1581,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -1575,7 +1635,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -1629,7 +1689,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -1684,7 +1744,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -1744,7 +1804,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -1798,7 +1858,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -1853,7 +1913,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -1930,7 +1990,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                    DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -1985,7 +2045,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2039,7 +2099,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2091,7 +2151,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2152,7 +2212,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2215,7 +2275,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2272,7 +2332,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2327,7 +2387,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2388,7 +2448,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2449,7 +2509,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2510,7 +2570,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2571,7 +2631,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2625,7 +2685,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2703,7 +2763,7 @@ class DescriptorTest {
                     };
             List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
             Assertions.assertTrue(
-                    Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                    DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                             tmpDescriptors,
                             tmpMoleculesArray,
                             tmpMatrix,
@@ -2763,7 +2823,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2816,7 +2876,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2876,7 +2936,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -2941,7 +3001,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -3003,7 +3063,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -3062,7 +3122,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -3122,7 +3182,7 @@ class DescriptorTest {
                 };
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -3200,7 +3260,7 @@ class DescriptorTest {
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
 
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -3231,7 +3291,7 @@ class DescriptorTest {
         Descriptor.setAromaticity(tmpMolecule, Aromaticity.Model.Daylight);
         IAtomContainer[] tmpMoleculesArray = new IAtomContainer[]{tmpMolecule};
         int tmpStartIndex = 0;
-        Descriptor[] tmpDescriptors = new Descriptor[]{Descriptor.MACCS_FINGERPRINTER};
+        Descriptor[] tmpDescriptors = new Descriptor[]{MACCS_FINGERPRINTER};
         boolean tmpIsParallelCalculation = false;
 
         Assertions.assertEquals(166, Descriptor.getNumberOfComponents(tmpDescriptors));
@@ -3257,7 +3317,7 @@ class DescriptorTest {
         Arrays.fill(tmpMatrix[0], 0f);
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -3314,7 +3374,7 @@ class DescriptorTest {
         Arrays.fill(tmpMatrix[0], 0f);
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -3370,7 +3430,7 @@ class DescriptorTest {
         Arrays.fill(tmpMatrix[0], 0f);
         aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix,
@@ -3417,7 +3477,7 @@ class DescriptorTest {
         boolean tmpIsParallelCalculation = false;
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrixSequential,
@@ -3432,7 +3492,7 @@ class DescriptorTest {
         tmpIsParallelCalculation = true;
         List<int[]> aNanPositionsParallel = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrixParallel,
@@ -3633,7 +3693,7 @@ class DescriptorTest {
         float[][] tmpMatrix1 = new float[tmpNumberOfMolecules][tmpNumberOfComponents];
         List<int[]> aNanPositions = Collections.synchronizedList(new LinkedList<>());
         Assertions.assertTrue(
-                Descriptor.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
                         tmpDescriptors,
                         tmpMoleculesArray,
                         tmpMatrix1,
@@ -3873,7 +3933,7 @@ class DescriptorTest {
     }
 
     /**
-     * Test method for setCircularFingerprintSize.
+     * Test method for setCircularFingerprintSize().
      *
      * @throws Exception if anything goes wrong
      */
@@ -3900,6 +3960,619 @@ class DescriptorTest {
             });
         } finally {
             Descriptor.setCircularFingerprintSize(originalSize);
+        }
+    }
+
+    /**
+     * Sets calculated descriptor components in vectors (rows) of a matrix (that corresponds to atomContainerArray)
+     * beginning with startIndex by (optional) parallelization of molecules. If parallel computation is used, the atom
+     * containers (molecules) are distributed onto parallel thread, one for each molecule, and they all access shared
+     * descriptor instances.
+     * Note: Uses a new descriptor instance for EVERY descriptor calculation which slows down the calculation.
+     * Note: For fingerprints a blocked queue is used, because fingerprinter instances are not threadsafe.
+     * The pool size can be changed via setFingerprintPoolSize(int)
+     *
+     * @param descriptors Array of descriptors to be calculated (IS NOT CHANGED)
+     * @param atomContainerArray Array of molecules. Note: atomContainerArray[i] corresponds to matrix[i] data
+     *                             vector. (IS NOT CHANGED)
+     * @param matrix Matrix of component vectors of molecules. Note: Data vector matrix[i] corresponds to molecule
+     *                atomContainerArray[i], i.e. the molecules define the rows of the matrix. (MAY BE CHANGED)
+     * @param startIndex Start index in a vector to be filled with calculated components of descriptors, i.e. matrix
+     *                    column to start filling with descriptors
+     * @param isParallelCalculation True: Calculations are parallelized, false: Calculations are sequential
+     * @param nanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     *                      IMPORTANT: For parallel calculations (isParallelCalculation=true), this must be thread-safe.
+     *                      Use Collections.synchronizedList() to avoid race conditions.
+     * @return True: Operation was successful, no NaN values generated; false: Operation failed, i.e. at least one component in a descriptor
+     *         calculation is NaN or a global exception occurred
+     * @throws IllegalArgumentException if the matrix dimensions are invalid
+     */
+    public static boolean setDescriptorsForMoleculesByMoleculeParallelizationNew(
+            Descriptor[] descriptors,
+            IAtomContainer[] atomContainerArray,
+            float[][] matrix,
+            int startIndex,
+            boolean isParallelCalculation,
+            List<int[]> nanPositionsList
+    ) throws IllegalArgumentException {
+        // Checks
+        final String methodName = "setDescriptorsForMoleculesByMoleculeParallelizationNew";
+        if (!Descriptor.validateDescriptors(descriptors, methodName)) {
+            Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
+            return true;
+        }
+        if (!Descriptor.validateAtomContainerArray(atomContainerArray, methodName)) {
+            Descriptor.LOGGER.log(Level.WARNING, "{0} : Given atom container array is empty, calculation aborted.", methodName);
+            return true;
+        }
+        if (nanPositionsList == null) {
+            throw new NullPointerException(methodName + ": nanPositionsList is null.");
+        }
+        // throws NullPointerException or IllegalArgumentException if the matrix or on eof its rows is null or its dimensions are invalid
+        Descriptor.validateMatrix(matrix, descriptors, atomContainerArray, startIndex, methodName);
+
+        int[] startIndices = new int[descriptors.length];
+        for (int i = 0; i < descriptors.length; i++) {
+            startIndices[i] = startIndex;
+            startIndex += descriptors[i].getDescriptorComponentNumber();
+        }
+
+        AtomicBoolean hasNaN = new AtomicBoolean(false);
+        try {
+            if (isParallelCalculation) {
+
+                // Advise by Oracle: Parallel streams should use the common Fork-join pool
+                IntStream.range(0, atomContainerArray.length).parallel().forEach(
+                        i ->
+                        {
+                            try {
+                                boolean success = DescriptorTest.setDescriptorsForSingleMoleculeNew(
+                                        descriptors,
+                                        atomContainerArray[i],
+                                        matrix[i],
+                                        startIndices,
+                                        i,
+                                        nanPositionsList
+                                );
+                                if (!success) {
+                                    hasNaN.set(true);
+                                }
+                            } catch (Exception exception) {
+                                hasNaN.set(true);
+                                Descriptor.LOGGER.log(
+                                        Level.WARNING,
+                                        String.format("DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew: One descriptor calculation caused an exception, molecule index: %d.", i),
+                                        exception
+                                );
+                            }
+                        }
+                );
+            } else {
+                for (int i = 0; i < atomContainerArray.length; i++) {
+                    if (!DescriptorTest.setDescriptorsForSingleMoleculeNew(descriptors, atomContainerArray[i], matrix[i], startIndices, i, nanPositionsList)) {
+                        hasNaN.set(true);
+                    }
+                }
+            }
+        } catch (Exception exception) {
+            Descriptor.LOGGER.log(
+                    Level.WARNING,
+                    "DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew: Global exception occurred in descriptor calculation: ",
+                    exception
+            );
+            return false;
+        }
+        return !hasNaN.get();
+    }
+
+
+
+    /**
+     * Sets calculated descriptor components in vector (that corresponds to atomContainer, a row in the data matrix)
+     * at aStartIndices.
+     * Note: Uses a new descriptor instance for EVERY descriptor calculation.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     *
+     * @param descriptors Array of descriptors to be calculated (IS NOT CHANGED)
+     * @param atomContainer Molecule (IS NOT CHANGED)
+     * @param vector Component vector of molecule (MAY BE CHANGED)
+     * @param aStartIndices Start indices in vector to be filled with calculated components of descriptor (each descriptor
+     *                      in descriptors has its dedicated start index here)
+     * @param moleculeIndex Index of the current molecule being processed
+     * @param nanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
+     * descriptor calculation result is NaN
+     * @throws CloneNotSupportedException if copying the molecule fails
+     */
+    private static boolean setDescriptorsForSingleMoleculeNew(
+            Descriptor[] descriptors,
+            IAtomContainer atomContainer,
+            float[] vector,
+            int[] aStartIndices,
+            int moleculeIndex,
+            List<int[]> nanPositionsList
+    ) throws CloneNotSupportedException {
+        IAtomContainer moleculeWithExplicitHydrogens = null;
+        for (Descriptor descriptor : descriptors) {
+            if (descriptor.needsExplicitHydrogens()){
+                moleculeWithExplicitHydrogens = Descriptor.createMoleculeWithExplicitHydrogens(atomContainer);
+                break;
+            }
+        }
+        boolean isSuccessful = true;
+        for (int i = 0; i < descriptors.length; i++) {
+            IAtomContainer moleculeToUse = descriptors[i].needsExplicitHydrogens() ? moleculeWithExplicitHydrogens : atomContainer;
+            if (!DescriptorTest.setDescriptorNew(descriptors[i], moleculeToUse, vector, aStartIndices[i], moleculeIndex, nanPositionsList)) {
+                isSuccessful = false;
+            }
+        }
+        return isSuccessful;
+    }
+
+    /**
+     * Sets component values of descriptor for atomContainer in vector beginning with startIndex.
+     * Note: This method instantiates a new CDK descriptor instance for EVERY calculation and is therefore thread-safe in
+     * concurrent computing.
+     * Note: Checks are NOT performed here. All necessary checks have already been made in public methods above.
+     *
+     * @param descriptor Descriptor to be calculated (IS NOT CHANGED)
+     * @param atomContainer Molecule (IS NOT CHANGED)
+     * @param vector Vector of molecule (row in data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param startIndex Start index in vector to be filled with calculated components of descriptors
+     * @param moleculeIndex Index of the current molecule being processed
+     * @param nanPositionsList List to track NaN positions as [moleculeIndex, componentIndex] pairs (MAY BE CHANGED).
+     * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
+     * descriptor calculation result is NaN
+     */
+    private static boolean setDescriptorNew(
+            Descriptor descriptor,
+            IAtomContainer atomContainer,
+            float[] vector,
+            int startIndex,
+            int moleculeIndex,
+            List<int[]> nanPositionsList
+    ) {
+        try {
+            switch (descriptor) {
+                //note: the initializations here should be the same as in the descriptorToCdkObjectMap!
+                case MOLECULAR_WEIGHT:
+                    vector[startIndex] = (float) ((DoubleResult) (new WeightDescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case WIENER_NUMBER:
+                    DoubleArrayResult result = (DoubleArrayResult) (new WienerNumbersDescriptor()).calculate(atomContainer).getValue();
+                    vector[startIndex] = (float) result.get(0); //Wiener path number
+                    vector[startIndex + 1] = (float) result.get(1); //Wiener polarity number
+                    break;
+                case ATOM_COUNT:
+                    vector[startIndex] = (float) ((IntegerResult) (new AtomCountDescriptor()).calculate(atomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_C:
+                    AtomCountDescriptor atomCountCDesc = new AtomCountDescriptor();
+                    //set parameter to count carbon atoms
+                    atomCountCDesc.setParameters(new String[]{"C"});
+                    vector[startIndex] = (float) ((IntegerResult) atomCountCDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_H:
+                    AtomCountDescriptor atomCountHDesc = new AtomCountDescriptor();
+                    //set parameter to count hydrogen atoms
+                    atomCountHDesc.setParameters(new String[]{"H"});
+                    vector[startIndex] = (float) ((IntegerResult) atomCountHDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_N:
+                    AtomCountDescriptor atomCountNDesc = new AtomCountDescriptor();
+                    //set parameter to count nitrogen atoms
+                    atomCountNDesc.setParameters(new String[]{"N"});
+                    vector[startIndex] = (float) ((IntegerResult) atomCountNDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_O:
+                    AtomCountDescriptor atomCountODesc = new AtomCountDescriptor();
+                    //set parameter to count oxygen atoms
+                    atomCountODesc.setParameters(new String[]{"O"});
+                    vector[startIndex] = (float) ((IntegerResult) atomCountODesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_S:
+                    AtomCountDescriptor atomCountSDesc = new AtomCountDescriptor();
+                    //set parameter to count sulfur atoms
+                    atomCountSDesc.setParameters(new String[]{"S"});
+                    vector[startIndex] = (float) ((IntegerResult) atomCountSDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_P:
+                    AtomCountDescriptor atomCountPDesc = new AtomCountDescriptor();
+                    //set parameter to count phosphorus atoms
+                    atomCountPDesc.setParameters(new Object[]{"P"});
+                    vector[startIndex] = (float) ((IntegerResult) atomCountPDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_F:
+                    AtomCountDescriptor atomCountFDesc = new AtomCountDescriptor();
+                    //set parameter to count fluorine atoms
+                    atomCountFDesc.setParameters(new String[]{"F"});
+                    vector[startIndex] = (float) ((IntegerResult) atomCountFDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_BR:
+                    AtomCountDescriptor atomCountBrDesc = new AtomCountDescriptor();
+                    //set parameter to count bromine atoms
+                    atomCountBrDesc.setParameters(new String[]{"Br"});
+                    vector[startIndex] = (float) ((IntegerResult) atomCountBrDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_CL:
+                    AtomCountDescriptor atomCountClDesc = new AtomCountDescriptor();
+                    //set parameter to count chlorine atoms
+                    atomCountClDesc.setParameters(new String[]{"Cl"});
+                    vector[startIndex] = (float) ((IntegerResult) atomCountClDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_I:
+                    AtomCountDescriptor atomCountIDesc = new AtomCountDescriptor();
+                    //set parameter to count iodine atoms
+                    atomCountIDesc.setParameters(new String[]{"I"});
+                    vector[startIndex] = (float) ((IntegerResult) atomCountIDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case H_BOND_ACCEPTOR_COUNT:
+                    vector[startIndex] = (float) ((IntegerResult) (new HBondAcceptorCountDescriptor()).calculate(atomContainer).getValue()).intValue();
+                    break;
+                case H_BOND_DONOR_COUNT:
+                    vector[startIndex] = (float) ((IntegerResult) (new HBondDonorCountDescriptor()).calculate(atomContainer).getValue()).intValue();
+                    break;
+                case TPSA:
+                    vector[startIndex] = (float) ((DoubleResult) (new TPSADescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case LARGEST_CHAIN:
+                    vector[startIndex] = (float) ((IntegerResult) (new LargestChainDescriptor()).calculate(atomContainer).getValue()).intValue();
+                    break;
+                case LONGEST_ALIPHATIC_CHAIN:
+                    vector[startIndex] = (float) ((IntegerResult) (new LongestAliphaticChainDescriptor()).calculate(atomContainer).getValue()).intValue();
+                    break;
+                case MANNHOLD_LOGP:
+                    vector[startIndex] = (float) ((DoubleResult) (new MannholdLogPDescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case BCUT:
+                    BCUTDescriptor bcutDescriptor = new BCUTDescriptor();
+                    // Change parameters so that we can use our own setAromaticity method default: checkAromaticity = true
+                    bcutDescriptor.setParameters(new Object[] {1, 1, false}); // nhigh = 1, nlow = 1, checkAromaticity = false
+                    DoubleArrayResult bcutResult = (DoubleArrayResult) bcutDescriptor.calculate(atomContainer).getValue();
+                    for (int i = 0; i < 6; i++) {
+                        vector[startIndex + i] = (float) bcutResult.get(i);
+                    }
+                    break;
+                case BOND_COUNT_ALL:
+                    vector[startIndex] = (float) ((IntegerResult) (new BondCountDescriptor()).calculate(atomContainer).getValue()).intValue();
+                    break;
+                case BOND_COUNT_SINGLE:
+                    BondCountDescriptor bondCountSingleDesc = new BondCountDescriptor();
+                    //set parameter to count single bonds
+                    bondCountSingleDesc.setParameters(new String[]{"s"});
+                    vector[startIndex] = (float) ((IntegerResult) bondCountSingleDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case BOND_COUNT_DOUBLE:
+                    BondCountDescriptor bondCountDoubleDesc = new BondCountDescriptor();
+                    //set parameter to count double bonds
+                    bondCountDoubleDesc.setParameters(new String[]{"d"});
+                    vector[startIndex] = (float) ((IntegerResult) bondCountDoubleDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case BOND_COUNT_TRIPLE:
+                    BondCountDescriptor bondCountTripleDesc = new BondCountDescriptor();
+                    //set parameter to count triple bonds
+                    bondCountTripleDesc.setParameters(new String[]{"t"});
+                    vector[startIndex] = (float) ((IntegerResult) bondCountTripleDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case B_POL:
+                    vector[startIndex] = (float) ((DoubleResult) (new BPolDescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case RULE_OF_FIVE:
+                    vector[startIndex] = (float) ((IntegerResult) (new RuleOfFiveDescriptor()).calculate(atomContainer).getValue()).intValue();
+                    break;
+                case AROMATIC_ATOMS_COUNT:
+                    vector[startIndex] = (float) ((IntegerResult) (new AromaticAtomsCountDescriptor()).calculate(atomContainer).getValue()).intValue();
+                    break;
+                case AROMATIC_BONDS_COUNT:
+                    vector[startIndex] = (float) ((IntegerResult) (new AromaticBondsCountDescriptor()).calculate(atomContainer).getValue()).intValue();
+                    break;
+                case ROTATABLE_BONDS_COUNT:
+                    vector[startIndex] = (float) ((IntegerResult) (new RotatableBondsCountDescriptor()).calculate(atomContainer).getValue()).intValue();
+                    break;
+                case FMF:
+                    vector[startIndex] = (float) ((DoubleResult) (new FMFDescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case FRACTIONAL_CSP3:
+                    vector[startIndex] = (float) ((DoubleResult) (new FractionalCSP3Descriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case HYBRIDIZATION_RATIO:
+                    vector[startIndex] = (float) ((DoubleResult) (new HybridizationRatioDescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case KAPPA_SHAPE_INDICES:
+                    DoubleArrayResult kappaResult = (DoubleArrayResult) (new KappaShapeIndicesDescriptor()).calculate(atomContainer).getValue();
+                    for (int i = 0; i < 3; i++) {
+                        vector[startIndex + i] = (float) kappaResult.get(i);
+                    }
+                    break;
+                case PETITJEAN_NUMBER:
+                    vector[startIndex] = (float) ((DoubleResult) (new PetitjeanNumberDescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case SPIRO_ATOM_COUNT:
+                    vector[startIndex] = (float) ((IntegerResult) (new SpiroAtomCountDescriptor()).calculate(atomContainer).getValue()).intValue();
+                    break;
+                case V_ADJ_MAT:
+                    vector[startIndex] = (float) ((DoubleResult) (new VAdjMaDescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case WEIGHTED_PATH:
+                    DoubleArrayResult weightedPathResultNew = (DoubleArrayResult) (new WeightedPathDescriptor()).calculate(atomContainer).getValue();
+                    for (int i = 0; i < 5; i++) {
+                        vector[startIndex + i] = (float) weightedPathResultNew.get(i);
+                    }
+                    break;
+                case ZAGREB_INDEX:
+                    vector[startIndex] = (float) ((DoubleResult) (new ZagrebIndexDescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case CARBON_TYPES:
+                    IntegerArrayResult carbonTypesResultNew = (IntegerArrayResult) (new CarbonTypesDescriptor()).calculate(atomContainer).getValue();
+                    for (int i = 0; i < 9; i++) {
+                        vector[startIndex + i] = carbonTypesResultNew.get(i);
+                    }
+                    break;
+                case A_LOG_P:
+                    DoubleArrayResult aLogPResult = (DoubleArrayResult) (new ALOGPDescriptor()).calculate(atomContainer).getValue();
+                    vector[startIndex] = (float) aLogPResult.get(0);// ALogP
+                    vector[startIndex + 1] = (float) aLogPResult.get(1);  // ALogP squared
+                    vector[startIndex + 2] = (float) aLogPResult.get(2);  // Molar Refractivity
+                    break;
+                case X_LOG_P:
+                    vector[startIndex] = (float) ((DoubleResult) (new XLogPDescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case JP_LOG_P:
+                    vector[startIndex] = (float) ((DoubleResult) (new JPlogPDescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case A_POL:
+                    vector[startIndex] = (float) ((DoubleResult) (new APolDescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case AUTOCORRELATION_CHARGE:
+                    DoubleArrayResult autocorrelationChargeResult = (DoubleArrayResult) (new AutocorrelationDescriptorCharge()).calculate(atomContainer).getValue();
+                    for (int i = 0; i < 5; i++) {
+                        vector[startIndex + i] = (float) autocorrelationChargeResult.get(i);
+                    }
+                    break;
+                case AUTOCORRELATION_MASS:
+                    DoubleArrayResult autocorrelationMassResult = (DoubleArrayResult) (new AutocorrelationDescriptorMass()).calculate(atomContainer).getValue();
+                    for (int i = 0; i < 5; i++) {
+                        vector[startIndex + i] = (float) autocorrelationMassResult.get(i);
+                    }
+                    break;
+                case AUTOCORRELATION_POLARIZABILITY:
+                    DoubleArrayResult autocorrelationPolarizabilityResult = (DoubleArrayResult) (new AutocorrelationDescriptorPolarizability()).calculate(atomContainer).getValue();
+                    for (int i = 0; i < 5; i++) {
+                        vector[startIndex + i] = (float) autocorrelationPolarizabilityResult.get(i);
+                    }
+                    break;
+                case FRAGMENT_COMPLEXITY:
+                    vector[startIndex] = (float) ((DoubleResult) (new FragmentComplexityDescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case CHI_CHAIN:
+                    DoubleArrayResult chiChainResult = (DoubleArrayResult) new ChiChainDescriptor().calculate(atomContainer).getValue();
+                    for (int i = 0; i < 10; i++) {
+                        vector[startIndex + i] = (float) chiChainResult.get(i);
+                    }
+                    break;
+                case CHI_CLUSTER:
+                    DoubleArrayResult chiClusterResult = (DoubleArrayResult) (new ChiClusterDescriptor()).calculate(atomContainer).getValue();
+                    for (int i = 0; i < 8; i++) {
+                        vector[startIndex + i] = (float) chiClusterResult.get(i);
+                    }
+                    break;
+                case CHI_PATH_CLUSTER:
+                    DoubleArrayResult chiPathClusterResult = (DoubleArrayResult) new ChiPathClusterDescriptor().calculate(atomContainer).getValue();
+                    for (int i = 0; i < 6; i++) {
+                        vector[startIndex + i] = (float) chiPathClusterResult.get(i);
+                    }
+                    break;
+                case CHI_PATH:
+                    DoubleArrayResult chiPathResult = (DoubleArrayResult) (new ChiPathDescriptor()).calculate(atomContainer).getValue();
+                    for (int i = 0; i < 16; i++) {
+                        vector[startIndex + i] = (float) chiPathResult.get(i);
+                    }
+                    break;
+                case FRACTIONAL_PSA:
+                    vector[startIndex] = (float) ((DoubleResult) (new FractionalPSADescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case LARGEST_PI_SYSTEM:
+                    LargestPiSystemDescriptor largestPiSystemDescriptor = new LargestPiSystemDescriptor();
+                    // Change parameters so that we can use our own setAromaticity method
+                    largestPiSystemDescriptor.setParameters(new Boolean[] {false}); // checkAromaticity = false
+                    vector[startIndex] = (float) ((IntegerResult) largestPiSystemDescriptor.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case SMALL_RING:
+                    IntegerArrayResult smallRingResult = (IntegerArrayResult) (new SmallRingDescriptor()).calculate(atomContainer).getValue();
+                    for (int i = 0; i < 11; i++) {
+                        vector[startIndex + i] = (float) smallRingResult.get(i);
+                    }
+                    break;
+                case BASIC_GROUP_COUNT:
+                    BasicGroupCountDescriptor basicGroupCountDesc = new BasicGroupCountDescriptor();
+                    basicGroupCountDesc.initialise(SilentChemObjectBuilder.getInstance());
+                    vector[startIndex] = (float) ((IntegerResult) basicGroupCountDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case ACIDIC_GROUP_COUNT:
+                    AcidicGroupCountDescriptor acidicGroupCountDesc = new AcidicGroupCountDescriptor();
+                    acidicGroupCountDesc.initialise(SilentChemObjectBuilder.getInstance());
+                    vector[startIndex] = (float) ((IntegerResult) acidicGroupCountDesc.calculate(atomContainer).getValue()).intValue();
+                    break;
+                case AMINO_ACID_COUNT:
+                    IntegerArrayResult aminoAcidCountResult = (IntegerArrayResult) (new AminoAcidCountDescriptor()).calculate(atomContainer).getValue();
+                    for (int i = 0; i < 20; i++) {
+                        vector[startIndex + i] = (float) aminoAcidCountResult.get(i);
+                    }
+                    break;
+                case KIER_HALL_SMARTS:
+                    IntegerArrayResult kierHallSmartsResult = (IntegerArrayResult) (new KierHallSmartsDescriptor()).calculate(atomContainer).getValue();
+                    for (int i = 0; i < 79; i++) {
+                        vector[startIndex + i] = (float) kierHallSmartsResult.get(i);
+                    }
+                    break;
+                case ECCENTRIC_CONNECTIVITY_INDEX:
+                    vector[startIndex] = (float) ((IntegerResult) (new EccentricConnectivityIndexDescriptor()).calculate(atomContainer).getValue()).intValue();
+                    break;
+                case MDE:
+                    DoubleArrayResult aDoubleArrayResult = (DoubleArrayResult) (new MDEDescriptor()).calculate(atomContainer).getValue();
+                    for (int i = 0; i < 19; i++) {
+                        vector[startIndex + i] = (float) aDoubleArrayResult.get(i);
+                    }
+                    break;
+                case VABC:
+                    vector[startIndex] = (float) ((DoubleResult) (new VABCDescriptor()).calculate(atomContainer).getValue()).doubleValue();
+                    break;
+                case PUBCHEM_FINGERPRINTER:
+                    //TODO: why do the fingerprints have their own try-catch block? It does the same as the general one below, right? So, can we remove them?
+                    try {
+                        IBitFingerprint fingerprint = new PubchemFingerprinter(SilentChemObjectBuilder.getInstance()).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.PUBCHEM_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                        }
+                    } catch (Exception exception) {
+                        for (int i = 0; i < Descriptor.PUBCHEM_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                            vector[startIndex + i] = Float.NaN;
+                        }
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP_0:
+                    try {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, Descriptor.getCircularFingerprintSize()).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                        }
+                    } catch (Exception exception) {
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = Float.NaN;
+                        }
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP_0:
+                    try {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, Descriptor.getCircularFingerprintSize()).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                        }
+                    } catch (Exception exception) {
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = Float.NaN;
+                        }
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP_2:
+                    try {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, Descriptor.getCircularFingerprintSize()).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                        }
+                    } catch (Exception exception) {
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = Float.NaN;
+                        }
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP_2:
+                    try {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, Descriptor.getCircularFingerprintSize()).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                        }
+                    } catch (Exception exception) {
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = Float.NaN;
+                        }
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP_4:
+                    try {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, Descriptor.getCircularFingerprintSize()).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                        }
+                    } catch (Exception exception) {
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = Float.NaN;
+                        }
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP_4:
+                    try {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, Descriptor.getCircularFingerprintSize()).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                        }
+                    } catch (Exception exception) {
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = Float.NaN;
+                        }
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_ECFP_6:
+                    try {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, Descriptor.getCircularFingerprintSize()).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                        }
+                    } catch (Exception exception) {
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = Float.NaN;
+                        }
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
+                    }
+                    break;
+                case CIRCULAR_FINGERPRINTER_FCFP_6:
+                    try {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, Descriptor.getCircularFingerprintSize()).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                        }
+                    } catch (Exception exception) {
+                        for (int i = 0; i < Descriptor.getCircularFingerprintSize(); i++) {
+                            vector[startIndex + i] = Float.NaN;
+                        }
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
+                    }
+                    break;
+                case MACCS_FINGERPRINTER:
+                    try {
+                        IBitFingerprint fingerprint = new MACCSFingerprinter(SilentChemObjectBuilder.getInstance()).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < MACCS_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                            vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
+                        }
+                    } catch (Exception exception) {
+                        for (int i = 0; i < MACCS_FINGERPRINTER.getDescriptorComponentNumber(); i++) {
+                            vector[startIndex + i] = Float.NaN;
+                        }
+                        Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
+                    }
+                    break;
+
+                // Add new descriptor information here!
+                default:
+                    throw new UnsupportedOperationException(descriptor + ": This descriptor does not have a routine yet!");
+            }
+            // Check for NaN values in the calculated result and track them
+            int numComponents = descriptor.getDescriptorComponentNumber();
+            return !Descriptor.checkAndTrackNaNValues(vector, startIndex, numComponents, moleculeIndex, nanPositionsList);
+        } catch (Exception exception) {
+            int numComponents = descriptor.getDescriptorComponentNumber();
+            for (int i = 0; i < numComponents; i++) {
+                vector[startIndex + i] = Float.NaN;
+                // Track NaN position if nanPositionsList is provided
+                if (nanPositionsList != null) {
+                    nanPositionsList.add(new int[]{moleculeIndex, startIndex + i});
+                }
+            }
+            Descriptor.LOGGER.log(
+                    Level.WARNING,
+                    String.format("DescriptorTest.setDescriptorNew: An exception occurred while calculating descriptor %s for molecule index %d.",
+                            descriptor,
+                            moleculeIndex),
+                    exception
+            );
+            return false;
         }
     }
 }
