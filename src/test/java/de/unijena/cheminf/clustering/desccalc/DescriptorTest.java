@@ -3848,4 +3848,58 @@ class DescriptorTest {
             Descriptor.getDescriptorAndComponentInfo(tmpDescriptors, 9);
         });
     }
+
+    /**
+     * Test method for setFingerprintPoolSize.
+     *
+     * @throws Exception if anything goes wrong
+     */
+    @Test
+    void test_setFingerprintPoolSize() throws Exception {
+        int originalPoolSize = Descriptor.getFingerprintPoolSize();
+        try {
+            Assertions.assertTrue(Descriptor.setFingerprintPoolSize(6));
+            Assertions.assertEquals(6, Descriptor.getFingerprintPoolSize());
+
+            Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                Descriptor.setFingerprintPoolSize(0);
+            });
+            Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                Descriptor.setFingerprintPoolSize(-1);
+            });
+        } finally {
+            Descriptor.setFingerprintPoolSize(originalPoolSize);
+        }
+    }
+
+    /**
+     * Test method for setCircularFingerprintSize.
+     *
+     * @throws Exception if anything goes wrong
+     */
+    @Test
+    void test_setCircularFingerprintSize() throws Exception {
+        int originalSize = Descriptor.getCircularFingerprintSize();
+        try {
+            Assertions.assertTrue(Descriptor.setCircularFingerprintSize(2048));
+            Assertions.assertEquals(2048, Descriptor.getCircularFingerprintSize());
+            Assertions.assertEquals(2048, Descriptor.CIRCULAR_FINGERPRINTER_ECFP_0.getDescriptorComponentNumber());
+            Assertions.assertEquals(2048, Descriptor.CIRCULAR_FINGERPRINTER_FCFP_0.getDescriptorComponentNumber());
+            Assertions.assertEquals(2048, Descriptor.CIRCULAR_FINGERPRINTER_ECFP_2.getDescriptorComponentNumber());
+            Assertions.assertEquals(2048, Descriptor.CIRCULAR_FINGERPRINTER_FCFP_2.getDescriptorComponentNumber());
+            Assertions.assertEquals(2048, Descriptor.CIRCULAR_FINGERPRINTER_ECFP_4.getDescriptorComponentNumber());
+            Assertions.assertEquals(2048, Descriptor.CIRCULAR_FINGERPRINTER_FCFP_4.getDescriptorComponentNumber());
+            Assertions.assertEquals(2048, Descriptor.CIRCULAR_FINGERPRINTER_ECFP_6.getDescriptorComponentNumber());
+            Assertions.assertEquals(2048, Descriptor.CIRCULAR_FINGERPRINTER_FCFP_6.getDescriptorComponentNumber());
+
+            Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                Descriptor.setCircularFingerprintSize(0);
+            });
+            Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                Descriptor.setCircularFingerprintSize(-1);
+            });
+        } finally {
+            Descriptor.setCircularFingerprintSize(originalSize);
+        }
+    }
 }
