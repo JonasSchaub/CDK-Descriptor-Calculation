@@ -54,8 +54,6 @@ import java.util.List;
  * @author Manuel Schauer
  */
 class DescriptorTest {
-    //TODO for CDK integration: remove editor folds
-    //<editor-fold desc="Single descriptor tests">
     /**
      * Test method for descriptor MOLECULAR_WEIGHT.
      *
@@ -3386,9 +3384,7 @@ class DescriptorTest {
 
     // Add new descriptor tests here!
 
-    //</editor-fold>
 
-    //<editor-fold desc="Tests with all implemented descriptors">
 
     /**
      * Tests parallelization. TODO: this test can split up into 5. And please add a bit more doc.
@@ -3711,9 +3707,7 @@ class DescriptorTest {
             }
         }
     }
-    //</editor-fold>
 
-    //<editor-fold desc="Tests preparation Methods">
     /**
      * Test method for createMoleculeWithExplicitHydrogens.
      *
@@ -3835,5 +3829,4 @@ class DescriptorTest {
         Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_ECFP_6));
         Assertions.assertTrue(fingerprintList.contains(Descriptor.CIRCULAR_FINGERPRINTER_FCFP_6));
     }
-    //</editor-fold>
 }

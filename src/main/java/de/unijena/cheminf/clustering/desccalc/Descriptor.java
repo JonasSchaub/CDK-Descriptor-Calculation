@@ -313,8 +313,6 @@ public enum Descriptor {
      * Note for developers: for adding a new descriptor, go to "Add new descriptor information here!"
      * (also marked in the test class)
      */
-    //TODO: remove editor folds for CDK integration
-    //<editor-fold desc="Descriptor enumeration and initialization">
     /**
      * Molecular weight, adds up the natural masses (weighted average of all known
      * isotopes of the particular element based on their natural abundances) of every atom
@@ -332,7 +330,6 @@ public enum Descriptor {
      * @see WienerNumbersDescriptor
      */
     WIENER_NUMBER(true, true, false, false, 2, "Wiener Number"),
-    //<editor-fold desc="Basic Bond and Count descriptors">
     /**
      * Atom count, counts the number of all atoms in the given molecule.
      *
@@ -476,7 +473,6 @@ public enum Descriptor {
      * @see AcidicGroupCountDescriptor
      */
     ACIDIC_GROUP_COUNT(true, true, false, false, 1, "Acidic Group Count"),
-    //</editor-fold>
     /**
      * TPSA descriptor, calculates the topological polar surface area (TPSA) of a molecule.
      * TPSA is the sum of the surface areas of polar atoms (typically oxygen and nitrogen)
@@ -627,7 +623,6 @@ public enum Descriptor {
      * @see CarbonTypesDescriptor
      */
     CARBON_TYPES(true, true, false, false, 9, "Carbon Types"),
-    //<editor-fold desc="LogP descriptors">
     /**
      * ALogP descriptor, calculates Ghose-Crippen LogP values, molar refractivity values
      * and ALogP squared values. Returns 3 values:<br>
@@ -659,14 +654,12 @@ public enum Descriptor {
      * @see MannholdLogPDescriptor
      */
     MANNHOLD_LOGP(true, true, false, false, 1, "Mannhold LogP"),
-    //</editor-fold>
     /**
      * APol descriptor, calculates the sum of the atomic polarizabilities (including implicit hydrogens).
      *
      * @see APolDescriptor
      */
     A_POL(true, true, false, false, 1, "APol"),
-    //<editor-fold desc="Autocorrelation descriptors">
     /**
      * Autocorrelation charge descriptor, calculates topological autocorrelation vectors
      * that capture patterns related to charge distribution across the molecular structure.
@@ -698,7 +691,6 @@ public enum Descriptor {
      * @see AutocorrelationDescriptorPolarizability
      */
     AUTOCORRELATION_POLARIZABILITY(true, true, false, false, 5, "Autocorrelation Polarizability"),
-    //</editor-fold>
     /**
      * Fragment complexity descriptor, calculates the complexity of a molecular system.
      * The complexity is defined as [Nilakantan, R. et al. Journal of chemical information and modeling. 2006. 46]:
@@ -713,7 +705,6 @@ public enum Descriptor {
      * @see FragmentComplexityDescriptor
      */
     FRAGMENT_COMPLEXITY(true, true, false, false, 1, "Fragment Complexity"),
-    //<editor-fold desc="CHI descriptors">
     /**
      * Chi chain descriptor, calculates the Kier + Hall chi chain indices of orders 3 through 7.
      * These values characterize a molecular graph based on its chain subgraphs.
@@ -786,7 +777,6 @@ public enum Descriptor {
      * @see ChiPathDescriptor
      */
     CHI_PATH(false, true, false, false, 16, "Chi Path"),
-    //</editor-fold>
     /**
      * Fractional PSA descriptor, calculates the ratio of polar surface area to molecular weight.
      * This descriptor provides the polar surface area efficiency, which is the TPSADescriptor value divided by the
@@ -950,9 +940,7 @@ public enum Descriptor {
     MACCS_FINGERPRINTER(true, true, true, false, 166, "MACCS Fingerprinter");
 
     // Add new descriptor information here!
-    //</editor-fold>
 
-    // <editor-fold desc="Descriptor information and constructor">
     /**
      * Indicates whether this descriptor is quickly calculable.
      * Fast descriptors have lower computational complexity and can be calculated efficiently,
@@ -980,7 +968,7 @@ public enum Descriptor {
     /**
      * The number of components calculated by this descriptor.
      */
-    private final int descriptorComponentNumber;
+    private int descriptorComponentNumber;
 
     /**
      * The human-readable name of this descriptor for output purposes.
@@ -1065,9 +1053,6 @@ public enum Descriptor {
         return this.name;
     }
 
-    //TODO: since this method returns void right now, we can have it return boolean to indicate whether the calculation
-    // was successful or not and hence remove th exception throwing (John will like that); the exception thrown in the
-    // try-catch block could then be logged as a warning
     /**
      * Calculates descriptor or fingerprint values for a molecule and stores them in the result vector.
      * <p>
@@ -1146,24 +1131,18 @@ public enum Descriptor {
         }
         return success;
     }
-    //</editor-fold>
 
-    //<editor-fold desc="Private static final LOGGER">
     /**
      * Logger of this class.
      * TODO for CDK integration: must be replaced with CDK ILoggingTool instance.
      */
     private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());
-    //</editor-fold>
 
-    // <editor-fold desc="SMILES parser">
     /**
      * SMILES Parser for SMILES String batch processing.
      */
     private static final SmilesParser SMILES_PARSER = new SmilesParser(SilentChemObjectBuilder.getInstance());
-    //</editor-fold>
 
-    // <editor-fold desc="CDK descriptor and fingerprinter mappings and static initializer block">
     /**
      * EnumMap that maps a descriptor enum constant to an instance of its associated CDK descriptor class.
      */
@@ -1181,9 +1160,19 @@ public enum Descriptor {
      */
     private static volatile int fingerprintPoolSize = 4;
     /**
-     * Size used for all circular fingerprint "descriptors". TODO: make this adjustable?
+     * Default size used for all circular fingerprint "descriptors".
+     * Note: This constant must remain static final because it is required during
+     * the static initialization of the enum constants above. Enum constants are
+     * instantiated before static variables are initialized, so using a non-final
+     * variable would result in a default value of 0.
      */
     private static final int CIRCULAR_FINGERPRINT_DEFAULT_SIZE = 1024;
+
+    /**
+     * Size used for all circular fingerprint "descriptors". Default value is 1024.
+     * Can be changed via the synchronized {@link #setCircularFingerprintSize(int)} method.
+     */
+    private static volatile int circularFingerprintSize = CIRCULAR_FINGERPRINT_DEFAULT_SIZE;
     /*
      * Static initializer block to populate the descriptorToCdkObjectMap and initialize the fingerprint pool.
      * Note: We use the map and initialize it here (instead of giving each descriptor constant an instance field)
@@ -1417,9 +1406,7 @@ public enum Descriptor {
             throw new UnsupportedOperationException("Failed to initialize descriptors, this should never happen. ", exception);
         }
     }
-    //</editor-fold>
 
-    //<editor-fold desc="Private static methods for pool management">
     /**
      * Initializes all fingerprint pools with the current {@link #fingerprintPoolSize}.
      * This method creates new BlockingQueues for each fingerprint type and populates them
@@ -1446,7 +1433,7 @@ public enum Descriptor {
         // CIRCULAR_FINGERPRINTER_ECFP_0 Pool
         BlockingQueue<IFingerprinter> ecfp0Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            if (!ecfp0Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+            if (!ecfp0Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, Descriptor.circularFingerprintSize))) {
                 LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter ECFP0 instance to pool. This should not happen.");
                 success = false;
             }
@@ -1456,7 +1443,7 @@ public enum Descriptor {
         // CIRCULAR_FINGERPRINTER_FCFP_0 Pool
         BlockingQueue<IFingerprinter> fcfp0Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            if (!fcfp0Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+            if (!fcfp0Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, Descriptor.circularFingerprintSize))) {
                 LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter FCFP0 instance to pool. This should not happen.");
                 success = false;
             }
@@ -1466,7 +1453,7 @@ public enum Descriptor {
         // CIRCULAR_FINGERPRINTER_ECFP_2 Pool
         BlockingQueue<IFingerprinter> ecfp2Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            if (!ecfp2Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+            if (!ecfp2Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, Descriptor.circularFingerprintSize))) {
                 LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter ECFP2 instance to pool. This should not happen.");
                 success = false;
             }
@@ -1476,7 +1463,7 @@ public enum Descriptor {
         // CIRCULAR_FINGERPRINTER_FCFP_2 Pool
         BlockingQueue<IFingerprinter> fcfp2Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            if (!fcfp2Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+            if (!fcfp2Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, Descriptor.circularFingerprintSize))) {
                 LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter FCFP2 instance to pool. This should not happen.");
                 success = false;
             }
@@ -1486,7 +1473,7 @@ public enum Descriptor {
         // CIRCULAR_FINGERPRINTER_ECFP_4 Pool
         BlockingQueue<IFingerprinter> ecfp4Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            if (!ecfp4Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+            if (!ecfp4Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, Descriptor.circularFingerprintSize))) {
                 LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter ECFP4 instance to pool. This should not happen.");
                 success = false;
             }
@@ -1496,7 +1483,7 @@ public enum Descriptor {
         // CIRCULAR_FINGERPRINTER_FCFP_4 Pool
         BlockingQueue<IFingerprinter> fcfp4Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            if (!fcfp4Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+            if (!fcfp4Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, Descriptor.circularFingerprintSize))) {
                 LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter FCFP4 instance to pool. This should not happen.");
                 success = false;
             }
@@ -1506,7 +1493,7 @@ public enum Descriptor {
         // CIRCULAR_FINGERPRINTER_ECFP_6 Pool
         BlockingQueue<IFingerprinter> ecfp6Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            if (!ecfp6Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+            if (!ecfp6Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, Descriptor.circularFingerprintSize))) {
                 LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter ECFP6 instance to pool. This should not happen.");
                 success = false;
             }
@@ -1516,7 +1503,7 @@ public enum Descriptor {
         // CIRCULAR_FINGERPRINTER_FCFP_6 Pool
         BlockingQueue<IFingerprinter> fcfp6Pool = new LinkedBlockingQueue<>(Descriptor.fingerprintPoolSize);
         for (int i = 0; i < Descriptor.fingerprintPoolSize; i++) {
-            if (!fcfp6Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE))) {
+            if (!fcfp6Pool.offer(new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, Descriptor.circularFingerprintSize))) {
                 LOGGER.log(Level.WARNING, () -> "Failed to add CircularFingerprinter FCFP6 instance to pool. This should not happen.");
                 success = false;
             }
@@ -1535,9 +1522,7 @@ public enum Descriptor {
 
         return success;
     }
-    //</editor-fold>
 
-    //<editor-fold desc="Public static methods">
     /**
      * Returns all available descriptors.
      *
@@ -1594,7 +1579,8 @@ public enum Descriptor {
                 includeDescriptor = false;
             }
 
-            if (includeDescriptor) { // Only fast, safe, and non-fingerprint descriptors remain if all flags are false
+            // Only fast, safe, and non-fingerprint descriptors remain if all flags are false
+            if (includeDescriptor) {
                 result.add(descriptor);
             }
         }
@@ -1612,11 +1598,8 @@ public enum Descriptor {
     public static int getNumberOfComponents(
         Descriptor[] descriptors
     ) {
-        //<editor-fold desc="Checks">
+        // Checks
         if (descriptors == null) {
-            //TODO (just a note for Manuel, please remove after reading): many people do not declare NullPointerExceptions
-            // in the method head throws clause. Because it is a 'no brainer' that passing a null parameter will cause this.
-            // To appease John, we do it this way now. But in MORTAR, we do everything explicitly!
             throw new NullPointerException("Descriptor.getNumberOfComponents: descriptor is null.");
         }
         if (descriptors.length == 0) {
@@ -1627,7 +1610,6 @@ public enum Descriptor {
                 throw new NullPointerException("Descriptor.getNumberOfComponents: At least one descriptor in descriptors is null.");
             }
         }
-        //</editor-fold>
 
         int totalNumberOfComponents = 0;
         for (Descriptor descriptor : descriptors) {
@@ -1658,7 +1640,6 @@ public enum Descriptor {
      */
     public static int[] getDescriptorAndComponentIndex(Descriptor[] descriptors, int anIndex)
             throws IllegalArgumentException {
-        //TODO exchange the editor folds for checks by a comment like this everywhere for CDK integration
         // Checks
         if (descriptors == null) {
             throw new NullPointerException(
@@ -1730,9 +1711,6 @@ public enum Descriptor {
         };
     }
 
-    //TODO: again, we could return a bool here indicating whether the operation was successful. This way, you don't
-    // have to log the info and you could do the same with initializeFingerprintPools(), which would also solve the
-    // question there what to do if offer() returns false
     /**
      * Sets the pool size for fingerprinter instances and reinitialized all fingerprint pools.
      * The default pool size is 4, which should be sufficient for regular users.
@@ -1771,6 +1749,48 @@ public enum Descriptor {
     }
 
     /**
+     * Sets the size for circular fingerprints and reinitializes the corresponding pools.
+     * This method is thread-safe and will block until all pools are reinitialized.
+     * Any fingerprinter instances currently in use will be returned to the old pools
+     * and will eventually be garbage collected.
+     *
+     * @param aSize The new size for circular fingerprints (must be greater than 0)
+     * @return true if successful, false otherwise
+     * @throws IllegalArgumentException if aSize is less than or equal to 0
+     */
+    public static synchronized boolean setCircularFingerprintSize(int aSize) throws IllegalArgumentException {
+        if (aSize <= 0) {
+            throw new IllegalArgumentException("Descriptor.setCircularFingerprintSize: aSize must be greater than 0.");
+        }
+        try {
+            Descriptor.circularFingerprintSize = aSize;
+            Descriptor.CIRCULAR_FINGERPRINTER_ECFP_0.descriptorComponentNumber = aSize;
+            Descriptor.CIRCULAR_FINGERPRINTER_FCFP_0.descriptorComponentNumber = aSize;
+            Descriptor.CIRCULAR_FINGERPRINTER_ECFP_2.descriptorComponentNumber = aSize;
+            Descriptor.CIRCULAR_FINGERPRINTER_FCFP_2.descriptorComponentNumber = aSize;
+            Descriptor.CIRCULAR_FINGERPRINTER_ECFP_4.descriptorComponentNumber = aSize;
+            Descriptor.CIRCULAR_FINGERPRINTER_FCFP_4.descriptorComponentNumber = aSize;
+            Descriptor.CIRCULAR_FINGERPRINTER_ECFP_6.descriptorComponentNumber = aSize;
+            Descriptor.CIRCULAR_FINGERPRINTER_FCFP_6.descriptorComponentNumber = aSize;
+            Descriptor.initializeFingerprintPools();
+            return true;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e, () -> "Failed to set circular fingerprint size and reinitialize pools: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Returns the current size used for circular fingerprints.
+     *
+     * @return Current circular fingerprint size
+     */
+    public static synchronized int getCircularFingerprintSize() {
+        return Descriptor.circularFingerprintSize;
+    }
+
+
+    /**
      * Uses a specified aromaticity model to modify molecule.
      * The method performs a complete workflow of:
      * <ol>
@@ -1790,7 +1810,7 @@ public enum Descriptor {
             IAtomContainer molecule,
             ElectronDonation electronDonationModel
     ) throws CDKException {
-        //<editor-fold desc="Checks">
+        // Checks
         if (molecule == null) {
             throw new NullPointerException("Input molecule must not be null");
         }
@@ -1800,7 +1820,6 @@ public enum Descriptor {
         if (electronDonationModel == null) {
             throw new NullPointerException("Aromaticity model must not be null");
         }
-        //</editor-fold>
         AtomContainerManipulator.normalizeHydrogens(molecule, HydrogenState.Minimal);
         // Needed for VABC Descriptor and CDK_AtomTypes
         AtomContainerManipulator.percieveAtomTypesAndConfigureAtoms(molecule);
@@ -1947,7 +1966,6 @@ public enum Descriptor {
             Descriptor.LOGGER.log(Level.WARNING, String.format("Failed to calculate descriptor %s: %s", descriptor.getName(), e.getMessage()), e);
             return result;
         }
-
     }
 
 
@@ -1988,7 +2006,7 @@ public enum Descriptor {
             boolean isParallelCalculation,
             List<int[]> nanPositionsList
     ) throws IllegalArgumentException, InterruptedException {
-        //<editor-fold desc="Checks">
+        // Checks
         final String methodName = "setDescriptorsForMoleculesByMoleculeBatchParallelization";
         if (!Descriptor.validateDescriptors(descriptors, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
@@ -2004,7 +2022,6 @@ public enum Descriptor {
         Descriptor.validateNanPositionsList(nanPositionsList, methodName);
         // throws IllegalArgumentException if batch size is <= 0
         Descriptor.validateBatchSize(batchSize, methodName);
-        //</editor-fold>
 
         int numberOfMolecules = atomContainerArray.length;
         int numberOfBatches = (int) Math.ceil((double) numberOfMolecules / batchSize);
@@ -2111,7 +2128,7 @@ public enum Descriptor {
             boolean isParallelCalculation,
             List<int[]> nanPositionsList
     ) throws IllegalArgumentException, InterruptedException {
-        //<editor-fold desc="Checks">
+        // Checks
         final String methodName = "setDescriptorsForMoleculeBySmilesStringsBatchParallelization";
         if (!Descriptor.validateDescriptors(descriptors, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
@@ -2127,7 +2144,6 @@ public enum Descriptor {
         Descriptor.validateNanPositionsList(nanPositionsList, methodName);
         // throws IllegalArgumentException if batch size is <= 0
         Descriptor.validateBatchSize(batchSize, methodName);
-        //</editor-fold>
 
         int numberOfMolecules = moleculeSmilesStringArray.length;
         int numberOfBatches = (int) Math.ceil((double) numberOfMolecules / batchSize);
@@ -2229,7 +2245,7 @@ public enum Descriptor {
             boolean isParallelCalculation,
             List<int[]> nanPositionsList
     ) throws IllegalArgumentException, InterruptedException {
-        //<editor-fold desc="Checks">
+        // Checks
         final String methodName = "setDescriptorsForMoleculesByMoleculeParallelization";
         if (!Descriptor.validateDescriptors(descriptors, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
@@ -2243,7 +2259,6 @@ public enum Descriptor {
         Descriptor.validateMatrix(matrix, descriptors, atomContainerArray, startIndex, methodName);
         // throws NullPointerException if list is null
         Descriptor.validateNanPositionsList(nanPositionsList, methodName);
-        //</editor-fold>
 
         int[] startIndices = new int[descriptors.length];
         for (int i = 0; i < descriptors.length; i++) {
@@ -2345,7 +2360,7 @@ public enum Descriptor {
             boolean isParallelCalculation,
             List<int[]> nanPositionsList
     ) throws IllegalArgumentException, InterruptedException {
-        //<editor-fold desc="Checks">
+        // Checks
         final String methodName = "setDescriptorsForMoleculesBySmilesStringParallelization";
         if (!Descriptor.validateDescriptors(descriptors, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
@@ -2359,7 +2374,6 @@ public enum Descriptor {
         Descriptor.validateMatrix(matrix, descriptors, moleculeSmilesStringArray, startIndex, methodName);
         // throws NullPointerException if list is null
         Descriptor.validateNanPositionsList(nanPositionsList, methodName);
-        //</editor-fold>
 
         int numberOfMolecules = moleculeSmilesStringArray.length;
         int[] startIndices = new int[descriptors.length];
@@ -2454,7 +2468,7 @@ public enum Descriptor {
             boolean isParallelCalculation,
             List<int[]> nanPositionsList
     ) throws IllegalArgumentException {
-        //<editor-fold desc="Checks">
+        // Checks
         final String methodName = "setDescriptorsForMoleculesByMoleculeParallelizationNew";
         if (!Descriptor.validateDescriptors(descriptors, methodName)) {
             Descriptor.LOGGER.log(Level.WARNING, "{0} : Given descriptor array is empty, calculation aborted.", methodName);
@@ -2468,7 +2482,6 @@ public enum Descriptor {
         Descriptor.validateMatrix(matrix, descriptors, atomContainerArray, startIndex, methodName);
         // throws NullPointerException if list is null
         Descriptor.validateNanPositionsList(nanPositionsList, methodName);
-        //</editor-fold>
 
         int[] startIndices = new int[descriptors.length];
         for (int i = 0; i < descriptors.length; i++) {
@@ -2527,9 +2540,7 @@ public enum Descriptor {
             return false;
         }
     }
-    //</editor-fold>
 
-    //<editor-fold desc="Private static methods">
     /**
      * Sets calculated descriptor components in vector (that corresponds to atomContainer, a row in the data matrix)
      * at aStartIndices.
@@ -3057,12 +3068,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_ECFP_0:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP0, Descriptor.circularFingerprintSize).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception exception) {
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = Float.NaN;
                         }
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
@@ -3070,12 +3081,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_FCFP_0:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP0, Descriptor.circularFingerprintSize).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception exception) {
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = Float.NaN;
                         }
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
@@ -3083,12 +3094,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_ECFP_2:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP2, Descriptor.circularFingerprintSize).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception exception) {
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = Float.NaN;
                         }
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
@@ -3096,12 +3107,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_FCFP_2:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP2, Descriptor.circularFingerprintSize).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception exception) {
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = Float.NaN;
                         }
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
@@ -3109,12 +3120,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_ECFP_4:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP4, Descriptor.circularFingerprintSize).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception exception) {
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = Float.NaN;
                         }
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
@@ -3122,12 +3133,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_FCFP_4:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP4, Descriptor.circularFingerprintSize).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception exception) {
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = Float.NaN;
                         }
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
@@ -3135,12 +3146,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_ECFP_6:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_ECFP6, Descriptor.circularFingerprintSize).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception exception) {
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = Float.NaN;
                         }
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
@@ -3148,12 +3159,12 @@ public enum Descriptor {
                     break;
                 case CIRCULAR_FINGERPRINTER_FCFP_6:
                     try {
-                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE).getBitFingerprint(atomContainer);
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        IBitFingerprint fingerprint = new CircularFingerprinter(CircularFingerprinter.CLASS_FCFP6, Descriptor.circularFingerprintSize).getBitFingerprint(atomContainer);
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = fingerprint.get(i) ? 1.0f : 0.0f;
                         }
                     } catch (Exception exception) {
-                        for (int i = 0; i < Descriptor.CIRCULAR_FINGERPRINT_DEFAULT_SIZE; i++) {
+                        for (int i = 0; i < Descriptor.circularFingerprintSize; i++) {
                             vector[startIndex + i] = Float.NaN;
                         }
                         Descriptor.LOGGER.log(Level.WARNING, exception.toString(), exception);
@@ -3200,7 +3211,6 @@ public enum Descriptor {
         }
     }
 
-    //<editor-fold desc="Helper methods">
 
     //TODO: I would move this up to the other private, non-static calculate method (and not label this as a "helper method")
     //TODO: see my comment on calculate(), this method could as well return a boolean instead of throwing an exception (only the InterruptedException should still be thrown)
@@ -3287,7 +3297,6 @@ public enum Descriptor {
         return foundNaN;
     }
 
-    //<editor-fold desc="Validation Methods">
     /**
      * Validates descriptor array input. Throws NullPointerExceptions if the array or one of its elements is null.
      * Returns false if the array is empty.
@@ -3445,9 +3454,7 @@ public enum Descriptor {
             }
         }
     }
-    //</editor-fold>
 
-    //<editor-fold desc="Package private static molecule processing methods">
     //TODO: @Manuel, how well tested is this? Are we sure all relevant properties are copied?
     //TODO: have a look at SugarDetectionUtility and CircularFragmenter in CDK and how copying is done there; are there any relevant properties/fields missing here?
     /**
@@ -3462,11 +3469,10 @@ public enum Descriptor {
      */
     static IAtomContainer copyMolecule(IAtomContainer molecule)
             throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
-        //<editor-fold desc="Checks">
+        // Checks
         if (molecule == null) {
             throw new NullPointerException("Input molecule must not be null");
         }
-        //</editor-fold>
         try {
             // Create a new empty atom container with the same properties
             IAtomContainer moleculeCopy = molecule.getBuilder().newInstance(IAtomContainer.class);
@@ -3531,7 +3537,7 @@ public enum Descriptor {
     static IAtomContainer createMoleculeWithExplicitHydrogens(
             IAtomContainer molecule
     ) throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
-        //<editor-fold desc="Checks">
+        // Checks
         if (molecule == null) {
             throw new NullPointerException("Input molecule must not be null");
         }
@@ -3539,7 +3545,6 @@ public enum Descriptor {
             //returns empty atom container
             return Descriptor.copyMolecule(molecule);
         }
-        //</editor-fold>
         try {
             // Create a deep copy of the molecule first
             IAtomContainer moleculeCopy = Descriptor.copyMolecule(molecule);
@@ -3550,7 +3555,4 @@ public enum Descriptor {
             throw new CloneNotSupportedException("Could not create molecule with explicit hydrogens: " + exception.getMessage());
         }
     }
-    //</editor-fold>
-    //</editor-fold>
-    //</editor-fold>
 }
