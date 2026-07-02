@@ -366,6 +366,8 @@ class DescriptorTest {
         String smiles1 = "CC(=O)O"; //Acetic Acid CID: 176
         String smiles2 = "O=N(=O)c1cccc2cn[nH]c12"; // 7-Nitroindole CID: 1893
         SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer molecule1 = smilesParser.parseSmiles(smiles1);
+        IAtomContainer molecule2 = smilesParser.parseSmiles(smiles2);
 
         int startIndex = 0;
         Descriptor[] descriptors = new Descriptor[]{Descriptor.H_BOND_ACCEPTOR_COUNT};
@@ -389,13 +391,8 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model for the first molecule
-            IAtomContainer molecule1 = smilesParser.parseSmiles(smiles1);
             // Apply aromaticity with the current model to the first molecule
-            //TODO: setAromaticity clears all existing flags, right? In that case, we do not need a new instance for every iteration.
             Descriptor.setAromaticity(molecule1, model);
-            // Parse fresh molecule for each model for the second molecule
-            IAtomContainer molecule2 = smilesParser.parseSmiles(smiles2);
             // Apply aromaticity with the current model to the second molecule
             Descriptor.setAromaticity(molecule2, model);
 
@@ -446,9 +443,11 @@ class DescriptorTest {
      */
     @Test
     void test_H_BOND_DONOR_COUNT() throws Exception {
-        String smiles1 = "CC(=O)O"; //Acetic Acid CID: 176
-        String smiles2 = "Oc1ccccc1"; // Phenol CID: 996
         SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        String smiles1 = "CC(=O)O"; //Acetic Acid CID: 176
+        IAtomContainer molecule1 = smilesParser.parseSmiles(smiles1);
+        String smiles2 = "Oc1ccccc1"; // Phenol CID: 996
+        IAtomContainer molecule2 = smilesParser.parseSmiles(smiles2);
 
         int startIndex = 0;
         Descriptor[] descriptors = new Descriptor[]{Descriptor.H_BOND_DONOR_COUNT};
@@ -469,12 +468,8 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model for the first molecule TODO: see above
-            IAtomContainer molecule1 = smilesParser.parseSmiles(smiles1);
             // Apply aromaticity with the current model to the first molecule
             Descriptor.setAromaticity(molecule1, model);
-            // Parse fresh molecule for each model for the second molecule
-            IAtomContainer molecule2 = smilesParser.parseSmiles(smiles2);
             // Apply aromaticity with the current model to the second molecule
             Descriptor.setAromaticity(molecule2, model);
 
@@ -528,8 +523,10 @@ class DescriptorTest {
         SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         // 3-(dimethylamino)-3-(methyleneamino)propanenitrile (not in PubChem)
         String smiles1 = "C=NC(CC#N)N(C)C";
+        IAtomContainer molecule1 = smilesParser.parseSmiles(smiles1);
         // 1-Nitropropane CID: 7903
         String smiles2 = "CCCN(=O)=O";
+        IAtomContainer molecule2 = smilesParser.parseSmiles(smiles2);
 
         int startIndex = 0;
         Descriptor[] descriptors = new Descriptor[]{Descriptor.TPSA};
@@ -552,12 +549,8 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model for the first molecule TODO: see above
-            IAtomContainer molecule1 = smilesParser.parseSmiles(smiles1);
             // Apply aromaticity with the current model to the first molecule
             Descriptor.setAromaticity(molecule1, model);
-            // Parse fresh molecule for each model for the second molecule
-            IAtomContainer molecule2 = smilesParser.parseSmiles(smiles2);
             // Apply aromaticity with the current model to the second molecule
             Descriptor.setAromaticity(molecule2, model);
 
@@ -611,8 +604,10 @@ class DescriptorTest {
         SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         // 1-Phenylbutadiene CID: 137048
         String smiles1 = "C=CC=Cc1ccccc1";
+        IAtomContainer molecule1 = smilesParser.parseSmiles(smiles1);
         // 4-(4-(penta-2,4-dien-1-yl)benzyl)-3-vinylpyridine (not in PubChem)
         String smiles2 = "C=CC=CCc2ccc(Cc1ccncc1C=C)cc2";
+        IAtomContainer molecule2 = smilesParser.parseSmiles(smiles2);
 
         int startIndex = 0;
         Descriptor[] descriptors = new Descriptor[]{Descriptor.LARGEST_CHAIN};
@@ -634,12 +629,8 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model for the first molecule TODO see bove
-            IAtomContainer molecule1 = smilesParser.parseSmiles(smiles1);
             // Apply aromaticity with the current model to the first molecule
             Descriptor.setAromaticity(molecule1, model);
-            // Parse fresh molecule for each model for the second molecule
-            IAtomContainer molecule2 = smilesParser.parseSmiles(smiles2);
             // Apply aromaticity with the current model to the second molecule
             Descriptor.setAromaticity(molecule2, model);
 
@@ -693,8 +684,10 @@ class DescriptorTest {
         SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
         // Butylbenzene CID: 7705
         String smiles1 = "CCCCc1ccccc1";
+        IAtomContainer molecule1 = smilesParser.parseSmiles(smiles1);
         // 4-(4-tert-butylphenoxy)-N-(1,3-thiazol-2-yl)butanamide CID: 1565007
         String smiles2 = "CC(C)(C)c2ccc(OCCCC(=O)Nc1nccs1)cc2";
+        IAtomContainer molecule2 = smilesParser.parseSmiles(smiles2);
 
         int startIndex = 0;
         Descriptor[] descriptors = new Descriptor[]{Descriptor.LONGEST_ALIPHATIC_CHAIN};
@@ -715,12 +708,8 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model for the first molecule TODO see above
-            IAtomContainer molecule1 = smilesParser.parseSmiles(smiles1);
             // Apply aromaticity with the current model to the first molecule
             Descriptor.setAromaticity(molecule1, model);
-            // Parse fresh molecule for each model for the second molecule
-            IAtomContainer molecule2 = smilesParser.parseSmiles(smiles2);
             // Apply aromaticity with the current model to the second molecule
             Descriptor.setAromaticity(molecule2, model);
 
@@ -1072,6 +1061,7 @@ class DescriptorTest {
         // 3-(4-(2-(1-ethoxybutoxy)-1-(naphthalen-1-yl)ethyl)-2-((hexahydropyrimidin-5-yl)methyl)cyclohexyl)propan-1-ol (not in PubChem)
         String smiles = "CCCC(OCC)OCC(c1cccc2ccccc12)C4CCC(CCCO)C(CC3CNCNC3)C4";
         SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer molecule = smilesParser.parseSmiles(smiles);
 
         int startIndex = 0;
         Descriptor[] descriptors = new Descriptor[]{Descriptor.RULE_OF_FIVE};
@@ -1091,8 +1081,6 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model TODO: again, necessary?
-            IAtomContainer molecule = smilesParser.parseSmiles(smiles);
             // Apply aromaticity with the current model
             Descriptor.setAromaticity(molecule, model);
 
@@ -1143,6 +1131,7 @@ class DescriptorTest {
     void test_AROMATIC_ATOMS_COUNT() throws Exception {
         String smiles = "c1ccccc1"; // Benzene CID: 241
         SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer molecule = smilesParser.parseSmiles(smiles);
 
         int startIndex = 0;
         Descriptor[] descriptors = new Descriptor[]{Descriptor.AROMATIC_ATOMS_COUNT};
@@ -1163,8 +1152,6 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model TODO see above
-            IAtomContainer molecule = smilesParser.parseSmiles(smiles);
             // Apply aromaticity with the current model
             Descriptor.setAromaticity(molecule, model);
 
@@ -1215,6 +1202,7 @@ class DescriptorTest {
     void test_AROMATIC_BONDS_COUNT() throws Exception {
         String smiles = "c1ccccc1"; // Benzene CID: 241
         SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer molecule = smilesParser.parseSmiles(smiles);
 
         int startIndex = 0;
         Descriptor[] descriptors = new Descriptor[]{Descriptor.AROMATIC_BONDS_COUNT};
@@ -1234,8 +1222,6 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model TODO see above
-            IAtomContainer molecule = smilesParser.parseSmiles(smiles);
             // Apply aromaticity with the current model
             Descriptor.setAromaticity(molecule, model);
 
@@ -2724,6 +2710,7 @@ class DescriptorTest {
         // 5,14-Pentacenedione CID: 10686237
         String smiles = "O=C1c2ccccc2C(=O)c2cc3cc4ccccc4cc3cc21";
         SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer molecule = smilesParser.parseSmiles(smiles);
 
         int startIndex = 0;
         Descriptor[] descriptors = new Descriptor[]{Descriptor.SMALL_RING};
@@ -2748,9 +2735,6 @@ class DescriptorTest {
         };
 
         for (ElectronDonation model : models) {
-            // Parse fresh molecule for each model TODO see above
-            IAtomContainer molecule = smilesParser.parseSmiles(smiles);
-
             // Apply aromaticity with the current model
             Descriptor.setAromaticity(molecule, model);
 
