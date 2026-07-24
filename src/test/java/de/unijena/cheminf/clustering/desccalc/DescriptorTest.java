@@ -229,7 +229,6 @@ class DescriptorTest {
         Assertions.assertEquals(expectedWienerPolarity, matrix[0][1]);
     }
 
-    //TODO: the CDK definitely needs a heavy atom count descriptor or a way to configure this descriptor to only count heavy atoms. Let's discuss how to best realise this.
     /**
      * Test method for descriptor ATOM_COUNT.
      *
@@ -245,6 +244,60 @@ class DescriptorTest {
         Descriptor[] descriptors = new Descriptor[]{Descriptor.ATOM_COUNT};
         boolean isParallelCalculation = false;
         float expected = 8.0f; // Acetic acid has 8 atoms (implicit Hs included)
+
+        Assertions.assertEquals(1, Descriptor.getNumberOfComponents(descriptors));
+
+        float[][] matrix = new float[][]
+                {
+                        {0f}
+                };
+
+        List<int[]> nanPositions = Collections.synchronizedList(new LinkedList<>());
+        Assertions.assertTrue(
+                DescriptorTest.setDescriptorsForMoleculesByMoleculeParallelizationNew(
+                        descriptors,
+                        moleculesArray,
+                        matrix,
+                        startIndex,
+                        isParallelCalculation,
+                        nanPositions
+                )
+        );
+        Assertions.assertEquals(expected, matrix[0][0]);
+
+        matrix = new float[][]
+                {
+                        {0f}
+                };
+        nanPositions = Collections.synchronizedList(new LinkedList<>());
+        Assertions.assertTrue(
+                Descriptor.setDescriptorsForMoleculesByMoleculeParallelization(
+                        descriptors,
+                        moleculesArray,
+                        matrix,
+                        startIndex,
+                        isParallelCalculation,
+                        nanPositions
+                )
+        );
+        Assertions.assertEquals(expected, matrix[0][0]);
+    }
+
+    /**
+     * Test method for descriptor ATOM_COUNT_HEAVY.
+     *
+     * @throws Exception if anything goes wrong
+     */
+    @Test
+    void test_ATOM_COUNT_HEAVY() throws Exception {
+        String smiles = "CC(=O)O"; //Acetic Acid CID: 176
+        SmilesParser smilesParser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer molecule = smilesParser.parseSmiles(smiles);
+        IAtomContainer[] moleculesArray = new IAtomContainer[]{molecule};
+        int startIndex = 0;
+        Descriptor[] descriptors = new Descriptor[]{Descriptor.ATOM_COUNT_HEAVY};
+        boolean isParallelCalculation = false;
+        float expected = 4.0f; // Acetic acid has 4 heavy atoms
 
         Assertions.assertEquals(1, Descriptor.getNumberOfComponents(descriptors));
 
@@ -4194,6 +4247,12 @@ class DescriptorTest {
                     break;
                 case ATOM_COUNT:
                     vector[startIndex] = (float) ((IntegerResult) (new AtomCountDescriptor()).calculate(atomContainer).getValue()).intValue();
+                    break;
+                case ATOM_COUNT_HEAVY:
+                    AtomCountDescriptor atomCountHeavyDesc = new AtomCountDescriptor();
+                    //set parameter to count heavy atoms
+                    atomCountHeavyDesc.setParameters(new String[]{"#"});
+                    vector[startIndex] = (float) ((IntegerResult) atomCountHeavyDesc.calculate(atomContainer).getValue()).intValue();
                     break;
                 case ATOM_COUNT_C:
                     AtomCountDescriptor atomCountCDesc = new AtomCountDescriptor();

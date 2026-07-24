@@ -344,6 +344,12 @@ public enum Descriptor {
      */
     ATOM_COUNT(true, true, false, false, 1, "Atom Count"),
     /**
+     * Atom count heavy, counts the number of all heavy atoms in the given molecule.
+     *
+     * @see AtomCountDescriptor
+     */
+    ATOM_COUNT_HEAVY(true, true, false, false, 1, "Atom Count"),
+    /**
      * Atom count C, counts the number of all carbon atoms separately in the given molecule.
      *
      * @see AtomCountDescriptor
@@ -1195,6 +1201,11 @@ public enum Descriptor {
 
             // ATOM_COUNT
             Descriptor.descriptorToCdkObjectMap.put(Descriptor.ATOM_COUNT, new AtomCountDescriptor());
+
+            // ATOM_COUNT_HEAVY
+            AtomCountDescriptor atomCountHeavyDescriptor = new AtomCountDescriptor();
+            atomCountHeavyDescriptor.setParameters(new Object[] {"#"}); // set heavy atom count
+            Descriptor.descriptorToCdkObjectMap.put(Descriptor.ATOM_COUNT_HEAVY, atomCountHeavyDescriptor);
 
             // ATOM_COUNT_C
             AtomCountDescriptor atomCountCDescriptor = new AtomCountDescriptor();
@@ -2849,8 +2860,8 @@ public enum Descriptor {
             // Explicit original -> copy maps; used for bonds, stereo elements, electrons and lone pairs.
             int atomCapacity = Math.max(16, (int) (molecule.getAtomCount() / 0.75f) + 1);
             int bondCapacity = Math.max(16, (int) (molecule.getBondCount() / 0.75f) + 1);
-            Map<IAtom, IAtom> atomMap = HashMap.newHashMap(atomCapacity);
-            Map<IBond, IBond> bondMap = HashMap.newHashMap(bondCapacity);
+            Map<IAtom, IAtom> atomMap = new HashMap<>(atomCapacity);
+            Map<IBond, IBond> bondMap = new HashMap<>(bondCapacity);
 
             // ---- Atoms ----
             for (IAtom atom : molecule.atoms()) {
