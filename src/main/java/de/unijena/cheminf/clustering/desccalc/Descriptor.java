@@ -37,6 +37,8 @@ import org.openscience.cdk.graph.Cycles;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.ISingleElectron;
+import org.openscience.cdk.interfaces.IStereoElement;
 import org.openscience.cdk.qsar.IMolecularDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.ALOGPDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.APolDescriptor;
@@ -99,13 +101,18 @@ import org.openscience.cdk.tools.manipulator.HydrogenState;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
+
+import javax.vecmath.Point2d;
+import javax.vecmath.Point3d;
 
 //TODO: add a note on which descriptors are included here (all IMolecularDescriptor implementing classes except for
 // those that require 3D coordinates, correct? Actually, we could still add them along with a new field "requires3DCoordinates")
@@ -1524,6 +1531,51 @@ public enum Descriptor {
     }
 
     /**
+     * Sets fingerprint component values in vector.
+     *
+     * @param atomContainer Molecule (IS NOT CHANGED)
+     * @param vector Vector of molecule (row in data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
+     * @param startIndex Start index in vector to be filled with calculated components of descriptors
+     * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
+     * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
+     *                              fingerprinter instance from the pool; this is the root source of
+     *                              {@link InterruptedException} in this class — {@link BlockingQueue#take()}
+     *                              throws it if the thread is interrupted while blocked waiting for an
+     *                              available fingerprinter, or if it is already interrupted when called
+     */
+    private boolean calculateFingerprintFromPool(IAtomContainer atomContainer, float[] vector, int startIndex)
+            throws InterruptedException {
+        IFingerprinter fingerprinter = null;
+        boolean success;
+        try {
+            BlockingQueue<IFingerprinter> pool = Descriptor.fingerprintPoolMap.get(this);
+            // take() blocks until a fingerprinter is available in the pool; throws InterruptedException
+            // if the thread is interrupted while waiting (or already interrupted). InterruptedException is
+            // neither CDKException nor RuntimeException, so it is not caught below and propagates naturally.
+            fingerprinter = pool.take();
+
+            IBitFingerprint bitFingerprint = fingerprinter.getBitFingerprint(atomContainer);
+            for (int i = 0; i < this.getDescriptorComponentNumber(); i++) {
+                vector[startIndex + i] = bitFingerprint.get(i) ? 1.0f : 0.0f;
+            }
+            success = true;
+        } catch (CDKException | RuntimeException exception) {
+            LOGGER.log(Level.WARNING, exception, () -> "Failed to calculate: " + this.name());
+            return false;
+        } finally {
+            // Only return the fingerprinter if it was successfully taken from the pool.
+            // If take() threw InterruptedException, fingerprinter is still null and offer(null)
+            // would throw NullPointerException.
+            if (fingerprinter != null && !Descriptor.fingerprintPoolMap.get(this).offer(fingerprinter)){
+                LOGGER.log(Level.WARNING, () -> "Failed to return fingerprinter to pool: " + this.name());
+                success = false;
+            }
+
+        }
+        return success;
+    }
+
+    /**
      * Returns all available descriptors.
      *
      * @return All available descriptors
@@ -2596,53 +2648,6 @@ public enum Descriptor {
         }
     }
 
-    //TODO: I would move this up to the other private, non-static calculate method (and not label this as a "helper method")
-    //TODO: see my comment on calculate(), this method could as well return a boolean instead of throwing an exception (only the InterruptedException should still be thrown)
-    /**
-     * Sets fingerprint component values in vector.
-     *
-     * @param atomContainer Molecule (IS NOT CHANGED)
-     * @param vector Vector of molecule (row in data matrix) to be filled with calculated components of descriptors (MAY BE CHANGED)
-     * @param startIndex Start index in vector to be filled with calculated components of descriptors
-     * @return True: Operation was successful, no NaN values were generated; false: Operation failed, i.e. at least one component in a
-     * @throws InterruptedException if the current thread is interrupted while waiting to acquire a
-     *                              fingerprinter instance from the pool; this is the root source of
-     *                              {@link InterruptedException} in this class — {@link BlockingQueue#take()}
-     *                              throws it if the thread is interrupted while blocked waiting for an
-     *                              available fingerprinter, or if it is already interrupted when called
-     */
-    private boolean calculateFingerprintFromPool(IAtomContainer atomContainer, float[] vector, int startIndex)
-            throws InterruptedException {
-        IFingerprinter fingerprinter = null;
-        boolean success;
-        try {
-            BlockingQueue<IFingerprinter> pool = Descriptor.fingerprintPoolMap.get(this);
-            // take() blocks until a fingerprinter is available in the pool; throws InterruptedException
-            // if the thread is interrupted while waiting (or already interrupted). InterruptedException is
-            // neither CDKException nor RuntimeException, so it is not caught below and propagates naturally.
-            fingerprinter = pool.take();
-
-            IBitFingerprint bitFingerprint = fingerprinter.getBitFingerprint(atomContainer);
-            for (int i = 0; i < this.getDescriptorComponentNumber(); i++) {
-                vector[startIndex + i] = bitFingerprint.get(i) ? 1.0f : 0.0f;
-            }
-            success = true;
-        } catch (CDKException | RuntimeException exception) {
-            LOGGER.log(Level.WARNING, exception, () -> "Failed to calculate: " + this.name());
-            return false;
-        } finally {
-            // Only return the fingerprinter if it was successfully taken from the pool.
-            // If take() threw InterruptedException, fingerprinter is still null and offer(null)
-            // would throw NullPointerException.
-            if (fingerprinter != null && !Descriptor.fingerprintPoolMap.get(this).offer(fingerprinter)){
-                    LOGGER.log(Level.WARNING, () -> "Failed to return fingerprinter to pool: " + this.name());
-                    success = false;
-                }
-
-        }
-        return success;
-    }
-
     /**
      * Helper method to check for NaN values in a calculated descriptor result and track their positions.
      * This method is thread-safe when used with a synchronized LinkedList. Note that not the entire data vector is
@@ -2809,17 +2814,25 @@ public enum Descriptor {
         }
     }
 
-    //TODO: @Manuel, how well tested is this? Are we sure all relevant properties are copied?
-    //TODO: have a look at SugarDetectionUtility and CircularFragmenter in CDK and how copying is done there; are there any relevant properties/fields missing here?
     /**
      * Creates a deep copy of the input molecule.
-     * Note: This method is used to create a new molecule object
-     * without affecting implicit hydrogen atoms.
-     * Note: If necessary, atom types must be perceived and configured manually after creation.
+     * <p>
+     * Notes:
+     * <ul>
+     *     <li>The copy is built with the same {@link org.openscience.cdk.interfaces.IChemObjectBuilder}
+     *         as the input, using the in-container factory methods
+     *         {@code newAtom(int, int)} / {@code newBond(IAtom, IAtom, IBond.Order)} which are
+     *         faster than the dynamic {@code newInstance(...)} dispatch.</li>
+     *     <li>Implicit hydrogen counts are preserved exactly (including a possible {@code null}).</li>
+     *     <li>Bond endpoints are resolved through an explicit original-to-copy atom map, so no
+     *         assumption is made about identical atom indices in both containers.</li>
+     *     <li>If needed, atom types must be perceived and configured manually after creation.</li>
+     * </ul>
      *
      * @param molecule Source molecule to be copied (NOT MODIFIED)
-     * @return New instance of the molecule
-     * @throws CloneNotSupportedException If the molecule cannot be properly copied
+     * @return New independent instance of the molecule
+     * @throws NullPointerException     if {@code molecule} is {@code null}
+     * @throws CloneNotSupportedException if the molecule cannot be properly copied
      */
     static IAtomContainer copyMolecule(IAtomContainer molecule)
             throws NullPointerException, IllegalArgumentException, CloneNotSupportedException {
@@ -2828,53 +2841,85 @@ public enum Descriptor {
             throw new NullPointerException("Input molecule must not be null");
         }
         try {
-            // Create a new empty atom container with the same properties
             IAtomContainer moleculeCopy = molecule.getBuilder().newInstance(IAtomContainer.class);
-            if (molecule.isEmpty()) {
-                return moleculeCopy;
+            // Molecule-level properties and identifier
+            if (molecule.getProperties() != null) {
+                moleculeCopy.addProperties(new HashMap<>(molecule.getProperties()));
             }
-            // Copy atoms
+            // Explicit original -> copy maps; used for bonds, stereo elements, electrons and lone pairs.
+            int atomCapacity = Math.max(16, (int) (molecule.getAtomCount() / 0.75f) + 1);
+            int bondCapacity = Math.max(16, (int) (molecule.getBondCount() / 0.75f) + 1);
+            Map<IAtom, IAtom> atomMap = HashMap.newHashMap(atomCapacity);
+            Map<IBond, IBond> bondMap = HashMap.newHashMap(bondCapacity);
+
+            // ---- Atoms ----
             for (IAtom atom : molecule.atoms()) {
-                //TODO: copy.newAtom(element, implicitHCount) would be faster
-                IAtom newAtom = atom.getBuilder().newInstance(IAtom.class);
-                // Copy atom properties
+                Integer atomicNumber = atom.getAtomicNumber();
+                Integer implicitHCount = atom.getImplicitHydrogenCount();
+                // fast in-container creation (avoids reflective newInstance dispatch)
+                IAtom newAtom = moleculeCopy.newAtom(
+                        atomicNumber != null ? atomicNumber : 0,          // 0 == wildcard element
+                        implicitHCount != null ? implicitHCount : 0);
                 newAtom.setSymbol(atom.getSymbol());
-                newAtom.setAtomicNumber(atom.getAtomicNumber());
+                newAtom.setImplicitHydrogenCount(implicitHCount);         // preserves a possible null
                 newAtom.setMassNumber(atom.getMassNumber());
                 newAtom.setFormalCharge(atom.getFormalCharge());
-                newAtom.setImplicitHydrogenCount(atom.getImplicitHydrogenCount());
                 newAtom.setCharge(atom.getCharge());
-                // Copy atom flags
-                if (atom.isAromatic()) {
-                    newAtom.setIsAromatic(true);
+                newAtom.setValency(atom.getValency());
+                newAtom.setHybridization(atom.getHybridization());
+                newAtom.setAtomTypeName(atom.getAtomTypeName());
+                // Coordinates (needed for stereo perception / preservation)
+                Point2d p2d = atom.getPoint2d();
+                if (p2d != null) {
+                    newAtom.setPoint2d(new Point2d(p2d));
                 }
-                if (atom.isInRing()) {
-                    newAtom.setIsInRing(true);
+                Point3d p3d = atom.getPoint3d();
+                if (p3d != null) {
+                    newAtom.setPoint3d(new Point3d(p3d));
                 }
-                // Add atom to new container
-                moleculeCopy.addAtom(newAtom);
+                Point3d fp3d = atom.getFractionalPoint3d();
+                if (fp3d != null) {
+                    newAtom.setFractionalPoint3d(new Point3d(fp3d));
+                }
+                // Flags
+                newAtom.setIsAromatic(atom.isAromatic());
+                newAtom.setIsInRing(atom.isInRing());
+                // Full generic property map (carries the SRU unique atom index + detection markers)
+                if (atom.getProperties() != null) {
+                    newAtom.addProperties(new HashMap<>(atom.getProperties()));
+                }
+                atomMap.put(atom, newAtom);
             }
-            // Copy bonds
+
+            // ---- Bonds ----
             for (IBond bond : molecule.bonds()) {
-                //TODO: copy.newBond(begin, end, order) would be faster
-                IBond newBond = bond.getBuilder().newInstance(IBond.class);
-                // Get atoms for this bond in the new molecule
-                //TODO: this concerns me; you are assuming that the atoms in the copy have the same index as in the original; I don't know whether we can safely assume that.
-                IAtom atom1 = moleculeCopy.getAtom(molecule.indexOf(bond.getBegin()));
-                IAtom atom2 = moleculeCopy.getAtom(molecule.indexOf(bond.getEnd()));
-                // Set bond properties
-                newBond.setOrder(bond.getOrder());
-                newBond.setAtoms(new IAtom[]{atom1, atom2});
-                // Copy bond flags
-                if (bond.isAromatic()) {
-                    newBond.setIsAromatic(true);
+                IAtom beginCopy = atomMap.get(bond.getBegin());
+                IAtom endCopy = atomMap.get(bond.getEnd());
+                IBond newBond = moleculeCopy.newBond(beginCopy, endCopy, bond.getOrder());
+                newBond.setDisplay(bond.getDisplay());
+                newBond.setIsAromatic(bond.isAromatic());
+                newBond.setIsInRing(bond.isInRing());
+                if (bond.getProperties() != null) {
+                    newBond.addProperties(new HashMap<>(bond.getProperties()));
                 }
-                if (bond.isInRing()) {
-                    newBond.setIsInRing(true);
-                }
-                // Add bond to new container
-                moleculeCopy.addBond(newBond);
+                bondMap.put(bond, newBond);
             }
+
+            // ---- Single electrons ----
+            for (ISingleElectron singleElectron : molecule.singleElectrons()) {
+                ISingleElectron newSingleElectron = molecule.getBuilder().newInstance(
+                        ISingleElectron.class, atomMap.get(singleElectron.getAtom()));
+                if (singleElectron.getProperties() != null) {
+                    newSingleElectron.addProperties(new HashMap<>(singleElectron.getProperties()));
+                }
+                moleculeCopy.addSingleElectron(newSingleElectron);
+            }
+
+            // ---- Stereo elements (preserve stereochemistry, re-mapped onto the copy) ----
+            for (IStereoElement<?, ?> stereoElement : molecule.stereoElements()) {
+                moleculeCopy.addStereoElement(stereoElement.map(atomMap, bondMap));
+            }
+
             return moleculeCopy;
         } catch (Exception exception) {
             throw new CloneNotSupportedException("Could not clone molecule: " + exception.getMessage());

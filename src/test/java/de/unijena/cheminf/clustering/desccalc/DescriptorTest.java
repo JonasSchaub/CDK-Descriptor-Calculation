@@ -38,6 +38,8 @@ import org.openscience.cdk.fingerprint.MACCSFingerprinter;
 import org.openscience.cdk.fingerprint.PubchemFingerprinter;
 import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.interfaces.IBond;
+import org.openscience.cdk.interfaces.IStereoElement;
 import org.openscience.cdk.qsar.descriptors.molecular.ALOGPDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.APolDescriptor;
 import org.openscience.cdk.qsar.descriptors.molecular.AcidicGroupCountDescriptor;
@@ -101,6 +103,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.stream.IntStream;
+
+import javax.vecmath.Point2d;
+import javax.vecmath.Point3d;
 
 //TODO test descriptors for how they handle empty molecules and empty SMILES strings.
 /**
@@ -3779,6 +3784,7 @@ class DescriptorTest {
         // Check that the new molecule has the expected number of bonds (4 C-H bonds)
         Assertions.assertEquals(4, methaneExplicit.getBondCount(),
                 "Methane with explicit H should have 4 bonds");
+
         // Check count of hydrogens
         int hydrogenCount = 0;
         for (IAtom atom : methaneExplicit.atoms()) {
@@ -3806,7 +3812,7 @@ class DescriptorTest {
     }
 
     /**
-     * Test method for copyMolecule method. TODO: look at my comment on the copy method and extend the test accordingly.
+     * Test method for copyMolecule method.
      *
      * @throws Exception if anything goes wrong
      */
@@ -3840,6 +3846,66 @@ class DescriptorTest {
         // Verify the clone remains unchanged
         Assertions.assertEquals(7, benzene.getAtomCount(), "Modified original should have 7 atoms");
         Assertions.assertEquals(6, benzeneClone.getAtomCount(), "Clone should still have 6 atoms");
+    }
+
+    @Test
+    void copyPreservesGenericAtomAndBondProperties() throws Exception {
+        IAtomContainer original = SilentChemObjectBuilder.getInstance().newInstance(IAtomContainer.class);
+        IAtom a = original.newAtom(6, 3);
+        IAtom b = original.newAtom(6, 3);
+        a.setProperty("unique.atom.index", 0);
+        b.setProperty("unique.atom.index", 1);
+        IBond bond = original.newBond(a, b, IBond.Order.SINGLE);
+        bond.setProperty("custom.bond.flag", "keep");
+        original.setProperty("mol.title", "ethane");
+
+        IAtomContainer copy = Descriptor.copyMolecule(original);
+
+        Assertions.assertEquals(0, (int) copy.getAtom(0).getProperty("unique.atom.index"));
+        Assertions.assertEquals(1, (int) copy.getAtom(1).getProperty("unique.atom.index"));
+        Assertions.assertEquals("keep", copy.getBond(0).getProperty("custom.bond.flag"));
+        Assertions.assertEquals("ethane", copy.getProperty("mol.title"));
+        // Deep independence of the property map
+        copy.getAtom(0).setProperty("unique.atom.index", 999);
+        Assertions.assertEquals(0, (int) original.getAtom(0).getProperty("unique.atom.index"));
+    }
+
+    @Test
+    void copyPreservesCoordinatesAsNewInstances() throws Exception {
+        IAtomContainer original = SilentChemObjectBuilder.getInstance().newInstance(IAtomContainer.class);
+        IAtom a = original.newAtom(6, 4);
+        a.setPoint2d(new Point2d(1.5, -2.0));
+        a.setPoint3d(new Point3d(1.0, 2.0, 3.0));
+
+        IAtomContainer copy = Descriptor.copyMolecule(original);
+        IAtom c = copy.getAtom(0);
+
+        Assertions.assertEquals(a.getPoint2d(), c.getPoint2d(), "2D coordinates must match");
+        Assertions.assertEquals(a.getPoint3d(), c.getPoint3d(), "3D coordinates must match");
+        Assertions.assertNotSame(a.getPoint2d(), c.getPoint2d(), "2D point must be a new instance");
+        Assertions.assertNotSame(a.getPoint3d(), c.getPoint3d(), "3D point must be a new instance");
+    }
+
+    @Test
+    void copyPreservesStereochemistryOnCopiedAtoms() throws Exception {
+        SmilesParser parser = new SmilesParser(SilentChemObjectBuilder.getInstance());
+        IAtomContainer original = parser.parseSmiles("C[C@H](N)O"); // tetrahedral centre
+
+        IAtomContainer copy = Descriptor.copyMolecule(original);
+
+        int originalStereoCount = 0;
+        for (IStereoElement<?, ?> ignored : original.stereoElements()) {
+            originalStereoCount++;
+        }
+        int copyStereoCount = 0;
+        for (IStereoElement<?, ?> element : copy.stereoElements()) {
+            copyStereoCount++;
+            // Every atom referenced by the stereo element must live in the copy, not the original
+            Assertions.assertTrue(copy.contains((IAtom) element.getFocus()),
+                    "Stereo focus atom must belong to the copy");
+        }
+        Assertions.assertTrue(originalStereoCount > 0, "Test input must contain a stereo element");
+        Assertions.assertEquals(originalStereoCount, copyStereoCount, "Stereo element count must be preserved");
     }
 
     /**
