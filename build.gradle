@@ -44,9 +44,6 @@ version = '0.0.0.1'
 
 //Creates javadoc and sources jars
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
     withJavadocJar()
     withSourcesJar()
 }
@@ -63,7 +60,7 @@ repositories {
     maven { url = uri("https://central.sonatype.com/repository/maven-snapshots/") }
 }
 
-def cdkVersion = '2.12-SNAPSHOT'
+def cdkVersion = '2.13-SNAPSHOT'
 
 dependencies {
     implementation group: 'org.jetbrains', name : 'annotations', version: '23.0.0'
@@ -183,6 +180,12 @@ publishing {
                 }
 
                 developers {
+                    developer {
+                        id = 'ManuelSchauer'
+                        name = 'Manuel Schauer'
+                        email = 'manuel.schauer@studmail.w-hs.de'
+                        url = 'https://github.com/ManuelSchauer'
+                    }
                     developer {
                         id = 'JonasSchaub'
                         name = 'Jonas Schaub'
